@@ -1,0 +1,61 @@
+version: 0.2
+backend:
+  phases:
+    preBuild:
+      commands:
+        # install required Amplify CLI version and moreutils for "sponge" command
+        - npm i -g @aws-amplify/cli@7.6.15
+        - amazon-linux-extras install epel -y
+        - yum install -y moreutils jq
+
+    build:
+      commands:
+        # download variables of DCE TerraForm deployment
+        - aws s3 cp s3://$TERRAFORM_BUCKET/terraform.output .
+
+        # extract API URL and table names from TerraForm output file
+        - export DCE_API_GW=$(cat terraform.output | jq -r .api_url.value)
+        - export DCE_LEASES_TABLE=$(cat terraform.output | jq -r .leases_table_name.value)
+        - export DCE_ACCOUNTS_TABLE=$(cat terraform.output | jq -r .accounts_table_name.value)
+
+        # update Amplify parameter files to connect Amplify frontend with backend
+        - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeAdminApi/parameters.json
+        - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceAccountsTable = $var' --arg var $DCE_ACCOUNTS_TABLE | sponge amplify/backend/function/safeAdminApi/parameters.json
+        - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeOperatorApi/parameters.json
+        - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceLeasesTable = $var' --arg var $DCE_LEASES_TABLE | sponge amplify/backend/function/safeOperatorApi/parameters.json
+        - cat amplify/backend/function/safeLoginApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeLoginApi/parameters.json
+        - cat amplify/backend/custom/cfnAdminUser/parameters.json | jq '.adminUserEmailAddress = $var' --arg var $ADMIN_USER_EMAIL | sponge amplify/backend/custom/cfnAdminUser/parameters.json
+
+        # create empty Amplify backend config file and deploy Amplify project
+        - echo "{}" > amplify/team-provider-info.json
+        - amplifyPush --simple
+
+        # upload Amplify backend config file to S3 in case we want to connect local development
+        - aws s3 cp amplify/team-provider-info.json s3://$TERRAFORM_BUCKET/
+
+frontend:
+  phases:
+    preBuild:
+      commands:
+        # configure NodeJS build environment
+        - nvm use 12
+        - npm ci
+
+    build:
+      commands:
+        # build Amplify frontend
+        - npm run build
+
+    postBuild:
+      commands:
+        # upload Amplify frontend config file to S3 in case we want to connect local development
+        - aws s3 cp src/aws-exports.js s3://$TERRAFORM_BUCKET/
+        
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - $(npm root --global)/**/*

@@ -1,0 +1,47 @@
+regions:
+  - "global"
+  # DCE Principals roles are currently locked down
+  # to only access these two regions
+  # This significantly reduces the run time of nuke.
+{{range .Regions}}  - "{{.}}"
+{{end}}
+
+account-blacklist:
+  - "{{ .ParentAccountID}}" # Arbitrary production account id
+
+resource-types:
+  excludes:
+    - S3Object # Let the S3Bucket delete all Objects instead of individual objects (optimization)
+
+accounts:
+  "{{ .ID}}": # Child Account
+    filters:
+      IAMPolicy:
+        # DCE resources
+        - type: "contains"
+          value: "{{ .PrincipalPolicy}}"
+      IAMRole:
+        # DCE resources
+        - "{{ .AdminRole}}"
+        - "{{ .PrincipalRole}}"
+        # AWS Organizations resources
+        - type: "contains"
+          value: "OrganizationAccountAccessRole"
+      IAMRolePolicy:
+        # DCE resources
+        - type: "contains"
+          value: "{{ .AdminRole}}"
+        - type: "contains"
+          value: "{{ .PrincipalRole}}"
+        - type: "contains"
+          value: "{{ .PrincipalPolicy}}"
+        - property: RoleName
+          value: "OrganizationAccountAccessRole"
+      IAMRolePolicyAttachment:
+        # DCE resources
+        - "{{ .PrincipalRole}} -> {{ .PrincipalPolicy}}"
+        - property: RoleName
+          value: "{{ .AdminRole}}"
+        # AWS Organizations resources
+        - property: RoleName
+          value: "OrganizationAccountAccessRole"

@@ -1,0 +1,60 @@
+{
+  "name": "sandbox-accounts-for-events",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@aws-amplify/ui-components": "^1.6.0",
+    "@aws-amplify/ui-react": "^1.2.4",
+    "@awsui/components-react": "^3.0.384",
+    "@awsui/design-tokens": "^3.0.16",
+    "@awsui/global-styles": "^1.0.10",
+    "@awsui/test-utils-core": "^1.0.15",
+    "@reduxjs/toolkit": "^1.7.1",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@testing-library/user-event": "^12.8.3",
+    "aws-amplify": "^4.3.11",
+    "aws-amplify-react": "^5.0.4",
+    "aws-sdk": "^2.939.0",
+    "aws4": "^1.11.0",
+    "moment": "^2.29.2",
+    "nanoid": "^3.1.23",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-markdown": "^8.0.0",
+    "react-redux": "^7.2.6",
+    "react-router-dom": "^6.2.1",
+    "react-scripts": "^5.0.0",
+    "redux": "^4.1.2",
+    "redux-thunk": "^2.4.1",
+    "sass": "^1.45.1",
+    "web-vitals": "^1.1.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "react-error-overlay": "6.0.9"
+  }
+}

@@ -1,0 +1,62 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      golang: 1.13
+
+    commands:
+      # Download and install TerraForm 1.2.1
+      - wget https://releases.hashicorp.com/terraform/1.2.1/terraform_1.2.1_linux_amd64.zip
+      - unzip terraform_1.2.1_linux_amd64.zip -d /usr/bin/
+
+  pre_build:
+    commands:
+      # Download original DCE(TM) project from GitHub
+      - git clone https://github.com/Optum/dce.git
+
+      # Update/overwrite some files with "Sandbox Accounts for Events"-specific versions:
+      # Let AWS Nuke ignore/skip deletion of OrganizationAccountAccess role
+      - cp dce-integration/cmd/codebuild/reset/default-nuke-config-template.yml dce/cmd/codebuild/reset/default-nuke-config-template.yml
+
+      # Use customized buildspec file for AWS Nuke that includes pre-, fix- and post-build scripts to catch some edge cases & copy scripts
+      - cp dce-integration/cmd/codebuild/reset/buildspec.yml dce/cmd/codebuild/reset/buildspec.yml
+      - cp dce-integration/cmd/codebuild/reset/pre-cleanup.sh dce/cmd/codebuild/reset/pre-cleanup.sh
+      - cp dce-integration/cmd/codebuild/reset/fix-cleanup.sh dce/cmd/codebuild/reset/fix-cleanup.sh
+      - cp dce-integration/cmd/codebuild/reset/post-cleanup.sh dce/cmd/codebuild/reset/post-cleanup.sh
+
+      # Set "Sandbox Accounts for Events"-specific config for TerraForm variables
+      - cp dce-integration/modules/dce.tfvars dce/modules/
+
+      # Use updated Makefile and TerraForm main.tf to allow TerraForm version 1.2.1
+      - cp dce-integration/Makefile dce/Makefile
+      - cp dce-integration/modules/main.tf dce/modules/main.tf
+
+      # Use improved TerraForm file for DynamoDB deployment to allow on-demand instead of provisioned capacity
+      - cp dce-integration/modules/dynamodb.tf dce/modules/dynamodb.tf
+
+      # Use improved deployment script that waits for Lambda deployment to be in ready state before uploading code
+      - cp dce-integration/scripts/deploy.sh dce/scripts/deploy.sh
+
+      # Use improved build script that includes pre-, fix- and post-build scripts into AWS Nuke build artifact 
+      - cp dce-integration/scripts/build.sh dce/scripts/build.sh
+
+      # Use improved IAM policy template for principal to avoid conflicts between policy and SCPs 
+      - cp dce-integration/modules/fixtures/policies/principal_policy.tmpl dce/modules/fixtures/policies/principal_policy.tmpl
+
+  build:
+    commands:
+      # Build and deploy backend resources via TerraForm
+      - cd dce/modules
+      - terraform init
+      - terraform apply -var-file dce.tfvars -auto-approve || (terraform destroy -auto-approve && false)
+
+      # Save TerraForm state and outputs to dedicated S3 bucket for later use 
+      - zip -r terraform.state.zip *
+      - aws s3 cp terraform.state.zip s3://$TERRAFORM_BUCKET/ || (terraform destroy -auto-approve && false)
+      - terraform output -json > terraform.output
+      - aws s3 cp terraform.output s3://$TERRAFORM_BUCKET/
+
+      # Build & deploy code artifacts
+      - cd ..
+      - make deploy

@@ -1,0 +1,105 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DoNotModifySelf",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:GetPolicy",
+        "iam:GetPolicyVersion",
+        "iam:GetRole",
+        "iam:GetRolePolicy",
+        "iam:ListRoles",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:ListRoleTags",
+        "iam:ListPoliciesGrantingServiceAccess",
+        "iam:ListEntitiesForPolicy",
+        "iam:ListPolicyVersions",
+        "iam:GenerateServiceLastAccessedDetails"
+      ],
+      "Resource": [
+        "{{.PrincipalPolicyArn}}",
+        "{{.PrincipalRoleArn}}",
+        "{{.AdminRoleArn}}"
+      ]
+    },
+    {
+      "Sid": "DenyTaggedResourcesAWS",
+      "Effect": "Deny",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/AppName": [
+            "{{ StringsJoin .PrincipalIAMDenyTags "\", \""}}"
+          ]
+        }
+      }
+    },
+    {
+      "Sid": "DenyIAM",
+      "Effect": "Deny",
+      "Action": [
+        "iam:DeactivateMFADevice",
+        "iam:CreateSAMLProvider",
+        "iam:UpdateAccountPasswordPolicy",
+        "iam:DeleteVirtualMFADevice",
+        "iam:EnableMFADevice",
+        "iam:CreateAccountAlias",
+        "iam:DeleteAccountAlias",
+        "iam:UpdateSAMLProvider",
+        "iam:DeleteSAMLProvider"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyCUR",
+      "Effect": "Deny",
+      "Action": [
+        "aws-portal:ViewBilling",
+        "aws-portal:ViewAccount",
+        "ce:*",
+        "cur:*"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyContractCommitments",
+      "Effect": "Deny",
+      "Resource": "*",
+      "Action": [
+        "organizations:*",
+        "ec2:ModifyReservedInstances",
+        "dynamodb:PurchaseReservedCapacityOfferings",
+        "route53domains:TransferDomain",
+        "redshift:PurchaseReservedNodeOffering",
+        "ec2:PurchaseReservedInstancesOffering",
+        "savingsplans:*",
+        "ec2:PurchaseHostReservation",
+        "rds:PurchaseReservedDBInstancesOffering",
+        "ec2:CreateCapacityReservation",
+        "ec2:PurchaseScheduledInstances",
+        "ec2:CreateReservedInstancesListing",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "route53domains:RegisterDomain",
+        "ec2:AcceptReservedInstancesExchangeQuote",
+        "s3:PutBucketObjectLockConfiguration"
+      ]
+    },    
+    {
+      "Sid": "AllowedRestButBlockBySCP",
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": [
+            {{$first := true}}{{range .Regions}}{{if $first}}{{$first = false}}{{else}},{{end}}"{{.}}"{{end}}
+          ]
+        }
+      }
+    }
+  ]
+}

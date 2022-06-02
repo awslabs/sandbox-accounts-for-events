@@ -1,0 +1,13 @@
+{
+  "lambdaLayers": [],
+  "environmentVariableList": [
+    {
+      "cloudFormationParameterName": "dceApiGw",
+      "environmentVariableName": "DCE_API_GW"
+    },
+    {
+      "cloudFormationParameterName": "dceAccountsTable",
+      "environmentVariableName": "DCE_ACCOUNTS_TABLE"
+    }
+  ]
+}

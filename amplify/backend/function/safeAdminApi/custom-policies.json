@@ -1,0 +1,24 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": [
+        "execute-api:Invoke",
+        "execute-api:ManageConnections"
+    ],
+    "Resource": ["arn:aws:execute-api:*:*:*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "sts:AssumeRole"
+    ],
+    "Resource": ["arn:aws:iam::*:role/*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "dynamodb:UpdateItem"
+    ],
+    "Resource": ["arn:aws:dynamodb:*:*:table/*"]
+  }
+]

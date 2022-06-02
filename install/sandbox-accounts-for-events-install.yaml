@@ -1,0 +1,327 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  AdminUserEmailInput:
+    Type: String
+    Description: Email address of admin user for Sandbox Accounts for Events
+    AllowedPattern: '[^\s@]+@[^\s@]+\.[^\s@]+'
+    ConstraintDescription: Please enter a valid email address.
+  RepositoryBucket:
+    Type: String
+    Description: Repository Bucket
+    Default: dcerepo
+  AmplifyEnvironment:
+    Type: String
+    Description: "Environment name for Sandbox Accounts for Events webapp. Keep 'main' unless advised otherwise."
+    Default: main
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Sandbox Accounts for Events Administration"
+        Parameters:
+          - AdminUserEmailInput
+      - Label:
+          default: "Source code repository"
+        Parameters:
+          - RepositoryBucket
+      - Label:
+          default: "Sandbox Accounts for Events backend configuration"
+        Parameters:
+          - AmplifyEnvironment
+    ParameterLabels:
+      AdminUserEmailInput:
+        default: "Admin email address for inital access to Sandbox Accounts for Events"
+      RepositoryBucket:
+        default: "S3 bucket that holds required source zip files"
+      AmplifyEnvironment:
+        default: "Name of Amplify environment"
+
+#################
+# DCE TERRAFORM #
+#################
+
+Resources:
+
+  DceTerraformStateBucket:
+    Type: AWS::S3::Bucket
+    Properties: 
+      BucketName: 
+        !Sub
+          - 'dce-terraform-state-${RandomGUID}'
+          - { RandomGUID: !Select [0, !Split ["-", !Select [2, !Split ["/", !Ref AWS::StackId ]]]] }
+
+  DceDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref DceCodeBuildRole
+      Name: DeployDce
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_MEDIUM
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        EnvironmentVariables:
+          - Name: TERRAFORM_BUCKET
+            Value: !Ref DceTerraformStateBucket
+      Source:
+        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
+        Type: S3
+        BuildSpec: dce-integration/buildspec-deploy.yaml
+      TimeoutInMinutes: 20
+
+  DceDestroyProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref DceCodeBuildRole
+      Name: DestroyDce
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_MEDIUM
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        EnvironmentVariables:
+          - Name: TERRAFORM_BUCKET
+            Value: !Ref DceTerraformStateBucket
+      Source:
+        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
+        Type: S3
+        BuildSpec: dce-integration/buildspec-destroy.yaml
+      TimeoutInMinutes: 20
+
+  DceCodeBuildRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  DceTriggerCodeBuildLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref RepositoryBucket
+        S3Key: sandbox-accounts-for-events-lambda-terraform.zip
+      Handler: index.handler
+      Role: !GetAtt DceTriggerCodeBuildLambdaRole.Arn
+      FunctionName: handleDceTerraFormDeployment
+      Description: "This function deploys or destroys all DCE backend infrastructure via Terraform and saves all necessary state information in S3."
+      Runtime: python3.7
+      Timeout: 900
+      Environment:
+        Variables:
+          DEPLOY_PROJECT: !Ref DceDeployProject
+          DESTROY_PROJECT: !Ref DceDestroyProject
+
+  DceTriggerCodeBuildLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: Provides permissions for internally-invoked Lambda resources
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CodeBuildPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codebuild:*
+                Resource:
+                  - !GetAtt DceDeployProject.Arn
+                  - !GetAtt DceDestroyProject.Arn
+
+  DceCodeBuildTerraformDeployment:
+    Type: Custom::DceCodeBuildTerraformDeployment
+    DependsOn: DceDeployProject
+    Properties:
+      ServiceToken: !GetAtt DceTriggerCodeBuildLambda.Arn
+      Region: !Ref "AWS::Region"
+
+  ##################
+  # AMPLIFY APP UI #
+  ##################
+
+  AppUiAmplifyRole:
+    Type: AWS::IAM::Role
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - amplify.amazonaws.com
+                - cloudformation.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+
+  AppUiAmplifyApp:
+    Type: AWS::Amplify::App
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      Name: Sandbox-Accounts-for-Events-UI
+      Repository: !GetAtt AppUiAmplifyRepository.CloneUrlHttp
+      EnvironmentVariables:
+        - Name: ADMIN_USER_EMAIL
+          Value: !Ref AdminUserEmailInput
+        - Name: TERRAFORM_BUCKET
+          Value: !Ref DceTerraformStateBucket
+      IAMServiceRole: !GetAtt AppUiAmplifyRole.Arn
+
+  AppUiAmplifyBranch:
+    Type: AWS::Amplify::Branch
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      BranchName: !Ref AmplifyEnvironment
+      AppId: !GetAtt AppUiAmplifyApp.AppId
+      EnableAutoBuild: yes
+
+  AppUiAmplifyRepository:
+    Type: AWS::CodeCommit::Repository
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      RepositoryName: Sandbox-Accounts-for-Events
+      RepositoryDescription: Amplify-based UI frontend for Sandbox-Accounts-for-Events
+      Code:
+        BranchName: !Ref AmplifyEnvironment
+        S3:
+          Bucket: !Ref RepositoryBucket
+          Key: sandbox-accounts-for-events.zip
+
+  AppUiTriggerAmplifyDeploymentLambda:
+    Type: AWS::Lambda::Function
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      Code:
+        S3Bucket: !Ref RepositoryBucket
+        S3Key: sandbox-accounts-for-events-lambda-amplify.zip
+      Handler: index.handler
+      Role: !GetAtt AppUiTriggerAmplifyDeploymentRole.Arn
+      Runtime: python3.7
+      FunctionName: handleAmplifyDeployment
+      Description: "This function deploys or destroys all Sandbox Accounts for Events web app infrastructure via AWS Amplify."
+      Timeout: 900
+      Environment:
+        Variables:
+          AMPLIFY_REPO: !GetAtt AppUiAmplifyRepository.Name
+          AMPLIFY_BRANCH: !GetAtt AppUiAmplifyBranch.BranchName
+          AMPLIFY_APP_ID: !GetAtt AppUiAmplifyApp.AppId
+          AMPLIFY_ENV: !Ref AmplifyEnvironment
+          DELETE_ROLE_ARN: !GetAtt AppUiAmplifyRole.Arn
+
+  AppUiTriggerAmplifyDeploymentRole:
+    Type: AWS::IAM::Role
+    DependsOn: DceCodeBuildTerraformDeployment
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Description: Provides permissions for internally-invoked Lambda resources
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: CodeCommitPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - codecommit:GetBranch
+                  - codecommit:CreateCommit
+                Resource: !GetAtt AppUiAmplifyRepository.Arn
+        - PolicyName: AmplifyDeletePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - amplify:GetBackendEnvironment
+                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/backendenvironments/${AmplifyEnvironment}
+        - PolicyName: AmplifyBackendDeletePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - amplifybackend:RemoveAllBackends
+                Resource: !Sub arn:aws:amplifybackend:${AWS::Region}:${AWS::AccountId}:/backend/${AppUiAmplifyApp.AppId}/remove/*
+        - PolicyName: AmplifyJobsPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - amplify:ListJobs
+                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/branches/${AppUiAmplifyBranch.BranchName}/jobs/*
+        - PolicyName: CloudFormationPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:DeleteStack
+                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*/*
+        - PolicyName: PassRolePolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:GetRole
+                  - iam:PassRole
+                Resource: !GetAtt AppUiAmplifyRole.Arn
+        - PolicyName: S3Policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource:
+                  - !Sub arn:aws:s3:::amplify-*
+                  - !Sub arn:aws:s3:::amplify-*/*
+
+  AppUiAmplifyDeployment:
+    Type: Custom::AppUiAmplifyDeployment
+    DependsOn:
+      - DceCodeBuildTerraformDeployment
+      - AppUiAmplifyApp
+    Properties:
+      ServiceToken: !GetAtt AppUiTriggerAmplifyDeploymentLambda.Arn
+      Region: !Ref "AWS::Region"
+
+Outputs:
+  AmplifyDomainOutput:
+    Value: !Sub https://${AmplifyEnvironment}.${AppUiAmplifyApp.DefaultDomain}
+  AdminUserEmailOutput:
+    Value: !Ref AdminUserEmailInput

@@ -1,0 +1,16 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
+      - unzip terraform_0.12.31_linux_amd64.zip -d /usr/bin
+  pre_build:
+    commands:
+      - chmod +x dce-integration/scripts/terraform-rollback.sh
+      - aws s3 cp s3://$TERRAFORM_BUCKET/team-provider-info.json .
+      - export AMPLIFY_BUCKET=$(cat team-provider-info.json | jq -r '.main.categories.function.safeAdminApi.deploymentBucketName')
+  build:
+    commands:
+      - dce-integration/scripts/terraform-rollback.sh
+      - aws s3 rm s3://$AMPLIFY_BUCKET/ --recursive || true

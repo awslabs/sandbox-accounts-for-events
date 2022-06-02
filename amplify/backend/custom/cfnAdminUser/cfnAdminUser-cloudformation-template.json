@@ -1,0 +1,111 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "adminUserEmailAddress": {
+      "Type": "String",
+      "Description": "Email address of initial admin user for Sandbox Accounts for Events"
+    },
+    "authsafeafe5208fIdentityPoolId": {
+      "Type": "String",
+      "Description": "Input parameter describing IdentityPoolId attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fIdentityPoolName": {
+      "Type": "String",
+      "Description": "Input parameter describing IdentityPoolName attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fUserPoolId": {
+      "Type": "String",
+      "Description": "Input parameter describing UserPoolId attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fUserPoolArn": {
+      "Type": "String",
+      "Description": "Input parameter describing UserPoolArn attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fUserPoolName": {
+      "Type": "String",
+      "Description": "Input parameter describing UserPoolName attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fAppClientIDWeb": {
+      "Type": "String",
+      "Description": "Input parameter describing AppClientIDWeb attribute for auth/safeafe5208f resource"
+    },
+    "authsafeafe5208fAppClientID": {
+      "Type": "String",
+      "Description": "Input parameter describing AppClientID attribute for auth/safeafe5208f resource"
+    },
+    "authuserPoolGroupsadminGroupRole": {
+      "Type": "String",
+      "Description": "Input parameter describing adminGroupRole attribute for auth/userPoolGroups resource"
+    },
+    "authuserPoolGroupsoperatorGroupRole": {
+      "Type": "String",
+      "Description": "Input parameter describing operatorGroupRole attribute for auth/userPoolGroups resource"
+    }
+  },
+  "Resources": {
+    "adminUser": {
+      "Type": "AWS::Cognito::UserPoolUser",
+      "Properties": {
+        "DesiredDeliveryMediums": [
+          "EMAIL"
+        ],
+        "UserAttributes": [
+          {
+            "Name": "email",
+            "Value": {
+              "Ref": "adminUserEmailAddress"
+            }
+          },
+          {
+            "Name": "email_verified",
+            "Value": true
+          }
+        ],
+        "Username": {
+          "Ref": "adminUserEmailAddress"
+        },
+        "UserPoolId": {
+          "Ref": "authsafeafe5208fUserPoolId"
+        }
+      }
+    },
+    "adminUserGroupAttachment": {
+      "Type": "AWS::Cognito::UserPoolUserToGroupAttachment",
+      "DependsOn": "adminUser",
+      "Properties": {
+        "GroupName": "admin",
+        "Username": {
+          "Ref": "adminUserEmailAddress"
+        },
+        "UserPoolId": {
+          "Ref": "authsafeafe5208fUserPoolId"
+        }
+      }
+    },
+    "operatorUserGroupAttachment": {
+      "Type": "AWS::Cognito::UserPoolUserToGroupAttachment",
+      "DependsOn": "adminUser",
+      "Properties": {
+        "GroupName": "operator",
+        "Username": {
+          "Ref": "adminUserEmailAddress"
+        },
+        "UserPoolId": {
+          "Ref": "authsafeafe5208fUserPoolId"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "AdminUserEmailAddress": {
+      "Description": "Email address of initial admin user for Sandbox Accounts for Events (check your email inbox for initial password).",
+      "Value": {
+        "Ref": "adminUserEmailAddress"
+      }
+    }
+  },
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.6.15\",\"stackType\":\"custom-customCloudformation\",\"metadata\":{}}"
+}

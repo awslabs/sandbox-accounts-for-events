@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "safegraphql",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authsafeafe5208f",
+      "Outputs.UserPoolId"
+    ]
+  }
+}

@@ -1,0 +1,35 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Phase - install"
+
+      # make all scripts executable
+      - chmod +x reset
+      - chmod +x pre-cleanup.sh
+      - chmod +x fix-cleanup.sh
+      - chmod +x post-cleanup.sh
+
+  pre_build:
+    commands:
+      - echo "Phase - pre_build"
+
+  build:
+    commands:
+      - echo "Phase - Reset"
+
+      # Execute AWS Nuke scripts:
+      # 1. pre-cleanup.sh: This script is always executed *before* an AWS Nuke run.
+      # 2. fix-cleanup.sh: This script is executed after a AWS Nuke run failed, e.g. when AWS Nuke could not 
+      #                    dissolve dependencies properly. Use this script as a workaround to help AWS Nuke with manual
+      #                    cleanup steps between multiple runs. It will throw an error after execution to flag the
+      #                    unsuccessful execution of AWS Nuke before.
+      #                    This script will not be executed when AWS Nuke run succeeded
+      # 3. post-cleanup.sh: This script is executed *after* an AWS Nuke succeeded.
+      - ./pre-cleanup.sh
+      - (./reset && ./post-cleanup.sh) || (./fix-cleanup.sh && false)
+
+  post_build:
+    commands:
+      - echo "Phase - Post Reset"

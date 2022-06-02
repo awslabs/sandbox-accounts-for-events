@@ -1,0 +1,18 @@
+[
+  {
+    "Effect": "Allow",
+    "Action": [
+      "dynamodb:DeleteItem",
+      "dynamodb:UpdateItem"
+    ], 
+    "Resource": ["arn:aws:dynamodb:*:*:table/*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "execute-api:Invoke",
+        "execute-api:ManageConnections"
+    ],
+    "Resource": ["arn:aws:execute-api:*:*:*"]
+  }
+]

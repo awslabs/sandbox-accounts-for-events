@@ -1,0 +1,28 @@
+type Event @model @auth(rules: [
+  { allow: private, operations: [read] },
+  { allow: groups, groups: ["admin","operator"] }
+]) {
+  id: ID!
+  eventName: String
+  eventOn: Int
+  eventDays: Int
+  eventHours: Int
+  eventOwner: String
+  maxAccounts: Int
+  eventBudget: Int
+  eventStatus: String
+}
+
+type Config @model @auth(rules: [
+  { allow: private, operations: [read] },
+  { allow: groups, groups: ["admin"] }
+]) {
+  id: ID!
+  config: String
+}
+
+type Query {
+  safeLoginApi (action: String, paramJson: String): String @function(name: "safeLoginApi-${env}") 
+  safeAdminApi (action: String, paramJson: String): String @function(name: "safeAdminApi-${env}") @auth( rules: [{ allow: groups, groups: ["admin"] }])
+  safeOperatorApi (action: String, paramJson: String): String @function(name: "safeOperatorApi-${env}") @auth( rules: [{ allow: groups, groups: ["admin","operator"] }])
+}
