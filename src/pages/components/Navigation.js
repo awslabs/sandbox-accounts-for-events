@@ -45,7 +45,7 @@ const Navigation = () => {
 
     return (
         <SpaceBetween>
-            <SideNavigation activeHref={0} items={NavigationItems} />
+            <SideNavigation activeHref={0} items={NavigationItems}/>
         </SpaceBetween>
     );
 };

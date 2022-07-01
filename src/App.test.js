@@ -1,8 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen } from "@testing-library/react";
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders App with correct title and login dialog', async () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  expect(screen.getByRole("heading", { name:/sandbox accounts for events/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /create new account/i })).toBeInTheDocument();
+  expect(screen.getByRole("button", { name: /login to existing account/i })).toBeInTheDocument();
+
 });

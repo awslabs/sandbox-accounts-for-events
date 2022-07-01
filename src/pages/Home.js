@@ -3,7 +3,7 @@ import { AppLayout, Grid, Box, Header, HelpPanel, Button, Cards, SpaceBetween } 
 import { useSelector } from "react-redux";
 import Navigation from "./components/Navigation";
 import { appLayoutLabels, itemSelectionLabels } from "./components/labels";
-import "../styles/landing-page.scss";
+import "../styles/home-page.scss";
 import { AmplifyAuthenticator, AmplifySignIn, AmplifySignUp } from "@aws-amplify/ui-react";
 import { AuthState } from "@aws-amplify/ui-components";
 import EventLogin from "./components/EventLogin";

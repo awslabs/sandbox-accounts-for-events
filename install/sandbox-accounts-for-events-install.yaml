@@ -44,6 +44,15 @@ Metadata:
 
 Resources:
 
+  LoggingBucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
+      AccessControl: LogDeliveryWrite
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+
   DceTerraformStateBucket:
     Type: AWS::S3::Bucket
     Properties: 
@@ -51,6 +60,13 @@ Resources:
         !Sub
           - 'dce-terraform-state-${RandomGUID}'
           - { RandomGUID: !Select [0, !Split ["-", !Select [2, !Split ["/", !Ref AWS::StackId ]]]] }
+      BucketEncryption: 
+        ServerSideEncryptionConfiguration: 
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      LoggingConfiguration:
+        DestinationBucketName: !Ref LoggingBucket
+        LogFilePrefix: dce-terraform-logs
 
   DceDeployProject:
     Type: AWS::CodeBuild::Project
@@ -86,6 +102,8 @@ Resources:
         EnvironmentVariables:
           - Name: TERRAFORM_BUCKET
             Value: !Ref DceTerraformStateBucket
+          - Name: LOG_BUCKET
+            Value: !Ref LoggingBucket
       Source:
         Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
         Type: S3
@@ -145,7 +163,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - codebuild:*
+                  - codebuild:StartBuild
+                  - codebuild:ListBuildsForProject
+                  - codebuild:BatchGetBuilds
                 Resource:
                   - !GetAtt DceDeployProject.Arn
                   - !GetAtt DceDestroyProject.Arn
@@ -306,7 +326,9 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:*
+                  - s3:Get*
+                  - s3:Delete*
+                  - s3:List*
                 Resource:
                   - !Sub arn:aws:s3:::amplify-*
                   - !Sub arn:aws:s3:::amplify-*/*

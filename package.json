@@ -24,7 +24,6 @@
     "react-markdown": "^8.0.0",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.1",
-    "react-scripts": "^5.0.0",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
     "sass": "^1.45.1",
@@ -33,7 +32,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!your-module-name)/\"",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -55,6 +54,8 @@
     ]
   },
   "devDependencies": {
-    "react-error-overlay": "6.0.9"
+    "react-error-overlay": "6.0.9",
+    "react-scripts": "^5.0.0",
+    "react-test-renderer": "^18.2.0"
   }
 }

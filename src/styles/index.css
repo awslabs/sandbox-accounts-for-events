@@ -10,25 +10,20 @@ code {
     font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
-.error-label {
-    color: red;
-    font-weight: bold;
-}
-
 :root {
     --amplify-primary-color: #0073bb;
     --amplify-primary-tint: #0073bb;
     --amplify-primary-shade: #0073bb;
 }
 
-#top-navigation {
+.top-navigation {
     position:fixed; 
     top: 0; 
     left: 0; 
     right: 0; 
-    z-index: 1002;
+    z-index: 1500;
 }
 
-#root {
-    transform: translateY(+56px)
+.content-frame {
+    transform: translateY(+56px);
 }
