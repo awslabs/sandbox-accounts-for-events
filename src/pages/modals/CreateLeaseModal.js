@@ -157,6 +157,7 @@ const CreateLeaseModal = ({ isAdminView }) => {
                         <Input
                             onChange={({ detail }) => updateFormValue({ budgetAmount: detail.value })}
                             value={value.budgetAmount}
+                            placeholder="10"
                         />
                     </FormField>
                     <FormField label="Lease expiration in" errorText={inputError.DURATION}>
@@ -165,14 +166,16 @@ const CreateLeaseModal = ({ isAdminView }) => {
                                 <Input
                                     onChange={({ detail }) => updateFormValue({ expiryDays: detail.value })}
                                     value={value.expiryDays}
-                                />
+                                    placeholder="0"
+                                    />
                                 <Box>days</Box>
                             </SpaceBetween>
                             <SpaceBetween direction="horizontal" size="xs">
                                 <Input
                                     onChange={({ detail }) => updateFormValue({ expiryHours: detail.value })}
                                     value={value.expiryHours}
-                                />
+                                    placeholder="8"
+                                    />
                                 <Box>hours</Box>
                             </SpaceBetween>
                         </Grid>

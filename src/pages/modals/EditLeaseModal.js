@@ -33,8 +33,8 @@ const EditLeaseModal = ({ isAdminView }) => {
         setInputError({});
         setValue({
             ...modal.item,
-            expiresDateInput: moment.unix(modal.item.expiresOn).format(Config.FORMAT_DATE),
-            expiresTimeInput: moment.unix(modal.item.expiresOn).format(Config.FORMAT_TIME)
+            expiresDateInput: modal.item.expiresOn ? moment.unix(modal.item.expiresOn).format(Config.FORMAT_DATE) : "",
+            expiresTimeInput: modal.item.expiresOn ? moment.unix(modal.item.expiresOn).format(Config.FORMAT_TIME) : ""
         });
     }, [modal.item, Config]);
 
@@ -53,7 +53,7 @@ const EditLeaseModal = ({ isAdminView }) => {
             }
         }
 
-        let expiresDate = moment(newValue.expiresDateInput + " " + newValue.expiresTimeInput);
+        let expiresDate = moment(newValue.expiresDateInput + " " + newValue.expiresTimeInput, "YYYY/MM/DD hh:mm");
         if (!expiresDate.isValid()) {
             errors.DATE = "Unable to parse expiry date correctly. Please check for invalid date.";
         } else {
@@ -158,6 +158,7 @@ const EditLeaseModal = ({ isAdminView }) => {
                             <Input
                                 onChange={({ detail }) => updateFormValue({ budgetAmount: detail.value })}
                                 value={value.budgetAmount}
+                                placeholder="10"
                             />
                         </FormField>
                         <FormField
@@ -168,7 +169,7 @@ const EditLeaseModal = ({ isAdminView }) => {
                                 moment().format("HH:mm") +
                                 ")"
                             }
-                        >
+                            >
                             <Grid gridDefinition={[{ colspan: 6 }, { colspan: 6 }]}>
                                 <DatePicker
                                     onChange={({ detail }) => updateFormValue({ expiresDateInput: detail.value })}

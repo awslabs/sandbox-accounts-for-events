@@ -91,7 +91,7 @@ const CreateEventModal = () => {
         }
 
         if (!(allowEmptyValues && newValue.eventDateInput === "" && newValue.eventTimeInput === "")) {
-            let eventDate = moment(newValue.eventDateInput + " " + newValue.eventTimeInput);
+            let eventDate = moment(newValue.eventDateInput + " " + newValue.eventTimeInput, "YYYY/MM/DD hh:mm");
             if (!eventDate.isValid()) {
                 errors.DATE = "Unable to parse event date correctly. Please check for invalid date.";
             } else {
@@ -186,6 +186,7 @@ const CreateEventModal = () => {
                             <SpaceBetween direction="horizontal" size="xs">
                                 <Input
                                     onChange={({ detail }) => updateFormValue({ eventDays: detail.value })}
+                                    placeholder="0"
                                     value={value.eventDays}
                                 />
                                 <Box>days</Box>
@@ -194,6 +195,7 @@ const CreateEventModal = () => {
                                 <Input
                                     onChange={({ detail }) => updateFormValue({ eventHours: detail.value })}
                                     value={value.eventHours}
+                                    placeholder="8"
                                 />
                                 <Box>hours</Box>
                             </SpaceBetween>

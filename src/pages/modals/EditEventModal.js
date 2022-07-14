@@ -34,8 +34,8 @@ const EditEventModal = () => {
         setInputError({});
         setValue({
             ...modal.item,
-            eventDateInput: moment.unix(modal.item.eventOn).format(Config.FORMAT_DATE),
-            eventTimeInput: moment.unix(modal.item.eventOn).format(Config.FORMAT_TIME),
+            eventDateInput: modal.item.eventOn ? moment.unix(modal.item.eventOn).format(Config.FORMAT_DATE) : "",
+            eventTimeInput: modal.item.eventOn ? moment.unix(modal.item.eventOn).format(Config.FORMAT_TIME) : "",
             overwriteEventDays: false,
             overwriteEventBudget: false
         });
@@ -85,7 +85,7 @@ const EditEventModal = () => {
             }
         }
 
-        let eventDate = moment(newValue.eventDateInput + " " + newValue.eventTimeInput);
+        let eventDate = moment(newValue.eventDateInput + " " + newValue.eventTimeInput, "YYYY/MM/DD hh:mm");
         if (!eventDate.isValid()) {
             errors.DATE = "Unable to parse event date correctly. Please check for invalid date.";
         } else {
@@ -196,6 +196,7 @@ const EditEventModal = () => {
                                     <Input
                                         onChange={({ detail }) => updateFormValue({ eventDays: detail.value })}
                                         value={value.eventDays}
+                                        placeholder="0"
                                     />
                                     <Box>days</Box>
                                 </SpaceBetween>
@@ -203,6 +204,7 @@ const EditEventModal = () => {
                                     <Input
                                         onChange={({ detail }) => updateFormValue({ eventHours: detail.value })}
                                         value={value.eventHours}
+                                        placeholder="8"
                                     />
                                     <Box>hours</Box>
                                 </SpaceBetween>
