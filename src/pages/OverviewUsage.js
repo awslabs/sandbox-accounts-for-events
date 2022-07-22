@@ -136,7 +136,7 @@ const OverviewUsage = () => {
                     id: "costAmount",
                     header: "AWS service spend",
                     sortingField: "costAmount",
-                    cell: (item) => Config.BUDGET_CURRENCY + " " + item.costAmount.toFixed(2)
+                    cell: (item) => item.costAmount.toFixed(2) + " " + Config.BUDGET_CURRENCY
                 }
             ]}
             items={items}

@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import ConfirmationModal from "./ConfirmationModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -23,7 +24,7 @@ test("renders simple ConfirmationModal with button text, action and content", as
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
     expect(screen.getByText(contentText)).toBeInTheDocument();
     const actionButton = screen.getByRole("button", { name: buttonText })
-    fireEvent.click(actionButton)
+    userEvent.click(actionButton)
     expect(buttonCallback).toHaveBeenCalled()
 });
 
@@ -52,8 +53,8 @@ test("renders extended ConfirmationModal, enters confirmationText and submits", 
     const confirmationInputElement = screen.getByRole("textbox")
 
     expect(confirmButtonElement).toBeDisabled()
-    fireEvent.change(confirmationInputElement, {target: {value: confirmationText}})
+    userEvent.type(confirmationInputElement, confirmationText)
     expect(confirmButtonElement).toBeEnabled()
-    fireEvent.click(confirmButtonElement)
+    userEvent.click(confirmButtonElement)
     expect(buttonCallback).toHaveBeenCalled()
 });

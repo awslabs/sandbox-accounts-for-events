@@ -252,6 +252,7 @@ const ItemTable = () => {
                                             item: collectionProps.selectedItems[0]
                                         })
                                     }
+                                    data-testid="editAccountRow"
                                 >
                                     Edit
                                 </Button>
@@ -267,12 +268,14 @@ const ItemTable = () => {
                                             items: collectionProps.selectedItems
                                         })
                                     }
+                                    data-testid="removeAccountRow"
                                 >
                                     Remove
                                 </Button>
                                 <Button
                                     variant="primary"
                                     onClick={() => dispatch({ type: "modal/open", status: "registerAccount" })}
+                                    data-testid="registerAccountRow"
                                 >
                                     Register account(s)
                                 </Button>
@@ -323,7 +326,12 @@ const DetailSplitPanel = () => {
     }, [selection, accounts, leases, Config]);
 
     return selection.id ? (
-        <SplitPanel header="AWS account details" i18nStrings={SplitPaneli18nStrings} hidePreferencesButton>
+        <SplitPanel 
+            header="AWS account details" 
+            i18nStrings={SplitPaneli18nStrings} 
+            hidePreferencesButton
+            data-testid="splitPanel"
+        >
             <ColumnLayout columns={3}>
                 <Box>
                     <Box variant="awsui-key-label">AWS account ID</Box>

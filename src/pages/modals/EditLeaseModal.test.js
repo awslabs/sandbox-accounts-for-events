@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import EditLeaseModal from "./EditLeaseModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -35,21 +36,26 @@ test("renders EditLeaseModal, enters valid and invalid texts, submits", async ()
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    fireEvent.change(budgetInputElement, {target: {value: '5a'}})
+    fireEvent.change(budgetInputElement, { target: { value: "" }})
+    userEvent.type(budgetInputElement, '5a')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(budgetInputElement, {target: {value: testObject.budgetAmount}})
+    fireEvent.change(budgetInputElement, { target: { value: "" }})
+    userEvent.type(budgetInputElement, testObject.budgetAmount)
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid date
-    fireEvent.change(timeInputElement, {target: {value: testObject.expiresTimeInput}})
-    fireEvent.change(dateInputElement, {target: {value: '2021/01/01'}})
+    fireEvent.change(timeInputElement, { target: { value: "" }})
+    userEvent.type(timeInputElement, testObject.expiresTimeInput)
+    fireEvent.change(dateInputElement, { target: { value: "" }})
+    userEvent.type(dateInputElement, '2021/01/01')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(dateInputElement, {target: {value: testObject.expiresDateInput.split('-').join('/')}})
+    fireEvent.change(dateInputElement, { target: { value: "" }})
+    userEvent.type(dateInputElement, testObject.expiresDateInput.split('-').join('/'))
     expect(saveButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const saveLeaseAction = jest.spyOn(actions, "updateLease").mockImplementation((lease) => () => lease)
-    fireEvent.click(saveButtonElement)
+    userEvent.click(saveButtonElement)
 
     // identify components of confirmation dialog
     expect(screen.getByText(/please confirm/i)).toBeInTheDocument();
@@ -60,8 +66,8 @@ test("renders EditLeaseModal, enters valid and invalid texts, submits", async ()
     expect(confirmButtonElement).toBeDisabled()
 
     // input confirmation text & submit
-    fireEvent.change(confirmTextInputElement, {target: {value: "update"}})
+    userEvent.type(confirmTextInputElement, "update")
     expect(confirmButtonElement).toBeEnabled()
-    fireEvent.click(confirmButtonElement)
+    userEvent.click(confirmButtonElement)
     expect(saveLeaseAction.mock.lastCall[0]).toMatchObject(testObject)
 });

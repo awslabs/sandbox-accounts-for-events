@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import RegisterAccountsModal from "./RegisterAccountsModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -46,19 +47,21 @@ test("renders RegisterAccountsModal, enters valid and invalid texts, submits", a
     expect(registerButtonElement).toBeEnabled()
 
     // try invalid and valid account list
-    fireEvent.change(accountsInputElement, {target: {value: "123456789012,1a2b3c4d5e6f"}})
+    userEvent.type(accountsInputElement, "123456789012,1a2b3c4d5e6f")
     expect(registerButtonElement).toBeDisabled()
-    fireEvent.change(accountsInputElement, {target: {value: testObject.accountIds.join(",")}})
+    fireEvent.change(accountsInputElement, { target: { value: "" }})
+    userEvent.type(accountsInputElement, testObject.accountIds.join(","))
     expect(registerButtonElement).toBeEnabled()
 
     // try invalid and valid role name
-    fireEvent.change(roleInputElement, {target: {value: 'invalid?role#name'}})
+    userEvent.type(roleInputElement, 'invalid?role#name')
     expect(registerButtonElement).toBeDisabled()
-    fireEvent.change(roleInputElement, {target: {value: testObject.roleName}})
+    fireEvent.change(roleInputElement, { target: { value: "" }})
+    userEvent.type(roleInputElement, testObject.roleName)
     expect(registerButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const registerUserAction = jest.spyOn(actions, "registerAccounts").mockImplementation((accounts) => () => accounts)
-    fireEvent.click(registerButtonElement)
+    userEvent.click(registerButtonElement)
     expect(registerUserAction.mock.lastCall[0]).toMatchObject(testObject)
 });

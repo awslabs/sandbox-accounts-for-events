@@ -149,6 +149,7 @@ const DetailPanel = () => {
                         Event Details
                     </Header>
                 }
+                data-testid="detailPanel"
             >
                 {itemLoading === "loading" || !Item ? (
                     <Box padding={{ top: "xl" }}>
@@ -255,13 +256,12 @@ const DetailPanel = () => {
 /////////////////
 
 const LeasesTable = () => {
-    const { urlParamEventId } = useParams();
     const Config = useSelector((state) => state.config);
     const Item = useSelector((state) => state.events.item);
     const EventLeases = useSelector((state) => ({
         ...state.leases,
         items: state.leases.items.filter(
-            (item) => item.principalId.substring(0, Config.EVENT_ID_LENGTH) === urlParamEventId
+            (item) => item.principalId.substring(0, Config.EVENT_ID_LENGTH) === Item.id
         )
     }));
     const dispatch = useDispatch();
@@ -402,6 +402,7 @@ const LeasesTable = () => {
                                         item: collectionProps.selectedItems[0]
                                     })
                                 }
+                                data-testid="editLeaseRow"
                             >
                                 Edit
                             </Button>
@@ -420,6 +421,7 @@ const LeasesTable = () => {
                                         items: collectionProps.selectedItems
                                     })
                                 }
+                                data-testid="terminateLeaseRow"
                             >
                                 Terminate
                             </Button>
@@ -435,6 +437,7 @@ const LeasesTable = () => {
                                         item: collectionProps.selectedItems[0]
                                     })
                                 }
+                                data-testid="deleteLeaseRow"
                             >
                                 Delete
                             </Button>
@@ -442,6 +445,7 @@ const LeasesTable = () => {
                                 variant="primary"
                                 onClick={() => dispatch({ type: "modal/open", status: "createLease", item: Item })}
                                 disabled={!Item || Item.eventStatus === "Terminated"}
+                                data-testid="createLeaseRow"
                             >
                                 Create lease
                             </Button>

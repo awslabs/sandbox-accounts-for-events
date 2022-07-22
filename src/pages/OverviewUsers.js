@@ -255,6 +255,7 @@ const ItemTable = () => {
                                             item: collectionProps.selectedItems[0]
                                         })
                                     }
+                                    data-testid="editUserRow"
                                 >
                                     Edit
                                 </Button>
@@ -270,12 +271,14 @@ const ItemTable = () => {
                                             items: collectionProps.selectedItems
                                         })
                                     }
+                                    data-testid="deleteUserRow"
                                 >
                                     Delete
                                 </Button>
                                 <Button
                                     variant="primary"
                                     onClick={() => dispatch({ type: "modal/open", status: "createUser" })}
+                                    data-testid="createUserRow"
                                 >
                                     Create user
                                 </Button>
@@ -342,7 +345,12 @@ const DetailSplitPanel = () => {
     }, [selection, users, leases, Config]);
 
     return selection.id ? (
-        <SplitPanel header="User details" i18nStrings={SplitPaneli18nStrings} hidePreferencesButton>
+        <SplitPanel 
+            header="User details" 
+            i18nStrings={SplitPaneli18nStrings} 
+            hidePreferencesButton
+            data-testid="splitPanel"
+        >
             <ColumnLayout columns={4}>
                 <Box>
                     <Box variant="awsui-key-label">Email address</Box>

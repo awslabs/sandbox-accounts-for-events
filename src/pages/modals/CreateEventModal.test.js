@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CreateEventModal from "./CreateEventModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -19,7 +20,7 @@ test("renders CreateEventModal, cannot submit empty dialog", async () => {
     expect(screen.getByText(/create new event/i)).toBeInTheDocument();
 
     expect(createButtonElement).toBeEnabled()
-    fireEvent.click(createButtonElement)
+    userEvent.click(createButtonElement)
     expect(createButtonElement).toBeDisabled()
 });
 
@@ -56,42 +57,48 @@ test("renders CreateEventModal, enters valid and invalid texts, submits", async 
 
     // check if submit button is initially enabled
     expect(createButtonElement).toBeEnabled()
-    fireEvent.change(nameInputElement, {target: {value: testObject.eventName}})
+    userEvent.type(nameInputElement, testObject.eventName)
 
     // try invalid and valid email address
-    fireEvent.change(ownerInputElement, {target: {value: "testowner"}})
+    userEvent.type(ownerInputElement, "testowner")
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(ownerInputElement, {target: {value: testObject.eventOwner}})
+    fireEvent.change(ownerInputElement, { target: { value: "" }})
+    userEvent.type(ownerInputElement, testObject.eventOwner)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid date
-    fireEvent.change(timeInputElement, {target: {value: testObject.eventTimeInput}})
-    fireEvent.change(dateInputElement, {target: {value: '2021/01/01'}})
+    userEvent.type(timeInputElement, testObject.eventTimeInput)
+    userEvent.type(dateInputElement, '2021/01/01')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(dateInputElement, {target: {value: testObject.eventDateInput.split('-').join('/')}})
+    fireEvent.change(dateInputElement, { target: { value: "" }})
+    userEvent.type(dateInputElement, testObject.eventDateInput.split('-').join('/'))
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid duration
-    fireEvent.change(durationDaysInputElement, {target: {value: testObject.eventDays}})
-    fireEvent.change(durationHoursInputElement, {target: {value: '25'}})
+    fireEvent.change(durationDaysInputElement, { target: { value: "" }})
+    userEvent.type(durationDaysInputElement, testObject.eventDays)
+    userEvent.type(durationHoursInputElement, '25')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(durationHoursInputElement, {target: {value: testObject.eventHours}})
+    fireEvent.change(durationHoursInputElement, { target: { value: "" }})
+    userEvent.type(durationHoursInputElement, testObject.eventHours)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid number of accounts
-    fireEvent.change(accountsInputElement, {target: {value: '5a'}})
+    userEvent.type(accountsInputElement, '5a')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(accountsInputElement, {target: {value: testObject.maxAccounts}})
+    fireEvent.change(accountsInputElement, { target: { value: "" }})
+    userEvent.type(accountsInputElement, testObject.maxAccounts)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    fireEvent.change(budgetInputElement, {target: {value: '5a'}})
+    userEvent.type(budgetInputElement, '5a')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(budgetInputElement, {target: {value: testObject.eventBudget}})
+    fireEvent.change(budgetInputElement, { target: { value: "" }})
+    userEvent.type(budgetInputElement, testObject.eventBudget)
     expect(createButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const createEventAction = jest.spyOn(actions, "createEvent").mockImplementation((event) => () => event)
-    fireEvent.click(createButtonElement)
+    userEvent.click(createButtonElement)
     expect(createEventAction.mock.lastCall[0]).toMatchObject(testObject)
 });

@@ -266,6 +266,7 @@ const ItemTable = () => {
                                             item: collectionProps.selectedItems[0]
                                         })
                                     }
+                                    data-testid="editLeaseRow"
                                 >
                                     Edit
                                 </Button>
@@ -281,6 +282,7 @@ const ItemTable = () => {
                                             items: collectionProps.selectedItems
                                         })
                                     }
+                                    data-testid="terminateLeaseRow"
                                 >
                                     Terminate
                                 </Button>
@@ -296,12 +298,14 @@ const ItemTable = () => {
                                             item: collectionProps.selectedItems[0]
                                         })
                                     }
+                                    data-testid="deleteLeaseRow"
                                 >
                                     Delete
                                 </Button>
                                 <Button
                                     variant="primary"
                                     onClick={() => dispatch({ type: "modal/open", status: "createLease" })}
+                                    data-testid="createLeaseRow"
                                 >
                                     Create lease
                                 </Button>
@@ -343,7 +347,12 @@ const DetailSplitPanel = () => {
     }, [selection, leases]);
 
     return selection.id ? (
-        <SplitPanel header="Lease details" i18nStrings={SplitPaneli18nStrings} hidePreferencesButton>
+        <SplitPanel 
+            header="Lease details" 
+            i18nStrings={SplitPaneli18nStrings} 
+            hidePreferencesButton
+            data-testid="splitPanel"
+        >
             <ColumnLayout columns={3}>
                 <Box>
                     <Box variant="awsui-key-label">User</Box>

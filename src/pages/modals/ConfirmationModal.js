@@ -27,6 +27,7 @@ const ConfirmationModal = ({ visible, action, buttonText, confirmationText, chil
                                 action();
                                 closeModal();
                             }}
+                            data-testid={"confirm" + buttonText + "Dialog"}
                         >
                             {buttonText}
                         </Button>

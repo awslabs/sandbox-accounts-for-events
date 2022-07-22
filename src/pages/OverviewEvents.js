@@ -325,6 +325,7 @@ const ItemTable = () => {
                                 <Button
                                     variant="primary"
                                     onClick={() => dispatch({ type: "modal/open", status: "createEvent" })}
+                                    data-testid="createEventRow"
                                 >
                                     Create event
                                 </Button>
@@ -383,6 +384,7 @@ const DetailSplitPanel = () => {
             header={'Event: "' + item.eventName + '"'}
             i18nStrings={SplitPaneli18nStrings}
             hidePreferencesButton
+            data-testid="splitPanel"
         >
             <ColumnLayout columns={4}>
                 <Box>

@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import EditEventModal from "./EditEventModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -43,39 +44,51 @@ test("renders EditEventModal, enters valid and invalid texts, submits", async ()
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid email address
-    fireEvent.change(ownerInputElement, {target: {value: "testowner"}})
+    fireEvent.change(ownerInputElement, { target: { value: "" }})
+    userEvent.type(ownerInputElement, "testowner")
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(ownerInputElement, {target: {value: testObject.eventOwner}})
+    fireEvent.change(ownerInputElement, { target: { value: "" }})
+    userEvent.type(ownerInputElement, testObject.eventOwner)
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid date
-    fireEvent.change(timeInputElement, {target: {value: testObject.eventTimeInput}})
-    fireEvent.change(dateInputElement, {target: {value: '2021/01/01'}})
+    fireEvent.change(timeInputElement, { target: { value: "" }})
+    userEvent.type(timeInputElement, testObject.eventTimeInput)
+    fireEvent.change(dateInputElement, { target: { value: "" }})
+    userEvent.type(dateInputElement, '2021/01/01')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(dateInputElement, {target: {value: testObject.eventDateInput.split('-').join('/')}})
+    fireEvent.change(dateInputElement, { target: { value: "" }})
+    userEvent.type(dateInputElement, testObject.eventDateInput.split('-').join('/'))
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid duration
-    fireEvent.change(durationDaysInputElement, {target: {value: testObject.eventDays}})
-    fireEvent.change(durationHoursInputElement, {target: {value: '25'}})
+    fireEvent.change(durationDaysInputElement, { target: { value: "" }})
+    userEvent.type(durationDaysInputElement, testObject.eventDays)
+    fireEvent.change(durationHoursInputElement, { target: { value: "" }})
+    userEvent.type(durationHoursInputElement, '25')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(durationHoursInputElement, {target: {value: testObject.eventHours}})
+    fireEvent.change(durationHoursInputElement, { target: { value: "" }})
+    userEvent.type(durationHoursInputElement, testObject.eventHours)
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid number of accounts
-    fireEvent.change(accountsInputElement, {target: {value: '5a'}})
+    fireEvent.change(accountsInputElement, { target: { value: "" }})
+    userEvent.type(accountsInputElement, '5a')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(accountsInputElement, {target: {value: testObject.maxAccounts}})
+    fireEvent.change(accountsInputElement, { target: { value: "" }})
+    userEvent.type(accountsInputElement, testObject.maxAccounts)
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    fireEvent.change(budgetInputElement, {target: {value: '5a'}})
+    fireEvent.change(budgetInputElement, { target: { value: "" }})
+    userEvent.type(budgetInputElement, '5a')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(budgetInputElement, {target: {value: testObject.eventBudget}})
+    fireEvent.change(budgetInputElement, { target: { value: "" }})
+    userEvent.type(budgetInputElement, testObject.eventBudget)
     expect(saveButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const saveEventAction = jest.spyOn(actions, "updateEvent").mockImplementation((event) => () => event)
-    fireEvent.click(saveButtonElement)
+    userEvent.click(saveButtonElement)
     expect(saveEventAction.mock.lastCall[0]).toMatchObject(testObject)
 });

@@ -65,9 +65,9 @@ const AdminConfig = () => {
                 } else {
                     if (
                         (item === "EVENT_DEFAULT_ACCOUNT_BUDGET" &&
-                            Number(newValue[item]) > Config.ACCOUNT_MAX_BUDGET) ||
-                        (item === "EVENT_DEFAULT_LENGTH_DAYS" && Number(newValue[item]) > Config.EVENT_MAX_DAYS) ||
-                        (item === "EVENT_DEFAULT_ACCOUNTS" && Number(newValue[item]) > Config.EVENT_MAX_ACCOUNTS)
+                            Number(newValue[item]) > newValue.ACCOUNT_MAX_BUDGET) ||
+                        (item === "EVENT_DEFAULT_LENGTH_DAYS" && Number(newValue[item]) > newValue.EVENT_MAX_DAYS) ||
+                        (item === "EVENT_DEFAULT_ACCOUNTS" && Number(newValue[item]) > newValue.EVENT_MAX_ACCOUNTS)
                     ) {
                         errors[item] = "Value for event default cannot be higher than maximum value above.";
                     }
@@ -168,12 +168,16 @@ const AdminConfig = () => {
                     <Form
                         actions={
                             <SpaceBetween direction="horizontal" size="l">
-                                <Button onClick={() => dispatch({ type: "modal/open", status: "default" })}>
+                                <Button 
+                                    onClick={() => dispatch({ type: "modal/open", status: "default" })}
+                                    data-testid="loadDefaultConfigButton"
+                                >
                                     Load defaults
                                 </Button>
                                 <Button
                                     variant="secondary"
                                     onClick={() => dispatch({ type: "modal/open", status: "undo" })}
+                                    data-testid="undoConfigButton"
                                 >
                                     Undo inputs
                                 </Button>
@@ -181,6 +185,7 @@ const AdminConfig = () => {
                                     variant="primary"
                                     onClick={() => dispatch({ type: "modal/open", status: "save" })}
                                     disabled={!isEmpty(inputError)}
+                                    data-testid="saveConfigButton"
                                 >
                                     Save configuration
                                 </Button>
@@ -198,6 +203,7 @@ const AdminConfig = () => {
                                         <Input
                                             onChange={({ detail }) => updateFormValue({ EVENT_MAX_DAYS: detail.value })}
                                             value={value.EVENT_MAX_DAYS}
+                                            data-testid="EVENT_MAX_DAYS"
                                         />
                                     </FormField>
                                     <FormField
@@ -209,6 +215,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ EVENT_MAX_ACCOUNTS: detail.value })
                                             }
                                             value={value.EVENT_MAX_ACCOUNTS}
+                                            data-testid="EVENT_MAX_ACCOUNTS"
                                         />
                                     </FormField>
                                     <FormField
@@ -220,6 +227,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ ACCOUNT_MAX_BUDGET: detail.value })
                                             }
                                             value={value.ACCOUNT_MAX_BUDGET}
+                                            data-testid="ACCOUNT_MAX_BUDGET"
                                         />
                                     </FormField>
                                     <FormField
@@ -231,6 +239,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ EVENT_DEFAULT_LENGTH_DAYS: detail.value })
                                             }
                                             value={value.EVENT_DEFAULT_LENGTH_DAYS}
+                                            data-testid="EVENT_DEFAULT_LENGTH_DAYS"
                                         />
                                     </FormField>
                                     <FormField
@@ -242,6 +251,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ EVENT_DEFAULT_ACCOUNTS: detail.value })
                                             }
                                             value={value.EVENT_DEFAULT_ACCOUNTS}
+                                            data-testid="EVENT_DEFAULT_ACCOUNTS"
                                         />
                                     </FormField>
                                     <FormField
@@ -253,6 +263,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ EVENT_DEFAULT_ACCOUNT_BUDGET: detail.value })
                                             }
                                             value={value.EVENT_DEFAULT_ACCOUNT_BUDGET}
+                                            data-testid="EVENT_DEFAULT_ACCOUNT_BUDGET"
                                         />
                                     </FormField>
                                     <FormField
@@ -264,6 +275,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ EVENT_DEFAULT_LENGTH_HOURS: detail.value })
                                             }
                                             value={value.EVENT_DEFAULT_LENGTH_HOURS}
+                                            data-testid="EVENT_DEFAULT_LENGTH_HOURS"
                                         />
                                     </FormField>
                                 </ColumnLayout>
@@ -280,6 +292,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ FORMAT_DATETIME: detail.value })
                                             }
                                             value={value.FORMAT_DATETIME}
+                                            data-testid="FORMAT_DATETIME"
                                         />
                                     </FormField>
                                     <FormField
@@ -291,6 +304,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ STATISTICS_DEFAULT_PRE_DAYS: detail.value })
                                             }
                                             value={value.STATISTICS_DEFAULT_PRE_DAYS}
+                                            data-testid="STATISTICS_DEFAULT_PRE_DAYS"
                                         />
                                     </FormField>
                                     <FormField
@@ -302,12 +316,14 @@ const AdminConfig = () => {
                                                 updateFormValue({ SUBITEM_PAGE_SIZE: detail.value })
                                             }
                                             value={value.SUBITEM_PAGE_SIZE}
+                                            data-testid="SUBITEM_PAGE_SIZE"
                                         />
                                     </FormField>
                                     <FormField label="Format string for date fields" errorText={inputError.FORMAT_DATE}>
                                         <Input
                                             onChange={({ detail }) => updateFormValue({ FORMAT_DATE: detail.value })}
                                             value={value.FORMAT_DATE}
+                                            data-testid="FORMAT_DATE"
                                         />
                                     </FormField>
                                     <FormField
@@ -319,6 +335,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ STATISTICS_DEFAULT_POST_DAYS: detail.value })
                                             }
                                             value={value.STATISTICS_DEFAULT_POST_DAYS}
+                                            data-testid="STATISTICS_DEFAULT_POST_DAYS"
                                         />
                                     </FormField>
                                     <FormField
@@ -328,12 +345,14 @@ const AdminConfig = () => {
                                         <Input
                                             onChange={({ detail }) => updateFormValue({ ITEM_PAGE_SIZE: detail.value })}
                                             value={value.ITEM_PAGE_SIZE}
+                                            data-testid="ITEM_PAGE_SIZE"
                                         />
                                     </FormField>
                                     <FormField label="Format string for time fields" errorText={inputError.FORMAT_TIME}>
                                         <Input
                                             onChange={({ detail }) => updateFormValue({ FORMAT_TIME: detail.value })}
                                             value={value.FORMAT_TIME}
+                                            data-testid="FORMAT_TIME"
                                         />
                                     </FormField>
                                     <FormField
@@ -345,6 +364,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ UPDATE_WEBSITE_INTERVAL: detail.value })
                                             }
                                             value={value.UPDATE_WEBSITE_INTERVAL}
+                                            data-testid="UPDATE_WEBSITE_INTERVAL"
                                         />
                                     </FormField>
                                     <FormField />
@@ -357,6 +377,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ STATISTICS_X_AXIS_DATE_FORMAT: detail.value })
                                             }
                                             value={value.STATISTICS_X_AXIS_DATE_FORMAT}
+                                            data-testid="STATISTICS_X_AXIS_DATE_FORMAT"
                                         />
                                     </FormField>
                                     <FormField
@@ -368,6 +389,7 @@ const AdminConfig = () => {
                                                 updateFormValue({ HIDE_NOTIFICATION_DURATION: detail.value })
                                             }
                                             value={value.HIDE_NOTIFICATION_DURATION}
+                                            data-testid="HIDE_NOTIFICATION_DURATION"
                                         />
                                     </FormField>
                                 </ColumnLayout>

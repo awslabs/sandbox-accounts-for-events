@@ -1,4 +1,5 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import EditUserModal from "./EditUserModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -26,6 +27,6 @@ test("renders EditUserModal, submits", async () => {
 
     // submit and test redux action call payload
     const saveUserAction = jest.spyOn(actions, "updateUser").mockImplementation((event) => () => event)
-    fireEvent.click(saveButtonElement)
+    userEvent.click(saveButtonElement)
     expect(saveUserAction.mock.lastCall[0]).toMatchObject(testObject)
 });

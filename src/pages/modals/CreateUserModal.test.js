@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CreateUserModal from "./CreateUserModal";
 import { Provider } from "react-redux";
 import store from "../../redux/store";
@@ -40,13 +41,14 @@ test("renders CreateUserModal, enters valid and invalid texts, submits", async (
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid email address
-    fireEvent.change(userInputElement, {target: {value: "testuser"}})
+    userEvent.type(userInputElement, "testuser")
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(userInputElement, {target: {value: testObject.email}})
+    fireEvent.change(userInputElement, { target: { value: "" }})
+    userEvent.type(userInputElement, testObject.email)
     expect(createButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const createUserAction = jest.spyOn(actions, "createUser").mockImplementation((user) => () => user)
-    fireEvent.click(createButtonElement)
+    userEvent.click(createButtonElement)
     expect(createUserAction.mock.lastCall[0]).toMatchObject(testObject)
 });
