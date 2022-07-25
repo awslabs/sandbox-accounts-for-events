@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppLayout, Grid, Box, Header, HelpPanel, Button, Cards, SpaceBetween } from "@awsui/components-react";
+import { AppLayout, Grid, Box, Header, HelpPanel, Button, Cards, SpaceBetween } from "@cloudscape-design/components";
 import { useSelector } from "react-redux";
 import Navigation from "./components/Navigation";
 import { appLayoutLabels, itemSelectionLabels } from "./components/labels";

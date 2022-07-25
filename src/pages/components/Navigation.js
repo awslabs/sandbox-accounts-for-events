@@ -1,4 +1,4 @@
-import { SideNavigation, SpaceBetween } from "@awsui/components-react";
+import { SideNavigation, SpaceBetween } from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 

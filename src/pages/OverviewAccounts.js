@@ -1,4 +1,4 @@
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Box,
@@ -13,7 +13,7 @@ import {
     SpaceBetween,
     SplitPanel,
     Table
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -237,7 +237,7 @@ const ItemTable = () => {
                 selectionType="multi"
                 header={
                     <Header
-                        variant="awsui-h1-sticky"
+                        variant="h1"
                         counter={"(" + Items.items.length + ")"}
                         selectedItems={collectionProps.selectedItems}
                         actions={
@@ -334,29 +334,29 @@ const DetailSplitPanel = () => {
         >
             <ColumnLayout columns={3}>
                 <Box>
-                    <Box variant="awsui-key-label">AWS account ID</Box>
+                    <Box variant="h5">AWS account ID</Box>
                     <CopyClipboardIconButton content={item.id}>
                         <Link href={"#/accounts/" + item.id}>{item.id}</Link>
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Registered on</Box>
+                    <Box variant="h5">Registered on</Box>
                     {item.createdDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Admin role ARN</Box>
+                    <Box variant="h5">Admin role ARN</Box>
                     <CopyClipboardIconButton content={item.adminRoleArn} />
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Status</Box>
+                    <Box variant="h5">Status</Box>
                     {toColorBox(item.accountStatus)}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Last modified on</Box>
+                    <Box variant="h5">Last modified on</Box>
                     {item.lastModifiedDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Principal role ARN</Box>
+                    <Box variant="h5">Principal role ARN</Box>
                     <CopyClipboardIconButton content={item.principalRoleArn} />
                 </Box>
             </ColumnLayout>
@@ -392,7 +392,7 @@ const DetailSplitPanel = () => {
 //////////////////
 
 const OverviewAccounts = () => {
-    const [splitPanelSize, setSplitPanelSize] = useState("50%");
+    const [splitPanelSize, setSplitPanelSize] = useState(500);
     const [splitPanelOpen, setSplitPanelOpen] = useState(false);
     const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
     const hasSelection = useSelector((state) => state.selection.status === "selected");

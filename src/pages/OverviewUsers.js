@@ -1,4 +1,4 @@
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Box,
@@ -14,7 +14,7 @@ import {
     SpaceBetween,
     SplitPanel,
     Table
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -240,7 +240,7 @@ const ItemTable = () => {
                 selectionType="multi"
                 header={
                     <Header
-                        variant="awsui-h1-sticky"
+                        variant="h1"
                         selectedItems={collectionProps.selectedItems}
                         counter={"(" + Users.items.length + (Users.nextToken ? "+)" : ")")}
                         actions={
@@ -353,24 +353,24 @@ const DetailSplitPanel = () => {
         >
             <ColumnLayout columns={4}>
                 <Box>
-                    <Box variant="awsui-key-label">Email address</Box>
+                    <Box variant="h5">Email address</Box>
                     <CopyClipboardIconButton content={item.email}>
                         <Link href={"#/users/" + encodeURIComponent(item.email)}>{item.email}</Link>
                     </CopyClipboardIconButton>
                     <Box>{item.status}</Box>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Roles</Box>
+                    <Box variant="h5">Roles</Box>
                     {item.isOperator ? <Box>Operator</Box> : ""}
                     {item.isAdmin ? <Box>Administrator</Box> : ""}
                     {!item.isOperator && !item.isAdmin ? <Box>-</Box> : null}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Created on</Box>
+                    <Box variant="h5">Created on</Box>
                     {item.createdDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Last modified on</Box>
+                    <Box variant="h5">Last modified on</Box>
                     {item.lastModifiedDate}
                 </Box>
             </ColumnLayout>
@@ -406,7 +406,7 @@ const DetailSplitPanel = () => {
 //////////////////
 
 const OverviewUsers = () => {
-    const [splitPanelSize, setSplitPanelSize] = useState("50%");
+    const [splitPanelSize, setSplitPanelSize] = useState(500);
     const [splitPanelOpen, setSplitPanelOpen] = useState(false);
     const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
     const hasSelection = useSelector((state) => state.selection.status === "selected");

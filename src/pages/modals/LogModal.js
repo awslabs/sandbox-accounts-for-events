@@ -1,4 +1,4 @@
-import { Box, Header, Modal, SpaceBetween, StatusIndicator } from "@awsui/components-react";
+import { Box, Header, Modal, SpaceBetween, StatusIndicator } from "@cloudscape-design/components";
 import { useDispatch, useSelector } from "react-redux";
 
 const LogModal = () => {

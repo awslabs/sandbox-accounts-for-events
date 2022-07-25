@@ -1,4 +1,4 @@
-import { Flashbar, Button } from "@awsui/components-react";
+import { Flashbar, Button } from "@cloudscape-design/components";
 import { useDispatch, useSelector } from "react-redux";
 
 const NotificationFlashbar = () => {

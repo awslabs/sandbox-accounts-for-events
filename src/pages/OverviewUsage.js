@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Link,
@@ -12,7 +12,7 @@ import {
     Pagination,
     PropertyFilter,
     SpaceBetween
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import Navigation from "./components/Navigation";
 import GitHubLinks from "./components/GitHubLinks";
 import { PropertyFilteri18nStrings, paginationLabels } from "./components/labels";
@@ -142,7 +142,7 @@ const OverviewUsage = () => {
             items={items}
             header={
                 <Header
-                    variant="awsui-h1-sticky"
+                    variant="h1"
                     counter={"(" + Items.items.length + ")"}
                     actions={<Button iconName="refresh" onClick={refreshNow} />}
                 >

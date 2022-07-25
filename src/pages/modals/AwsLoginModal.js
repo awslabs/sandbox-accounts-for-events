@@ -1,4 +1,4 @@
-import { Form, Link, Modal } from "@awsui/components-react";
+import { Form, Link, Modal } from "@cloudscape-design/components";
 import { useDispatch, useSelector } from "react-redux";
 import ReactMarkdown from "react-markdown";
 import termsAndConditionsText from "../components/termsAndConditionsText";

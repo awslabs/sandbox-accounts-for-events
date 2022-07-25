@@ -1,4 +1,4 @@
-import { Alert, Box, Button, Container, FormField, Header, Input, SpaceBetween } from "@awsui/components-react";
+import { Alert, Box, Button, Container, FormField, Header, Input, SpaceBetween } from "@cloudscape-design/components";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router";

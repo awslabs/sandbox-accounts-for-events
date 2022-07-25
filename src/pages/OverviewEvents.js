@@ -1,4 +1,4 @@
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Box,
@@ -14,7 +14,7 @@ import {
     SpaceBetween,
     SplitPanel,
     Table
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEvents, deleteEvent, terminateEvent, startEvent } from "../redux/actions/events";
@@ -243,7 +243,7 @@ const ItemTable = () => {
                 selectionType="multi"
                 header={
                     <Header
-                        variant="awsui-h1-sticky"
+                        variant="h1"
                         selectedItems={collectionProps.selectedItems}
                         counter={"(" + Items.items.length + ")"}
                         actions={
@@ -388,23 +388,23 @@ const DetailSplitPanel = () => {
         >
             <ColumnLayout columns={4}>
                 <Box>
-                    <Box variant="awsui-key-label">Login link for event attendees</Box>
+                    <Box variant="h5">Login link for event attendees</Box>
                     <CopyClipboardIconButton content={awsLoginUrl}>
                         {awsLoginUrl.length > 40 ? awsLoginUrl.substring(0, 39) + "..." : awsLoginUrl}
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Event ID</Box>
+                    <Box variant="h5">Event ID</Box>
                     <CopyClipboardIconButton content={item.id}>
                         <Link href={"#/events/" + item.id}>{item.id}</Link>
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Event start date</Box>
+                    <Box variant="h5">Event start date</Box>
                     {item.eventDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Event duration</Box>
+                    <Box variant="h5">Event duration</Box>
                     {(item.eventDays > 0 ? item.eventDays + "d " : "") +
                         item.eventHours +
                         "h (" +
@@ -416,35 +416,35 @@ const DetailSplitPanel = () => {
                         ")"}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Maximum number of AWS accounts</Box>
+                    <Box variant="h5">Maximum number of AWS accounts</Box>
                     {item.maxAccounts}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Terminated AWS accounts</Box>
+                    <Box variant="h5">Terminated AWS accounts</Box>
                     {item.terminatedAccounts}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Leased AWS accounts</Box>
+                    <Box variant="h5">Leased AWS accounts</Box>
                     {item.leasedAccounts}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Free AWS accounts</Box>
+                    <Box variant="h5">Free AWS accounts</Box>
                     {item.freeAccounts}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Maximum budget per AWS account</Box>
+                    <Box variant="h5">Maximum budget per AWS account</Box>
                     {item.eventBudget + " " + Config.BUDGET_CURRENCY}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Current overall spend</Box>
+                    <Box variant="h5">Current overall spend</Box>
                     {item.eventSpend + " " + Config.BUDGET_CURRENCY}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Created on</Box>
+                    <Box variant="h5">Created on</Box>
                     {item.createdDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Owner</Box>
+                    <Box variant="h5">Owner</Box>
                     <CopyClipboardIconButton content={item.eventOwner}>
                         <Link href={"mailto:" + item.eventOwner}>{item.eventOwner}</Link>
                     </CopyClipboardIconButton>
@@ -482,7 +482,7 @@ const DetailSplitPanel = () => {
 //////////////////
 
 const OverviewEvents = () => {
-    const [splitPanelSize, setSplitPanelSize] = useState("50%");
+    const [splitPanelSize, setSplitPanelSize] = useState(500);
     const [splitPanelOpen, setSplitPanelOpen] = useState(false);
     const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
     const hasSelection = useSelector((state) => state.selection.status === "selected");

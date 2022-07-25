@@ -1,4 +1,4 @@
-import { Box, Header, Link } from "@awsui/components-react";
+import { Box, Header, Link } from "@cloudscape-design/components";
 
 const GitHubLinks = () => (
     <Box>

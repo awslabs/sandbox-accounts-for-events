@@ -11,7 +11,7 @@ import {
     TimeInput,
     Checkbox,
     Box
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import ConfirmationModal from "./ConfirmationModal";
 import moment from "moment";

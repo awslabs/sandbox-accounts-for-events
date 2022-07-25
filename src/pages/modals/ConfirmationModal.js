@@ -1,4 +1,4 @@
-import { Button, Form, FormField, Input, Modal, SpaceBetween, Alert, Header } from "@awsui/components-react";
+import { Button, Form, FormField, Input, Modal, SpaceBetween, Alert, Header } from "@cloudscape-design/components";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 

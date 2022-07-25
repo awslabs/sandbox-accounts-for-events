@@ -1,20 +1,20 @@
-@use '@awsui/design-tokens/index.scss' as awsui;
+@use '@cloudscape-design/design-tokens/index' as cloudscape;
 
 // 912px is the container breakpoint-s, the viewport breakpoint is 912(container width) + 40(closed side navigation width) + 4(negative margin from grid)
 $viewport-breakpoint-s: 957px;
 $open-navigation-width: 240px;
 
 .custom-home__header {
-  background-color: awsui.$color-background-home-header;
+  background-color: cloudscape.$color-background-home-header;
 }
 
 .custom-home__header-title {
-  color: awsui.$color-text-home-header-default;
+  color: cloudscape.$color-text-home-header-default;
 }
 
 .custom-home__category,
 .custom-home__header-sub-title {
-  color: awsui.$color-text-home-header-secondary;
+  color: cloudscape.$color-text-home-header-secondary;
 }
 
 .custom-home__header-title > * {

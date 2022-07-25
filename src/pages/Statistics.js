@@ -13,7 +13,7 @@ import {
     Spinner,
     AreaChart,
     DateRangePicker
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Navigation from "./components/Navigation";

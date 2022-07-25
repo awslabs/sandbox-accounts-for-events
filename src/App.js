@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser } from "./redux/actions/current_user";
 import { fetchConfig } from "./redux/actions/config";
 
-import { Box } from "@awsui/components-react";
+import { Box } from "@cloudscape-design/components";
 import TopMenuBar from "./pages/components/TopMenuBar";
 import Home from "./pages/Home";
 import OverviewEvents from "./pages/OverviewEvents";
@@ -24,12 +24,19 @@ import OverviewUsage from "./pages/OverviewUsage";
 import DetailEvent from "./pages/DetailEvent";
 import Statistics from "./pages/Statistics";
 import AdminConfig from "./pages/AdminConfig";
+import { applyMode, applyDensity, Density, Mode } from '@cloudscape-design/global-styles';
 
 Amplify.configure(awsconfig);
 PubSub.configure(awsconfig);
 
 const AuthContainer = ({ children }) => {
     const dispatch = useDispatch();
+    const config = useSelector((state) => state.config)
+
+    useEffect(() => {
+        applyMode(Mode[config.DISPLAY_THEME])
+        applyDensity(Density[config.DISPLAY_TEXT_MODE])
+    },[config])
 
     useEffect(() => {
         Auth.currentAuthenticatedUser()

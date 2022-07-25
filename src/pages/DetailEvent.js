@@ -1,4 +1,4 @@
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Box,
@@ -15,7 +15,7 @@ import {
     Spinner,
     Pagination,
     PropertyFilter
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -161,27 +161,27 @@ const DetailPanel = () => {
                 ) : (
                     <SpaceBetween size="l">
                         <Box>
-                            <Box variant="awsui-key-label">Event status</Box>
+                            <Box variant="h5">Event status</Box>
                             {toIconColorBox(Item.eventStatus)}
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Login link for event attendees</Box>
+                            <Box variant="h5">Login link for event attendees</Box>
                             <CopyClipboardIconButton
                                 content={window.location.protocol + "//" + window.location.host + "/#/login/" + Item.id}
                             />
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Event start date</Box>
+                            <Box variant="h5">Event start date</Box>
                             {Item.eventDate}
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Event ID</Box>
+                            <Box variant="h5">Event ID</Box>
                             <CopyClipboardIconButton content={Item.id}>
                                 <Link href={"#/events/" + Item.id}>{Item.id}</Link>
                             </CopyClipboardIconButton>
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Event duration</Box>
+                            <Box variant="h5">Event duration</Box>
                             {(Item.eventDays > 0 ? Item.eventDays + "d " : "") +
                                 Item.eventHours +
                                 "h (" +
@@ -193,17 +193,17 @@ const DetailPanel = () => {
                                 ")"}
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Owner</Box>
+                            <Box variant="h5">Owner</Box>
                             <CopyClipboardIconButton content={Item.eventOwner}>
                                 <Link href={"mailto:" + Item.eventOwner}>{Item.eventOwner}</Link>
                             </CopyClipboardIconButton>
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Maximum budget per AWS account</Box>
+                            <Box variant="h5">Maximum budget per AWS account</Box>
                             {Item.eventBudget + " " + Config.BUDGET_CURRENCY}
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Created on</Box>
+                            <Box variant="h5">Created on</Box>
                             {Item.createdDate}
                         </Box>
                     </SpaceBetween>
@@ -220,7 +220,7 @@ const DetailPanel = () => {
                 ) : (
                     <SpaceBetween size="l">
                         <Box>
-                            <Box variant="awsui-key-label">Assigned AWS accounts</Box>
+                            <Box variant="h5">Assigned AWS accounts</Box>
                             <Grid gridDefinition={[{ colspan: 3 }, { colspan: 3 }, { colspan: 3 }, { colspan: 3 }]}>
                                 <Box>
                                     <small>MAX</small>
@@ -241,7 +241,7 @@ const DetailPanel = () => {
                             </Grid>
                         </Box>
                         <Box>
-                            <Box variant="awsui-key-label">Current overall spend</Box>
+                            <Box variant="h5">Current overall spend</Box>
                             {Item.eventSpend + " " + Config.BUDGET_CURRENCY}
                         </Box>
                     </SpaceBetween>
@@ -386,7 +386,7 @@ const LeasesTable = () => {
             selectionType="multi"
             header={
                 <Header
-                    variant="awsui-h1-sticky"
+                    variant="h1"
                     selectedItems={collectionProps.selectedItems}
                     actions={
                         <SpaceBetween direction="horizontal" size="xs">

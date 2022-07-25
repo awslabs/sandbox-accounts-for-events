@@ -10,7 +10,7 @@ import {
     Grid,
     DatePicker,
     TimeInput
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

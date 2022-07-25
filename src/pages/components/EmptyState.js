@@ -1,4 +1,4 @@
-import { Box } from "@awsui/components-react";
+import { Box } from "@cloudscape-design/components";
 
 const EmptyState = ({ title, subtitle, action }) => (
     <Box textAlign="center" color="inherit">

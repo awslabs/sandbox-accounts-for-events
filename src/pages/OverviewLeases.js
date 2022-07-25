@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useCollection } from "@awsui/collection-hooks";
+import { useCollection } from "@cloudscape-design/collection-hooks";
 import {
     AppLayout,
     Link,
@@ -15,7 +15,7 @@ import {
     SplitPanel,
     ColumnLayout,
     ProgressBar
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import Navigation from "./components/Navigation";
 import GitHubLinks from "./components/GitHubLinks";
 import { useSelector } from "react-redux";
@@ -251,7 +251,7 @@ const ItemTable = () => {
                 selectionType="multi"
                 header={
                     <Header
-                        variant="awsui-h1-sticky"
+                        variant="h1"
                         counter={"(" + Items.items.length + ")"}
                         selectedItems={collectionProps.selectedItems}
                         actions={
@@ -355,21 +355,21 @@ const DetailSplitPanel = () => {
         >
             <ColumnLayout columns={3}>
                 <Box>
-                    <Box variant="awsui-key-label">User</Box>
+                    <Box variant="h5">User</Box>
                     <CopyClipboardIconButton content={item.user}>
                         <Link href={"#/users/" + encodeURIComponent(item.user)}>{item.user}</Link>
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Status</Box>
+                    <Box variant="h5">Status</Box>
                     {toColorBox(item.leaseStatus)}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Created on</Box>
+                    <Box variant="h5">Created on</Box>
                     {item.createdDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Event ID</Box>
+                    <Box variant="h5">Event ID</Box>
                     {item.eventId === "" ? (
                         "-"
                     ) : (
@@ -379,56 +379,56 @@ const DetailSplitPanel = () => {
                     )}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Status reason</Box>
+                    <Box variant="h5">Status reason</Box>
                     {item.leaseStatusReason}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Expires on</Box>
+                    <Box variant="h5">Expires on</Box>
                     {item.expiresDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Lease ID</Box>
+                    <Box variant="h5">Lease ID</Box>
                     <CopyClipboardIconButton content={item.id}>
                         <Link href={"#/leases/" + item.id}>{item.id}</Link>
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Budget</Box>
+                    <Box variant="h5">Budget</Box>
                     {item.budgetAmount} {item.budgetCurrency}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Last modified on</Box>
+                    <Box variant="h5">Last modified on</Box>
                     {item.lastModifiedDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">AWS account ID</Box>
+                    <Box variant="h5">AWS account ID</Box>
                     <CopyClipboardIconButton content={item.accountId}>
                         <Link href={"#/accounts/" + item.accountId}>{item.accountId}</Link>
                     </CopyClipboardIconButton>
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Current spend</Box>
+                    <Box variant="h5">Current spend</Box>
                     {item.spendAmount} {item.budgetCurrency}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Lease status modified on</Box>
+                    <Box variant="h5">Lease status modified on</Box>
                     {item.leaseStatusModifiedDate}
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Principal ID</Box>
+                    <Box variant="h5">Principal ID</Box>
                     <CopyClipboardIconButton content={item.principalId} />
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Budget utilized</Box>
+                    <Box variant="h5">Budget utilized</Box>
                     <ProgressBar variant="key-value" value={item.spendPercent} />
                 </Box>
                 <Box>
-                    <Box variant="awsui-key-label">Expiration period utilized</Box>
+                    <Box variant="h5">Expiration period utilized</Box>
                     <ProgressBar variant="key-value" value={item.expiresPercent} />
                 </Box>
             </ColumnLayout>
             <Box margin={{ top: "xxxl", bottom: "xl" }}>
-                <Box variant="awsui-key-label">AWS account direct login link</Box>
+                <Box variant="h5">AWS account direct login link</Box>
                 <CopyClipboardIconButton
                     content={window.location.protocol + "//" + window.location.host + "/#/login/" + item.id}
                 >
@@ -449,7 +449,7 @@ const DetailSplitPanel = () => {
 //////////////////
 
 const OverviewLeases = () => {
-    const [splitPanelSize, setSplitPanelSize] = useState("50%");
+    const [splitPanelSize, setSplitPanelSize] = useState(500);
     const [splitPanelOpen, setSplitPanelOpen] = useState(false);
     const [hasManuallyClosedOnce, setHasManuallyClosedOnce] = useState(false);
     const hasSelection = useSelector((state) => state.selection.status === "selected");

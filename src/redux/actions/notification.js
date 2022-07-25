@@ -1,4 +1,4 @@
-import { ProgressBar } from "@awsui/components-react";
+import { ProgressBar } from "@cloudscape-design/components";
 
 const createItem = ({ header, type, content, hasProgressBar, progressPercent, loading, hasAction }) => {
     return {

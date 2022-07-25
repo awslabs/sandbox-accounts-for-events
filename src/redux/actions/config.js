@@ -29,7 +29,9 @@ let initialState = {
     FORMAT_TIME: "HH:mm",
     UPDATE_WEBSITE_INTERVAL: 10,
     HIDE_NOTIFICATION_DURATION: 10,
-    USER_LIST_BATCH_SIZE: 60
+    USER_LIST_BATCH_SIZE: 60,
+    DISPLAY_THEME: "Light",
+    DISPLAY_TEXT_MODE: "Comfortable"
 };
 initialState = {
     ...initialState,

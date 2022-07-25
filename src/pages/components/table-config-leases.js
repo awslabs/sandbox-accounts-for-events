@@ -1,5 +1,5 @@
 import { fetchAwsLoginUrl } from "../../redux/actions/aws_login";
-import { Link, ProgressBar, Button } from "@awsui/components-react";
+import { Link, ProgressBar, Button } from "@cloudscape-design/components";
 import { toColorBox } from "./utils";
 import { useDispatch, useSelector } from "react-redux";
 

@@ -1,4 +1,4 @@
-import { Button, Container, FormField, Input, SpaceBetween, Alert, Header } from "@awsui/components-react";
+import { Button, Container, FormField, Input, SpaceBetween, Alert, Header } from "@cloudscape-design/components";
 import { useState } from "react";
 import { useParams } from "react-router";
 import AwsLoginModal from "../modals/AwsLoginModal";

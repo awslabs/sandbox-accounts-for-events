@@ -1,11 +1,9 @@
 import { Auth } from "aws-amplify";
-import { Button, Link, Header } from "@awsui/components-react";
+import { Button, Link, Header, TopNavigation } from "@cloudscape-design/components";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { TopNavigationi18nStrings } from "../components/labels";
 import ConfirmationModal from "../modals/ConfirmationModal";
-
-import TopNavigation from "@awsui/components-react/top-navigation/1.0-beta";
 import { useNavigate } from "react-router-dom";
 
 const TopMenuBar = () => {

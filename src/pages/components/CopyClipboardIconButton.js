@@ -1,4 +1,4 @@
-import { Box, Button, Popover, StatusIndicator } from "@awsui/components-react";
+import { Box, Button, Popover, StatusIndicator } from "@cloudscape-design/components";
 import React, { useState } from "react";
 
 const CopyClipboardIconButton = ({ content, children }) => {

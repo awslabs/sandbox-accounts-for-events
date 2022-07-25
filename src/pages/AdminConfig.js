@@ -10,8 +10,9 @@ import {
     Button,
     Header,
     HelpPanel,
+    Select,
     SpaceBetween
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Navigation from "./components/Navigation";
@@ -164,7 +165,7 @@ const AdminConfig = () => {
             tools={<SideHelp />}
             notifications={<NotificationFlashbar />}
             content={
-                <Container header={<Header>Configuration settings</Header>}>
+                <Container header={<Header variant="h1">Configuration settings</Header>}>
                     <Form
                         actions={
                             <SpaceBetween direction="horizontal" size="l">
@@ -194,7 +195,7 @@ const AdminConfig = () => {
                     >
                         <SpaceBetween size="l">
                             <Box>
-                                <Header>Lease and event parameters</Header>
+                                <Header variant="h3">Lease and event parameters</Header>
                                 <ColumnLayout borders="vertical" columns={3}>
                                     <FormField
                                         label="Maximum duration per event (in days)"
@@ -281,7 +282,7 @@ const AdminConfig = () => {
                                 </ColumnLayout>
                             </Box>
                             <Box>
-                                <Header>Display preferences</Header>
+                                <Header variant="h3">Display preferences</Header>
                                 <ColumnLayout borders="vertical" columns={3}>
                                     <FormField
                                         label="Format string for date + time fields"
@@ -367,7 +368,21 @@ const AdminConfig = () => {
                                             data-testid="UPDATE_WEBSITE_INTERVAL"
                                         />
                                     </FormField>
-                                    <FormField />
+                                    <FormField
+                                        label="Display Theme"
+                                    >
+                                        <Select
+                                            onChange={({ detail }) =>
+                                                updateFormValue({ DISPLAY_THEME: detail.selectedOption.value })
+                                            }
+                                            selectedAriaLabel="Selected"
+                                            selectedOption={{ label: value.DISPLAY_THEME, value: value.DISPLAY_THEME }}
+                                            options={[
+                                                { label: "Light Mode", value: "Light" },
+                                                { label: "Dark Mode", value: "Dark" }
+                                            ]}
+                                        />
+                                    </FormField>
                                     <FormField
                                         label="Format string for date label in statistics charts"
                                         errorText={inputError.STATISTICS_X_AXIS_DATE_FORMAT}
@@ -390,6 +405,21 @@ const AdminConfig = () => {
                                             }
                                             value={value.HIDE_NOTIFICATION_DURATION}
                                             data-testid="HIDE_NOTIFICATION_DURATION"
+                                        />
+                                    </FormField>
+                                    <FormField
+                                        label="Display Text Mode"
+                                    >
+                                        <Select
+                                            onChange={({ detail }) =>
+                                                updateFormValue({ DISPLAY_TEXT_MODE: detail.selectedOption.value })
+                                            }
+                                            selectedAriaLabel="Selected"
+                                            selectedOption={{ label: value.DISPLAY_TEXT_MODE, value: value.DISPLAY_TEXT_MODE }}
+                                            options={[
+                                                { label: "Comfortable Text Mode", value: "Comfortable" },
+                                                { label: "Compact Text Mode", value: "Compact" }
+                                            ]}
                                         />
                                     </FormField>
                                 </ColumnLayout>

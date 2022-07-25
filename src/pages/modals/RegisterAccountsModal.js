@@ -9,7 +9,7 @@ import {
     Modal,
     SpaceBetween,
     Textarea
-} from "@awsui/components-react";
+} from "@cloudscape-design/components";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerAccounts } from "../../redux/actions/accounts";

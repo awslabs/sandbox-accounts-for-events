@@ -1,4 +1,4 @@
-import { Box, SpaceBetween, Icon } from "@awsui/components-react";
+import { Box, SpaceBetween, Icon } from "@cloudscape-design/components";
 
 export const isEmpty = (item) => Object.keys(item).length === 0;
 
