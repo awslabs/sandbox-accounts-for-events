@@ -31,17 +31,17 @@ endif
 .SILENT:
 
 build: 
-# create "build" folder if it doesn't exist and empty it
-	mkdir -p build
-	rm -f build/*
+# create "build-cfn" folder if it doesn't exist and empty it
+	mkdir -p build-cfn
+	rm -f build-cfn/*
 
 # create build artifacts (= zip files) for CloudFormation deployment
-	git archive --format zip --output build/sandbox-accounts-for-events.zip main
-	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -r ../../../build/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
-	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -r ../../../build/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
+	git archive --format zip --output build-cfn/sandbox-accounts-for-events.zip main
+	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
+	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
 
 # upload build artifacts and CloudFormation template to specified S3 bucket
-	aws s3 sync build s3://$(bucket) $(profileString)
+	aws s3 sync build-cfn s3://$(bucket) $(profileString)
 	aws s3 cp install/sandbox-accounts-for-events-install.yaml s3://$(bucket)/sandbox-accounts-for-events-install.yaml $(profileString)
 
 

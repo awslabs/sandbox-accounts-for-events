@@ -3,16 +3,27 @@ version: 0.2
 phases:
   install:
     commands:
-      - wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
-      - unzip terraform_0.12.31_linux_amd64.zip -d /usr/bin
+      # Download and install TerraForm 1.2.6
+      - wget https://releases.hashicorp.com/terraform/1.2.6/terraform_1.2.6_linux_amd64.zip
+      - unzip terraform_1.2.6_linux_amd64.zip -d /usr/bin/
+
   pre_build:
     commands:
-      - chmod +x dce-integration/scripts/terraform-rollback.sh
-      - aws s3 cp s3://$TERRAFORM_BUCKET/team-provider-info.json .
-      - export AMPLIFY_BUCKET=$(cat team-provider-info.json | jq -r '.main.categories.function.safeAdminApi.deploymentBucketName')
+      # Set "Sandbox Accounts for Events"-specific config for TerraForm variables
+      - cp dce-integration/modules/dce.tfvars dce/modules/
+
   build:
     commands:
-      - dce-integration/scripts/terraform-rollback.sh
-      - aws s3 rm s3://$AMPLIFY_BUCKET/ --recursive || true
-      - aws s3 rm s3://$TERRAFORM_BUCKET/ --recursive || true
-      - aws s3 rm s3://$LOG_BUCKET/ --recursive || true
+      # Get bucket name from Amplify parameter file and delete bucket if Amplify hasn't done it
+      - aws s3 cp s3://$TERRAFORM_BUCKET/team-provider-info.json . || true
+      - export AMPLIFY_BUCKET=$(cat team-provider-info.json | jq -r '.main.categories.function.safeAdminApi.deploymentBucketName') || true
+      - aws s3 rb s3://$AMPLIFY_BUCKET --force || true
+
+      # Execute destroy script of Terraform deployment & delete state bucket
+      - chmod +x dce-integration/scripts/terraform-destroy.sh
+      - cd dce/modules
+      - ../../dce-integration/scripts/terraform-destroy.sh || true
+      - cd ../..
+
+      # Empty Log bucket so CFN can delete it 
+      - aws s3 rm s3://$LOG_BUCKET --recursive || true

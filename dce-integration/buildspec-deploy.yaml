@@ -6,9 +6,9 @@ phases:
       golang: 1.13
 
     commands:
-      # Download and install TerraForm 1.2.1
-      - wget https://releases.hashicorp.com/terraform/1.2.1/terraform_1.2.1_linux_amd64.zip
-      - unzip terraform_1.2.1_linux_amd64.zip -d /usr/bin/
+      # Download and install TerraForm 6
+      - wget https://releases.hashicorp.com/terraform/1.2.6/terraform_1.2.6_linux_amd64.zip
+      - unzip terraform_1.2.6_linux_amd64.zip -d /usr/bin/
 
   pre_build:
     commands:
@@ -28,7 +28,7 @@ phases:
       # Set "Sandbox Accounts for Events"-specific config for TerraForm variables
       - cp dce-integration/modules/dce.tfvars dce/modules/
 
-      # Use updated Makefile and TerraForm main.tf to allow TerraForm version 1.2.1
+      # Use updated Makefile and TerraForm main.tf to allow TerraForm version 1.2.6
       - cp dce-integration/Makefile dce/Makefile
       - cp dce-integration/modules/main.tf dce/modules/main.tf
 
@@ -47,15 +47,9 @@ phases:
   build:
     commands:
       # Build and deploy backend resources via TerraForm
+      - chmod +x dce-integration/scripts/terraform-deploy.sh
       - cd dce/modules
-      - terraform init
-      - terraform apply -var-file dce.tfvars -auto-approve || (terraform destroy -auto-approve && false)
-
-      # Save TerraForm state and outputs to dedicated S3 bucket for later use 
-      - zip -r terraform.state.zip *
-      - aws s3 cp terraform.state.zip s3://$TERRAFORM_BUCKET/ || (terraform destroy -auto-approve && false)
-      - terraform output -json > terraform.output
-      - aws s3 cp terraform.output s3://$TERRAFORM_BUCKET/
+      - ../../dce-integration/scripts/terraform-deploy.sh
 
       # Build & deploy code artifacts
       - cd ..
