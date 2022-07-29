@@ -9,9 +9,8 @@ phases:
 
   pre_build:
     commands:
-      # Set "Sandbox Accounts for Events"-specific config for TerraForm variables
+      # Create TerraForm execution folder
       - mkdir -p dce/modules
-      - cp dce-integration/modules/dce.tfvars dce/modules
 
   build:
     commands:
