@@ -107,10 +107,10 @@ If you experience CloudFormation error messages stating failed deployment/rollba
     unzip terraform.state.zip
     ```
 
-1. Download & unzip TerraForm v0.12 to your local environment and initialize it:
+1. Download & unzip TerraForm v1.2.6 to your local environment and initialize it:
     ```bash
-    wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
-    unzip terraform_0.12.31_linux_amd64.zip
+    wget https://releases.hashicorp.com/terraform/1.2.6/terraform_1.2.6_linux_amd64.zip
+    unzip terraform_1.2.6_linux_amd64.zip
     terraform init
     ```
 
