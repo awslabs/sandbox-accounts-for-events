@@ -321,7 +321,7 @@ const DetailSplitPanel = () => {
     useEffect(() => {
         if (selection.status === "selected") {
             setItem(accounts.items.find((account) => account.id === selection.id) ?? {});
-            setAccountLeases(leases.items.filter((item) => item.accountId === selection.id));
+            setAccountLeases(leases.items.filter((accountItem) => accountItem.accountId === selection.id));
         }
     }, [selection, accounts, leases, Config]);
 

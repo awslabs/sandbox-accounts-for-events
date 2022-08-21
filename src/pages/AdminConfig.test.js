@@ -10,7 +10,7 @@ const ReduxProvider = ({ children, reduxStore }) => <Provider store={reduxStore}
 test("renders AdminConfig, enters valid and invalid texts, submits", async () => {
 
     const config = store.getState().config
-    const fetchConfigAction = jest.spyOn(actions, "fetchConfig").mockImplementation((config) => () => config)
+    const fetchConfigAction = jest.spyOn(actions, "fetchConfig").mockImplementation((fetchConfig) => () => fetchConfig)
 
     render(
         <ReduxProvider reduxStore={store}>
@@ -63,7 +63,7 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
     userEvent.click(confirmUndoButton)
 
     // submit and test redux action call payload
-    const saveConfigAction = jest.spyOn(actions, "updateConfig").mockImplementation((config) => () => config)
+    const saveConfigAction = jest.spyOn(actions, "updateConfig").mockImplementation((updateConfig) => () => updateConfig)
     userEvent.click(saveButtonElement)
 
     // identify components of confirmation dialog

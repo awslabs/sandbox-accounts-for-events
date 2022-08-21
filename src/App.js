@@ -3,13 +3,11 @@ import Amplify, { Auth } from "aws-amplify";
 import awsconfig from "./aws-exports";
 import PubSub from "@aws-amplify/pubsub";
 
-import { Provider } from "react-redux";
-import { Route, Outlet, Navigate } from "react-router-dom";
-import { Routes, HashRouter } from "react-router-dom";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { Route, Outlet, Navigate, Routes, HashRouter } from "react-router-dom";
 import store from "./redux/store";
 
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { setCurrentUser } from "./redux/actions/current_user";
 import { fetchConfig } from "./redux/actions/config";
 

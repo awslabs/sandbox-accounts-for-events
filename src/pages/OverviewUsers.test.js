@@ -47,7 +47,7 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     const fetchUsersAction = jest.spyOn(userActions, "fetchUsers").mockImplementation((users) => () => users)
     store.dispatch({ type: "users/loaded", payload: [testUser], addUsers: false, config })
     store.dispatch({ type: "leases/loaded", payload: [testLease], config })
-    const tree = render(
+    render(
         <ReduxProvider reduxStore={store}>
             <OverviewUsers/>
         </ReduxProvider>

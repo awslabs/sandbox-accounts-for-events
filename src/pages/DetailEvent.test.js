@@ -5,7 +5,6 @@ import { HashRouter } from "react-router-dom";
 import * as redux from "react-redux";
 import store from "../redux/store";
 import * as eventActions from "../redux/actions/events";
-import * as leaseActions from "../redux/actions/leases";
 import moment from "moment";
 
 const ReduxProvider = ({ children, reduxStore }) => <redux.Provider store={reduxStore}>{children}</redux.Provider>;

@@ -37,7 +37,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(awsServerlessExpressMiddleware.eventContext());
 
 // Enable CORS for all methods
-app.use((req, res, next) => {
+app.use((_req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 // Only perform tasks if the user is in a specific group
 const allowedGroups = process.env.GROUP.split(',');
 
-const checkGroup = function(req, res, next) {
+const checkGroup = function(req, _res, next) {
   if (req.path == '/signUserOut') {
     return next();
   }
@@ -293,7 +293,7 @@ app.post('/deleteUser', async (req, res, next) => {
 });
 
 // Error middleware must be defined last
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
   console.error(err.message);
   if (!err.statusCode) err.statusCode = 500; // If err has no specified error code, set error code to 'Internal Server Error (500)'
   res

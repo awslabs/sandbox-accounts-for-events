@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AppLayout, Grid, Box, Header, HelpPanel, Button, Cards, SpaceBetween } from "@cloudscape-design/components";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Navigation from "./components/Navigation";
 import { appLayoutLabels, itemSelectionLabels } from "./components/labels";
 import "../styles/home-page.scss";
@@ -8,7 +8,6 @@ import { AmplifyAuthenticator, AmplifySignIn, AmplifySignUp } from "@aws-amplify
 import { AuthState } from "@aws-amplify/ui-components";
 import EventLogin from "./components/EventLogin";
 import LeaseLogin from "./components/LeaseLogin";
-import { useDispatch } from "react-redux";
 import { useParams } from "react-router";
 import { regExpAll } from "./components/utils";
 import { setCurrentUser } from "../redux/actions/current_user";

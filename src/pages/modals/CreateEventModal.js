@@ -57,7 +57,7 @@ const CreateEventModal = () => {
             errors.EMAIL = "Invalid email address.";
         }
 
-        if (!(allowEmptyValues && newValue.eventDays === "") && !/^[0-9]+$/.test(newValue.eventDays)) {
+        if (!(allowEmptyValues && newValue.eventDays === "") && !/^\d+$/.test(newValue.eventDays)) {
             errors.DURATION = "Invalid number of days. Please enter a valid number.";
         } else {
             if (parseInt(newValue.eventDays) > Config.EVENT_MAX_DAYS) {
@@ -65,7 +65,7 @@ const CreateEventModal = () => {
             }
         }
 
-        if (!(allowEmptyValues && newValue.eventHours === "") && !/^[0-9]+$/.test(newValue.eventHours)) {
+        if (!(allowEmptyValues && newValue.eventHours === "") && !/^\d+$/.test(newValue.eventHours)) {
             errors.DURATION = "Invalid number of hours. Please enter a valid number.";
         } else {
             if (parseInt(newValue.eventHours) > 23) {
@@ -74,7 +74,7 @@ const CreateEventModal = () => {
             }
         }
 
-        if (!(allowEmptyValues && newValue.eventBudget === "") && !/^[0-9]+(\.[0-9]+)*$/.test(newValue.eventBudget)) {
+        if (!(allowEmptyValues && newValue.eventBudget === "") && !/^\d+(\.\d+)*$/.test(newValue.eventBudget)) {
             errors.BUDGET = "Invalid budget. Please enter a valid decimal value.";
         } else {
             if (parseFloat(newValue.eventBudget) > Config.ACCOUNT_MAX_BUDGET) {
@@ -82,7 +82,7 @@ const CreateEventModal = () => {
             }
         }
 
-        if (!(allowEmptyValues && newValue.maxAccounts === "") && !/^[0-9]+$/.test(newValue.maxAccounts)) {
+        if (!(allowEmptyValues && newValue.maxAccounts === "") && !/^\d+$/.test(newValue.maxAccounts)) {
             errors.ACCOUNTS = "Invalid number of AWS accounts. Please enter a valid number.";
         } else {
             if (parseInt(newValue.maxAccounts) > Config.EVENT_MAX_ACCOUNTS) {

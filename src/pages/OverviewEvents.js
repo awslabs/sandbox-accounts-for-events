@@ -374,7 +374,7 @@ const DetailSplitPanel = () => {
             setItem(events.items.find((event) => event.id === selection.id) ?? {});
             setAwsLoginUrl(window.location.protocol + "//" + window.location.host + "/#/login/" + selection.id);
             setEventLeases(
-                leases.items.filter((item) => item.principalId.substring(0, Config.EVENT_ID_LENGTH) === selection.id)
+                leases.items.filter((leaseItem) => leaseItem.principalId.substring(0, Config.EVENT_ID_LENGTH) === selection.id)
             );
         }
     }, [selection, events, leases, Config]);

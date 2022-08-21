@@ -122,31 +122,31 @@ export const externalLinkProps = {
 };
 
 export const distributionSelectionLabels = {
-    itemSelectionLabel: (data, row) => `select ${row.id}`,
+    itemSelectionLabel: (_data, row) => `select ${row.id}`,
     allItemsSelectionLabel: () => "select all",
     selectionGroupLabel: "Distribution selection"
 };
 
 export const itemSelectionLabels = {
-    itemSelectionLabel: (data, row) => `select ${row.id}`,
+    itemSelectionLabel: (_data, row) => `select ${row.id}`,
     allItemsSelectionLabel: () => "select all",
     selectionGroupLabel: "Item selection"
 };
 
 export const originsSelectionLabels = {
-    itemSelectionLabel: (data, row) => `select ${row.name}`,
+    itemSelectionLabel: (_data, row) => `select ${row.name}`,
     allItemsSelectionLabel: () => "select all",
     selectionGroupLabel: "Origins selection"
 };
 
 export const behaviorsSelectionLabels = {
-    itemSelectionLabel: (data, row) => `select path ${row.pathPattern} from origin ${row.origin}`,
+    itemSelectionLabel: (_data, row) => `select path ${row.pathPattern} from origin ${row.origin}`,
     allItemsSelectionLabel: () => "select all",
     selectionGroupLabel: "Behaviors selection"
 };
 
 export const logsSelectionLabels = {
-    itemSelectionLabel: (data, row) => `select ${row.name}`,
+    itemSelectionLabel: (_data, row) => `select ${row.name}`,
     allItemsSelectionLabel: () => "select all",
     selectionGroupLabel: "Logs selection"
 };

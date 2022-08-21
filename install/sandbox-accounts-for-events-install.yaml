@@ -330,8 +330,8 @@ Resources:
                   - s3:Delete*
                   - s3:List*
                 Resource:
-                  - !Sub arn:aws:s3:::amplify-*
-                  - !Sub arn:aws:s3:::amplify-*/*
+                  - arn:aws:s3:::amplify-*
+                  - arn:aws:s3:::amplify-*/*
 
   AppUiAmplifyDeployment:
     Type: Custom::AppUiAmplifyDeployment

@@ -42,11 +42,11 @@ const CreateLeaseModal = ({ isAdminView }) => {
             errors.EMAIL = "Invalid email address.";
         }
 
-        if (!(newValue.eventId === "") && !new RegExp(regExpAll(Config.EVENT_ID_REGEX)).test(newValue.eventId)) {
+        if ((newValue.eventId !== "") && !new RegExp(regExpAll(Config.EVENT_ID_REGEX)).test(newValue.eventId)) {
             errors.EVENT_ID = "Invalid event ID.";
         }
 
-        if (!(allowEmptyValues && newValue.budgetAmount === "") && !/^[0-9]+(\.[0-9]+)*$/.test(newValue.budgetAmount)) {
+        if (!(allowEmptyValues && newValue.budgetAmount === "") && !/^\d+(\.\d+)*$/.test(newValue.budgetAmount)) {
             errors.BUDGET = "Invalid budget. Please enter a valid decimal value.";
         } else {
             if (parseFloat(newValue.budgetAmount) > Config.ACCOUNT_MAX_BUDGET) {
@@ -54,7 +54,7 @@ const CreateLeaseModal = ({ isAdminView }) => {
             }
         }
 
-        if (!(allowEmptyValues && newValue.expiryDays === "") && !/^[0-9]+$/.test(newValue.expiryDays)) {
+        if (!(allowEmptyValues && newValue.expiryDays === "") && !/^\d+$/.test(newValue.expiryDays)) {
             errors.DURATION = "Invalid number of days. Please enter a valid number.";
         } else {
             if (parseInt(newValue.expiryDays) > Config.EVENT_MAX_DAYS) {
@@ -62,7 +62,7 @@ const CreateLeaseModal = ({ isAdminView }) => {
             }
         }
 
-        if (!(allowEmptyValues && newValue.expiryHours === "") && !/^[0-9]+$/.test(newValue.expiryHours)) {
+        if (!(allowEmptyValues && newValue.expiryHours === "") && !/^\d+$/.test(newValue.expiryHours)) {
             errors.DURATION = "Invalid number of hours. Please enter a valid number.";
         } else {
             if (parseInt(newValue.expiryHours) > 23) {

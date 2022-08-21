@@ -37,11 +37,11 @@ const invokeApi = (path, method, body = null) => {
             path: apiUrl.pathname + "/" + path
         };
         if (body !== null) {
-            (params.body = bodyString),
-                (params.headers = {
-                    "Content-Type": "application/json",
-                    "Content-Length": Buffer.byteLength(bodyString)
-                });
+            params.body = bodyString;
+            params.headers = {
+                "Content-Type": "application/json",
+                "Content-Length": Buffer.byteLength(bodyString)
+            };
         }
         const httpRequest = https.request(aws4.sign(params), (result) => {
             let data = "";
@@ -49,13 +49,13 @@ const invokeApi = (path, method, body = null) => {
                 data += chunk;
             });
             result.on("end", () => {
-                let result;
+                let endResult;
                 try {
-                    result = JSON.parse(data.toString());
+                    endResult = JSON.parse(data.toString());
                 } catch (e) {
-                    result = data.toString();
+                    endResult = data.toString();
                 }
-                resolve(result);
+                resolve(endResult);
             });
             result.on("error", (error) => reject(error));
         });
@@ -309,7 +309,7 @@ exports.handler = async ({ arguments: args }) => {
             case "listUsage":
                 return listUsage();
             default:
-                throw "unknown API action '" + args.action + "'";
+                throw new Error("unknown API action '" + args.action + "'");
         }
     } catch (error) {
         return respondWithError("Internal error while trying to execute task.", error);

@@ -26,8 +26,7 @@ const EditUserModal = () => {
 
     const updateFormValue = (update) => {
         setValue((prev) => {
-            let newValue = { ...prev, ...update };
-            return newValue;
+            return { ...prev, ...update };
         });
     };
 

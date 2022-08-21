@@ -34,7 +34,7 @@ def wait_for_amplify_backend_deletion(stack_name):
             print(stacks)
             deleteStatus = stacks['Stacks'][0]['StackStatus']
         except Exception as e:
-            print("Amplify backend stacks successfully deleted.")
+            print("Amplify backend stacks successfully deleted.", e)
             deleteStatus = "DELETE_COMPLETE"
     return deleteStatus
 
@@ -45,7 +45,7 @@ def handler(event, context):
                 repositoryName=repo,
                 branchName=branch
             )
-            newCommit = codecommit_client.create_commit(
+            codecommit_client.create_commit(
                 repositoryName=repo,
                 branchName=branch,
                 parentCommitId = parentCommit['branch']['commitId'],

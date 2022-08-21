@@ -44,12 +44,12 @@ const RegisterAccountsModal = () => {
 
         if (
             !(allowEmptyValues && newValue.accountIds.length === 0) &&
-            !/^[,;\s]*["']{0,1}\d{12}["']{0,1}([,;\s]+["']{0,1}\d{12}["']{0,1})*[,;\s]*$/.test(newValue.accountIds)
+            !/^[,;\s]*["']?\d{12}["']?([,;\s]+["']?\d{12}["']?)*[,;\s]*$/.test(newValue.accountIds)
         ) {
             errors.ACCOUNTS = "Invalid account ID list.";
         }
 
-        if (!(newValue.roleName.length === 0) && !/^[\w+=,.@-]{1,64}$/.test(newValue.roleName)) {
+        if ((newValue.roleName.length !== 0) && !/^[\w+=,.@-]{1,64}$/.test(newValue.roleName)) {
             errors.ROLE = "Invalid role name.";
         }
 
@@ -75,7 +75,7 @@ const RegisterAccountsModal = () => {
         if (!validateInputs(newValue, false)) return;
         let accountIds = value.accountIds.match(/\d{12}/g);
 
-        let duplicateAccounts = accountIds.filter((value, idx, list) => list.indexOf(value) !== idx);
+        let duplicateAccounts = accountIds.filter((idValue, idx, list) => list.indexOf(idValue) !== idx);
         if (duplicateAccounts.length > 0) {
             setInputError((errors) => ({
                 ...errors,

@@ -45,7 +45,7 @@ const EditLeaseModal = ({ isAdminView }) => {
     const validateInputs = (newValue) => {
         let errors = {};
 
-        if (!/^[0-9]+(\.[0-9]+)*$/.test(newValue.budgetAmount)) {
+        if (!/^\d+(\.\d+)*$/.test(newValue.budgetAmount)) {
             errors.BUDGET = "Invalid budget. Please enter a valid decimal value.";
         } else {
             if (parseFloat(newValue.budgetAmount) > Config.ACCOUNT_MAX_BUDGET) {

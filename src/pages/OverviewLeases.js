@@ -18,8 +18,7 @@ import {
 } from "@cloudscape-design/components";
 import Navigation from "./components/Navigation";
 import GitHubLinks from "./components/GitHubLinks";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { fetchLeases, deleteLease, terminateLeases } from "../redux/actions/leases";
 import { toColorBox } from "./components/utils";
 import EmptyState from "./components/EmptyState";

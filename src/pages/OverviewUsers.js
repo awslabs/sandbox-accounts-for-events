@@ -340,7 +340,7 @@ const DetailSplitPanel = () => {
     useEffect(() => {
         if (selection.status === "selected") {
             setItem(users.items.find((user) => user.email === selection.id) ?? {});
-            setUserLeases(leases.items.filter((item) => item.user === selection.id));
+            setUserLeases(leases.items.filter((userItem) => userItem.user === selection.id));
         }
     }, [selection, users, leases, Config]);
 
