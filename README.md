@@ -27,12 +27,12 @@ Although it is not required to set up [AWS Organizations](https://docs.aws.amazo
 
 If creating/using an AWS Organizations is no option, you can also set up *Sandbox Accounts for Events* in a "flat" AWS account structure.
 
-See chapter [Children Accounts](accounts.md) to learn about both options and understand how to deploy them.
+See chapter [Children Accounts](docs/accounts.md) to learn about both options and understand how to deploy them.
 
 # Installing Sandbox Accounts for Events
 
 Prerequisites:
-* An AWS account, preferably part of AWS Organizations (see chapter "AWS Account structure recommendation")
+* An AWS account, preferably part of AWS Organizations (see recommendations in chapter [Children Accounts](docs/accounts.md))
 * AWS CLI installed
 * GNU make installed
 
@@ -138,7 +138,7 @@ Follow the manuals in the "docs" folder to understand how to operate *Sandbox Ac
 * [End user documentation](docs/user.md) - End user guide how to log in and lease an AWS account
 * [Operator documentation](docs/operator.md) - Operator guide how to set up & manage events, manage users and provide AWS account leases
 * [Admin documentation](docs/admin.md) - Admin guide how to register and manage AWS account pool
-* [Children Accounts](accounts.md) - How to create and prepare AWS accounts for your account pool
+* [Children Accounts](docs/accounts.md) - How to create and prepare AWS accounts for your account pool
 * [FAQ](docs/faq.md) - Answers to commonly asked questions
 
 # Contributing to *Sandbox Accounts for Events*
