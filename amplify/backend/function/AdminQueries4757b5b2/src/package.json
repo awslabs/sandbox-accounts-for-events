@@ -15,8 +15,5 @@
     "body-parser": "^1.17.2",
     "express": "^4.17.1",
     "uuid": "^7.0.3"
-  },
-  "devDependencies": {
-    "aws-lambda-build": "^1.0.7"
   }
 }
