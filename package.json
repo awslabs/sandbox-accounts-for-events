@@ -5,16 +5,17 @@
   "dependencies": {
     "@aws-amplify/ui-components": "^1.6.0",
     "@aws-amplify/ui-react": "^1.2.4",
-    "@cloudscape-design/components": "^3.0.4",
+    "@cloudscape-design/components": "^3.0.45",
     "@cloudscape-design/design-tokens": "^3.0.1",
     "@cloudscape-design/global-styles": "^1.0.1",
-    "@reduxjs/toolkit": "^1.7.1",
-    "@testing-library/jest-dom": "^5.14.1",
+    "@reduxjs/toolkit": "^1.8.5",
+    "@svgr/webpack": "^6.2.1",
+    "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
-    "aws-amplify": "^4.3.11",
+    "aws-amplify": "^4.3.34",
     "aws-amplify-react": "^5.0.4",
-    "aws-sdk": "^2.939.0",
+    "aws-sdk": "^2.1209.0",
     "aws4": "^1.11.0",
     "moment": "^2.29.4",
     "nanoid": "^3.1.23",
@@ -25,7 +26,7 @@
     "react-router-dom": "^6.2.1",
     "redux": "^4.1.2",
     "redux-thunk": "^2.4.1",
-    "sass": "^1.45.1",
+    "sass": "^1.54.8",
     "web-vitals": "^1.1.2"
   },
   "scripts": {
@@ -54,7 +55,7 @@
   },
   "devDependencies": {
     "react-error-overlay": "6.0.9",
-    "react-scripts": "^5.0.0",
+    "react-scripts": "^5.0.1",
     "react-test-renderer": "^18.2.0"
   }
 }
