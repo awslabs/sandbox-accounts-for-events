@@ -45,9 +45,10 @@ const accounts = (state = initialState, action) => {
                     '                "AWS": "arn:aws:iam::' +
                     action.masterAccountId +
                     ':root"\n' +
+                    "            },\n" +
+                    '            "Action": "sts:AssumeRole",\n' +
+                    '            "Condition": {}\n' +
                     "        },\n" +
-                    '        "Action": "sts:AssumeRole",\n' +
-                    '        "Condition": {}\n' +
                     "    ]\n" +
                     "}"
             };

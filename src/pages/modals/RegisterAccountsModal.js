@@ -163,7 +163,7 @@ const RegisterAccountsModal = () => {
                         <Input
                             onChange={({ detail }) => updateFormValue({ roleName: detail.value })}
                             value={value.roleName}
-                            placeholder="DCEAdmin"
+                            placeholder="enter IAM role, e.g. 'DCEAdmin'"
                         />
                     </FormField>
                     <ExpandableSection
