@@ -118,7 +118,7 @@ const registerAccount = ({ id, roleName }) => {
                         .promise()
                         .then((aliases) => {
                             if (aliases.AccountAliases.length === 0)
-                                return respondWithError("No account alias found for account " + id + ".", error);
+                                return respondWithError("No account alias found for account " + id + ".");
                             return invokeApi("accounts", "POST", {
                                 adminRoleArn: roleArn,
                                 id: id
