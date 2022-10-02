@@ -33,7 +33,7 @@ See chapter [Children Accounts](docs/accounts.md) to learn about both options an
 
 Prerequisites:
 * An AWS account, preferably part of AWS Organizations (see recommendations in chapter [Children Accounts](docs/accounts.md))
-* AWS CLI installed
+* AWS CLI v2 installed
 * GNU make installed
 
 1. Clone this GitHub repository to your local environment:
@@ -43,13 +43,13 @@ Prerequisites:
     ```
 
 1. Review if you want to add any content or change configuration values in the following files:  
-    *- dce-integration/modules/dce.tfvars*  
-    *- dce-integration/cmd/codebuild/reset/default-config-nuke-template.yml*  
-    *- dce-integration/cmd/codebuild/reset/pre-cleanup.sh*  
-    *- dce-integration/cmd/codebuild/reset/fix-cleanup.sh*  
-    *- dce-integration/cmd/codebuild/reset/post-cleanup.sh*  
-    *- src/pages/components/termsAndConditionsText.js*
-    *- dce-integration/modules/fixtures/policies/principal_policy.tmpl*  
+    - `dce-integration/modules/dce.tfvars`
+    - `dce-integration/cmd/codebuild/reset/default-config-nuke-template.yml` (If you use SSO andControltower, use [filter-presets](https://github.com/rebuy-de/aws-nuke#filter-presets) with this [example](https://github.com/rebuy-de/aws-nuke/issues/711#issuecomment-1170365123).)
+    - `dce-integration/cmd/codebuild/reset/pre-cleanup.sh`
+    - `dce-integration/cmd/codebuild/reset/fix-cleanup.sh`
+    - `dce-integration/cmd/codebuild/reset/post-cleanup.sh`
+    - `src/pages/components/termsAndConditionsText.js`
+    - `dce-integration/modules/fixtures/policies/principal_policy.tmpl`
 
 1. Create an S3 bucket with a unique name to hold the *Sandbox Accounts for Events* deployment artifacts. Note down the name of the new S3 bucket:
     ```bash
