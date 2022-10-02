@@ -13,7 +13,7 @@ phases:
   pre_build:
     commands:
       # Download original DCE(TM) project from GitHub
-      - git clone https://github.com/Optum/dce.git
+      - git clone --depth 1 --branch v0.33.8 https://github.com/Optum/dce.git
 
       # Update/overwrite some files with "Sandbox Accounts for Events"-specific versions:
       # Let AWS Nuke ignore/skip deletion of OrganizationAccountAccess role
