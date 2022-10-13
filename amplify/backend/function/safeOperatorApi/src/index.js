@@ -69,7 +69,7 @@ const listLeases = () => {
         return new Date(date).toISOString().substring(0, 10);
     };
 
-    return Promise.all([invokeApi("leases", "GET"), invokeApi("usage", "GET")]).then((responses) => {
+    return Promise.all([invokeApi("leases?limit=500", "GET"), invokeApi("usage?limit=1000", "GET")]).then((responses) => {
         if (responses.error) return respondWithError("Failed to list leases.", responses.error);
         if (responses[0].message) return respondWithError("Failed to list leases.", responses[0].message);
         if (responses[1].message) return respondWithError("Failed to list usage.", responses[1].message);
@@ -236,7 +236,7 @@ const deleteLease = ({ accountId, principalId, user }) => {
 };
 
 const getStatistics = () => {
-    return Promise.all([invokeApi("leases", "GET"), invokeApi("accounts", "GET"), invokeApi("usage", "GET")])
+    return Promise.all([invokeApi("leases?limit=500", "GET"), invokeApi("accounts?limit=500", "GET"), invokeApi("usage?limit10500", "GET")])
         .then((responses) => {
             if (responses.error) return respondWithError("Failed to load statistics data.", responses.error);
             if (
@@ -259,7 +259,7 @@ const getStatistics = () => {
 };
 
 const listUsage = () => {
-    return Promise.all([invokeApi("leases", "GET"), invokeApi("usage", "GET")])
+    return Promise.all([invokeApi("leases?limit=500", "GET"), invokeApi("usage?limit=1000", "GET")])
         .then((responses) => {
             if (responses.error) return respondWithError("Failed to load usage data.", responses.error);
             if (

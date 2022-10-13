@@ -66,7 +66,7 @@ const invokeApi = (path, method, body = null) => {
 
 const listAccounts = (context) => {
     const masterAccountId = context.invokedFunctionArn.split(":")[4];
-    return invokeApi("accounts", "GET")
+    return invokeApi("accounts?limit=500", "GET")
         .then((response) => {
             if (response.message) return respondWithError("Failed to list accounts.", response.message);
             return respondWithSuccess("", {
