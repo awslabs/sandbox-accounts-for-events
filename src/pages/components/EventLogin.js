@@ -53,10 +53,10 @@ const EventLogin = () => {
     };
 
     useEffect(() => {
-        if (!valueChangedOnce && isEmpty(Event.item) && urlParamEventId) {
+        if (!valueChangedOnce && isEmpty(Event.item) && urlParamEventId && User.isLoggedIn) {
             dispatch(fetchEndUserEvent(urlParamEventId));
         }
-    }, [Event.item, urlParamEventId, dispatch, valueChangedOnce]);
+    }, [Event.item, urlParamEventId, dispatch, valueChangedOnce, User]);
 
     useEffect(() => {
         if (!Event.item.eventStatus) return;

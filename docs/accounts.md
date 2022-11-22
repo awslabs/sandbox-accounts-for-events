@@ -63,17 +63,17 @@ Any AWS account needs to fulfill two requirements to be added to the account poo
     The IAM trust policy should look like:
     ```json
     {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-        "Effect": "Allow",
-        "Principal": {
-            "AWS": "arn:aws:iam::XXXXXXXXXXXX:root"
-        },
-        "Action": "sts:AssumeRole",
-        "Condition": {}
-        }
-    ]
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": "arn:aws:iam::XXXXXXXXXXXX:root"
+                },
+                "Action": "sts:AssumeRole",
+                "Condition": {}
+            }
+        ]
     }
     ```  
     Substitute the "XXXXXXXXXXXX" part with the AWS account ID of your **master account** (where you have deployed Sandbox Accounts for Events), **not** the AWS account ID of your children accounts. If you open the "Register account(s)" dialog in the Sandbox Accounts for Events "Manage acounts" webpage, you can directly copy & paste the correct IAM trust policy from there.
