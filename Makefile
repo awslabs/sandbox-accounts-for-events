@@ -5,7 +5,7 @@
 #
 # command syntax: 
 #   make build bucket=[myDeploymentBucket]
-#   make build bucket=[myDeploymentBucket] profile=[myAwsProfile]
+#   make build bucket=[myDeploymentBucket] profile=[myAwsProfile] branch=[currentDevelopmentBranch]
 #   make deploy bucket=[myDeploymentBucket] email=[myAdminEmailAddress]
 #   make deploy bucket=[myDeploymentBucket] email=[myAdminEmailAddress] profile=[myAwsProfile]
 
@@ -25,6 +25,12 @@ ifdef profile
 profileString=--profile $(profile)
 endif
 
+# check if "branch" parameter is set for local development, otherwise set branch to "main" as default 
+ifndef branch
+branch=main
+$(info Parameter 'branch' has not been set, defaulting to branch 'main'.)
+endif
+
 
 # avoid interferences between "build" folder and "build" command, clear build history
 .PHONY: all build clean
@@ -36,13 +42,13 @@ build:
 	rm -f build-cfn/*
 
 # create build artifacts (= zip files) for CloudFormation deployment
-	git archive --format zip --output build-cfn/sandbox-accounts-for-events.zip main
+	git archive --format zip --output build-cfn/sandbox-accounts-for-events.zip $(branch)
 	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
 	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
 
 # upload build artifacts and CloudFormation template to specified S3 bucket
 	aws s3 sync build-cfn s3://$(bucket) $(profileString)
-	aws s3 cp install/sandbox-accounts-for-events-install.yaml s3://$(bucket)/sandbox-accounts-for-events-install.yaml $(profileString)
+# aws s3 cp install/sandbox-accounts-for-events-install.yaml s3://$(bucket)/sandbox-accounts-for-events-install.yaml $(profileString)
 
 
 deploy: 
