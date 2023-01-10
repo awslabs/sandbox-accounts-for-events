@@ -48,7 +48,7 @@ build:
 
 # upload build artifacts and CloudFormation template to specified S3 bucket
 	aws s3 sync build-cfn s3://$(bucket) $(profileString)
-# aws s3 cp install/sandbox-accounts-for-events-install.yaml s3://$(bucket)/sandbox-accounts-for-events-install.yaml $(profileString)
+	aws s3 cp install/sandbox-accounts-for-events-install.yaml s3://$(bucket)/sandbox-accounts-for-events-install.yaml $(profileString)
 
 
 deploy: 
