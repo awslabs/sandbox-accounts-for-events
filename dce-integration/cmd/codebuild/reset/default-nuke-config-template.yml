@@ -61,6 +61,9 @@ presets:
       IAMRolePolicyAttachment:
         - type: "glob"
           value: "AWSReservedSSO_*"
+      IAMRolePolicy:
+        - type: "glob"
+          value: "AWSReservedSSO_*"
   controltower:
     filters:
       CloudTrailTrail:
@@ -72,8 +75,14 @@ presets:
       EC2VPCEndpoint:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name
+          type: "contains"
+          value: "aws-controltower"
       EC2VPC:
         - type: "contains"
+          value: "aws-controltower"
+        - property: tag:Name
+          type: contains
           value: "aws-controltower"
       OpsWorksUserProfile:
         - type: "contains"
@@ -95,6 +104,9 @@ presets:
       EC2Subnet:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name
+          type: "contains"
+          value: "aws-controltower"
       ConfigServiceDeliveryChannel:
         - type: "contains"
           value: "aws-controltower"
@@ -107,11 +119,17 @@ presets:
       EC2RouteTable:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name 
+          type: "contains"
+          value: "aws-controltower"
       LambdaFunction:
         - type: "contains"
           value: "aws-controltower"
       EC2DHCPOption:
         - type: "contains"
+          value: "aws-controltower"
+        - property: tag:Name  
+          type: "contains"
           value: "aws-controltower"
       IAMRole:
         - type: "contains"
@@ -126,3 +144,8 @@ presets:
       IAMRolePolicy:
         - type: "contains"
           value: "aws-controltower"
+        - type: "contains"
+          value: "AWSControlTower"
+      ConfigServiceConfigRule:
+        - type: "contains"
+          value: "securityhub"
