@@ -1,4 +1,4 @@
-import API from "@aws-amplify/api";
+import { API } from "@aws-amplify/api";
 import { Auth } from "aws-amplify";
 import moment from "moment";
 import { autoDismiss } from "./notification";

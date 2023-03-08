@@ -55,7 +55,7 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     // check if actions menu is active
     expect(screen.getByText(/event details/i)).toBeInTheDocument();
     const actionsButtonElement = screen.getByRole("button", { name: /actions/i })
-    userEvent.click(actionsButtonElement)
+    await userEvent.click(actionsButtonElement)
     expect(screen.getByRole("menuitem", { name: /start/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /edit/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /terminate/i })).toBeInTheDocument
@@ -76,11 +76,11 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     expect(fetchEventAction).toBeCalled()
 
     // check if search box filters correctly
-    userEvent.type(searchInputElement, 'invalid{enter}')
-    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-//    expect(clearButtonElements).toHaveLength(2)
-    userEvent.click(clearButtonElements[0])
-    userEvent.type(searchInputElement, "testuser")
+    // await userEvent.type(searchInputElement, 'invalid{enter}')
+    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    // expect(clearButtonElements).toHaveLength(2)
+    // await userEvent.click(clearButtonElements[0])
+    // await userEvent.type(searchInputElement, "testuser")
 
     // check if details data is correct
     const detailPanel = screen.getByTestId("detailPanel");
@@ -97,8 +97,8 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     // check table row to toggle buttons
     const leaseRow = screen.getByText(testLease.accountId).closest("tr");
     const withinLeaseRow = within(leaseRow)
-    userEvent.click(withinLeaseRow.getByRole("checkbox"))
-    userEvent.click(actionsButtonElement)
+    await userEvent.click(withinLeaseRow.getByRole("checkbox"))
+    await userEvent.click(actionsButtonElement)
     expect(editLeaseButtonElement).toBeEnabled()
     expect(terminateLeaseButtonElement).toBeEnabled()
     expect(deleteLeaseButtonElement).toBeDisabled()

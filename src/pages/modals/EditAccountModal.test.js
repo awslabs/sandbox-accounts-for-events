@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import EditAccountModal from "./EditAccountModal";
 import { Provider } from "react-redux";
@@ -27,16 +27,16 @@ test("renders EditAccountModal, enters valid and invalid texts, submits", async 
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    fireEvent.change(roleInputElement, { target: { value: "" }})
-    userEvent.type(roleInputElement, 'invalid?role#name')
+    await userEvent.clear(roleInputElement)
+    await userEvent.type(roleInputElement, 'invalid?role#name')
     expect(saveButtonElement).toBeDisabled()
-    fireEvent.change(roleInputElement, { target: { value: "" }})
-    userEvent.type(roleInputElement, testObject.adminRole)
+    await userEvent.clear(roleInputElement)
+    await userEvent.type(roleInputElement, testObject.adminRole)
     expect(saveButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const saveAccountAction = jest.spyOn(actions, "updateAccount").mockImplementation((account) => () => account)
-    userEvent.click(saveButtonElement)
+    await userEvent.click(saveButtonElement)
 
     // identify components of confirmation dialog
     expect(screen.getByText(/please confirm/i)).toBeInTheDocument();
@@ -47,8 +47,8 @@ test("renders EditAccountModal, enters valid and invalid texts, submits", async 
     expect(confirmButtonElement).toBeDisabled()
 
     // input confirmation text & submit
-    userEvent.type(confirmTextInputElement, "update")
+    await userEvent.type(confirmTextInputElement, "update")
     expect(confirmButtonElement).toBeEnabled()
-    userEvent.click(confirmButtonElement)
+    await userEvent.click(confirmButtonElement)
     expect(saveAccountAction.mock.lastCall[0]).toMatchObject(testObject)
 });

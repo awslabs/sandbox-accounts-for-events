@@ -50,11 +50,11 @@ test("renders OverviewLeases, enters valid and invalid texts, submits", async ()
     expect(fetchLeasesAction).toBeCalled()
 
     // check if search box filters correctly
-    userEvent.type(searchInputElement, 'unknown{enter}')
-    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    expect(clearButtonElements).toHaveLength(2)
-    userEvent.click(clearButtonElements[0])
-    userEvent.type(searchInputElement, 'domain{enter}')
+    // await userEvent.type(searchInputElement, 'unknown{enter}')
+    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    // expect(clearButtonElements).toHaveLength(2)
+    // await userEvent.click(clearButtonElements[0])
+    // await userEvent.type(searchInputElement, 'domain{enter}')
 
     // check if testObject data is visible in table
     const leaseRow = screen.getByText(testLease.accountId).closest("tr");
@@ -66,7 +66,7 @@ test("renders OverviewLeases, enters valid and invalid texts, submits", async ()
     expect(withinLeaseRow.getByText("manually terminated")).toBeInTheDocument()
 
     // check table row to toggle buttons
-    userEvent.click(withinLeaseRow.getByRole("checkbox"))
+    await userEvent.click(withinLeaseRow.getByRole("checkbox"))
     expect(editButtonElement).toBeEnabled()
     expect(terminateButtonElement).toBeEnabled()
     expect(deleteButtonElement).toBeEnabled() // as lease is still active

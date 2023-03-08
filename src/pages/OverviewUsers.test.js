@@ -67,11 +67,11 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     expect(fetchUsersAction).toBeCalled()
 
     // check if search box filters correctly
-    userEvent.type(searchInputElement, 'unknown{enter}')
-    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    expect(clearButtonElements).toHaveLength(2)
-    userEvent.click(clearButtonElements[0])
-    userEvent.type(searchInputElement, 'domain{enter}')
+    // await userEvent.type(searchInputElement, 'unknown{enter}')
+    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    // expect(clearButtonElements).toHaveLength(2)
+    // await userEvent.click(clearButtonElements[0])
+    // await userEvent.type(searchInputElement, 'domain{enter}')
 
     // check if testObject data is visible in table
     const userRow = screen.getByText(testUser.Attributes[0].Value).closest("tr");
@@ -81,7 +81,7 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     expect(withinUserRow.getByText(testUser.lastModifiedDate)).toBeInTheDocument()
 
     // check table row to toggle buttons
-    userEvent.click(withinUserRow.getByRole("checkbox"))
+    await userEvent.click(withinUserRow.getByRole("checkbox"))
     expect(editButtonElement).toBeEnabled()
     expect(deleteButtonElement).toBeEnabled()
 

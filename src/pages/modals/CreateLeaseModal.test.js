@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CreateLeaseModal from "./CreateLeaseModal";
 import { Provider } from "react-redux";
@@ -19,7 +19,7 @@ test("renders CreateLeaseModal, cannot submit empty dialog", async () => {
     expect(screen.getByText(/create new lease/i)).toBeInTheDocument();
 
     expect(createButtonElement).toBeEnabled()
-    userEvent.click(createButtonElement)
+    await userEvent.click(createButtonElement)
     expect(createButtonElement).toBeDisabled()
 });
 
@@ -50,36 +50,36 @@ test("renders CreateLeaseModal, enters valid and invalid texts, submits", async 
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid email address
-    userEvent.type(userInputElement, "testowner")
+    await userEvent.type(userInputElement, "testowner")
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(userInputElement, { target: { value: "" }})
-    userEvent.type(userInputElement, testObject.user)
+    await userEvent.clear(userInputElement)
+    await userEvent.type(userInputElement, testObject.user)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    userEvent.type(budgetInputElement, '5a')
+    await userEvent.type(budgetInputElement, '5a')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(budgetInputElement, { target: { value: "" }})
-    userEvent.type(budgetInputElement, testObject.budgetAmount)
+    await userEvent.clear(budgetInputElement)
+    await userEvent.type(budgetInputElement, testObject.budgetAmount)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid expiration period
-    userEvent.type(expirationDaysInputElement, testObject.expiryDays)
-    userEvent.type(expirationHoursInputElement, '25')
+    await userEvent.type(expirationDaysInputElement, testObject.expiryDays)
+    await userEvent.type(expirationHoursInputElement, '25')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(expirationHoursInputElement, { target: { value: "" }})
-    userEvent.type(expirationHoursInputElement, testObject.expiryHours)
+    await userEvent.clear(expirationHoursInputElement)
+    await userEvent.type(expirationHoursInputElement, testObject.expiryHours)
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid event id
-    userEvent.type(eventIdInputElement, 'abcdef?#abc')
+    await userEvent.type(eventIdInputElement, 'abcdef?#abc')
     expect(createButtonElement).toBeDisabled()
-    fireEvent.change(eventIdInputElement, { target: { value: "" }})
-    userEvent.type(eventIdInputElement, testObject.eventId)
+    await userEvent.clear(eventIdInputElement)
+    await userEvent.type(eventIdInputElement, testObject.eventId)
     expect(createButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const createLeaseAction = jest.spyOn(actions, "createLease").mockImplementation((event) => () => event)
-    userEvent.click(createButtonElement)
+    await userEvent.click(createButtonElement)
     expect(createLeaseAction.mock.lastCall[0]).toMatchObject(testObject)
 });

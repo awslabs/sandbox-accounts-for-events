@@ -4,13 +4,12 @@ import { useSelector, useDispatch } from "react-redux";
 import Navigation from "./components/Navigation";
 import { appLayoutLabels, itemSelectionLabels } from "./components/labels";
 import "../styles/home-page.scss";
-import { AmplifyAuthenticator, AmplifySignIn, AmplifySignUp } from "@aws-amplify/ui-react";
-import { AuthState } from "@aws-amplify/ui-components";
+import { Authenticator } from "@aws-amplify/ui-react";
+import '@aws-amplify/ui-react/styles.css';
 import EventLogin from "./components/EventLogin";
 import LeaseLogin from "./components/LeaseLogin";
 import { useParams } from "react-router";
 import { regExpAll } from "./components/utils";
-import { setCurrentUser } from "../redux/actions/current_user";
 import GitHubLinks from "./components/GitHubLinks";
 
 const Content = () => {
@@ -20,7 +19,6 @@ const Content = () => {
 
     const User = useSelector((state) => state.current_user);
     const Config = useSelector((state) => state.config);
-    const dispatch = useDispatch();
     const [LoginType, setLoginType] = useState(LOGIN_TYPE_NONE);
     const { urlParamEventId } = useParams();
 
@@ -65,18 +63,6 @@ const Content = () => {
         />
     );
 
-    const authDispatcher = (nextAuthState, data) => {
-        switch (nextAuthState) {
-            case "signedin":
-                dispatch(setCurrentUser(data));
-                break;
-            case "signedout":
-                dispatch({ type: "current_user/clear" });
-                break;
-            default:
-        }
-    };
-
     return (
         <Box margin={{ bottom: "s" }}>
             <div className="custom-home__header">
@@ -111,52 +97,29 @@ const Content = () => {
                 {!User.isLoggedIn && LoginType === LOGIN_TYPE_NONE ? (
                     <LoginOptions />
                 ) : (
-                    <AmplifyAuthenticator
-                        style={{ "--container-height": "400px" }}
-                        usernameAlias="email"
-                        initialAuthState={LoginType === LOGIN_TYPE_CREATE ? AuthState.SignUp : AuthState.SignIn}
-                        handleAuthStateChange={authDispatcher}
+                    <Authenticator
+                        formFields={{
+                            signUp: {
+                                password: {
+                                    label: 'Password:',
+                                    placeholder: 'Create a password',
+                                },
+                                confirm_password: {
+                                    label: 'Confirm new password',
+                                    placeholder: 'Please confirm your new password:',
+                                },
+                            }
+                        }}
+                        loginMechanisms={['email']}
+                        signUpAttributes={[]}
+                        initialState={LoginType === LOGIN_TYPE_CREATE ? "signUp" : "signIn"}
                     >
-                        <AmplifySignUp
-                            usernameAlias="email"
-                            slot="sign-up"
-                            formFields={[
-                                {
-                                    type: "email",
-                                    label: "Your email address",
-                                    inputProps: { required: true, autocomplete: "email" }
-                                },
-                                {
-                                    type: "password",
-                                    label: "Create a password",
-                                    inputProps: { required: true, autocomplete: "new-password" }
-                                }
-                            ]}
-                            headerText="Create a new user account"
-                        />
-                        <AmplifySignIn
-                            slot="sign-in"
-                            usernameAlias="email"
-                            formFields={[
-                                {
-                                    type: "email",
-                                    label: "Your email address",
-                                    inputProps: { required: true, autocomplete: "email" }
-                                },
-                                {
-                                    type: "password",
-                                    label: "Your password",
-                                    inputProps: { required: true, autocomplete: "new-password" }
-                                }
-                            ]}
-                            headerText="Login to existing user account"
-                        />
                         {new RegExp(regExpAll(Config.LEASE_ID_REGEX)).test(urlParamEventId) ? (
                             <LeaseLogin />
                         ) : (
                             <EventLogin />
                         )}
-                    </AmplifyAuthenticator>
+                    </Authenticator>
                 )}
             </Box>
         </Box>

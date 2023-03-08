@@ -3,31 +3,27 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-components": "^1.6.0",
-    "@aws-amplify/ui-react": "^1.2.4",
-    "@cloudscape-design/components": "^3.0.45",
-    "@cloudscape-design/design-tokens": "^3.0.1",
-    "@cloudscape-design/global-styles": "^1.0.1",
-    "@reduxjs/toolkit": "^1.8.5",
-    "@svgr/webpack": "^6.2.1",
+    "@aws-amplify/ui-react": "^4.3.9",
+    "@cloudscape-design/components": "^3.0.219",
+    "@cloudscape-design/design-tokens": "^3.0.9",
+    "@cloudscape-design/global-styles": "^1.0.7",
+    "@reduxjs/toolkit": "^1.9.3",
     "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^11.2.7",
-    "@testing-library/user-event": "^12.8.3",
-    "aws-amplify": "^4.3.34",
-    "aws-amplify-react": "^5.0.4",
-    "aws-sdk": "^2.1209.0",
-    "aws4": "^1.11.0",
+    "@testing-library/react": "^14.0.0",
+    "@testing-library/user-event": "^14.4.3",
+    "aws-amplify": "^5.0.16",
+    "aws-sdk": "^2.1327.0",
+    "aws4": "^1.12.0",
     "moment": "^2.29.4",
-    "nanoid": "^3.1.23",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-markdown": "^8.0.0",
-    "react-redux": "^7.2.6",
-    "react-router-dom": "^6.2.1",
-    "redux": "^4.1.2",
-    "redux-thunk": "^2.4.1",
-    "sass": "^1.54.8",
-    "web-vitals": "^1.1.2"
+    "nanoid": "^4.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^8.0.5",
+    "react-redux": "^8.0.5",
+    "react-router-dom": "^6.8.2",
+    "redux": "^4.2.1",
+    "redux-thunk": "^2.4.2",
+    "sass": "^1.58.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -54,8 +50,13 @@
     ]
   },
   "devDependencies": {
-    "react-error-overlay": "6.0.9",
+    "react-error-overlay": "6.0.11",
     "react-scripts": "^5.0.1",
     "react-test-renderer": "^18.2.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^.*/ui-react/styles.css$": "<rootDir>/src/test-css.js"
+    }
   }
 }

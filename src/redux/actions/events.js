@@ -1,4 +1,4 @@
-import API, { graphqlOperation } from "@aws-amplify/api";
+import { API, graphqlOperation } from "@aws-amplify/api";
 import * as queries from "../../graphql/queries";
 import * as mutations from "../../graphql/mutations";
 import moment from "moment";

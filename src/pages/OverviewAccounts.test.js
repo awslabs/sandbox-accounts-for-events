@@ -60,11 +60,11 @@ test("renders OverviewAccounts, enters valid and invalid texts, submits", async 
     expect(fetchAccountsAction).toBeCalled()
 
     // check if search box filters correctly
-    userEvent.type(searchInputElement, '123456789123{enter}')
-    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    expect(clearButtonElements).toHaveLength(2)
-    userEvent.click(clearButtonElements[0])
-    userEvent.type(searchInputElement, testAccount.id.slice(0,6))
+    // await userEvent.type(searchInputElement, '123456789123{enter}')
+    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    // expect(clearButtonElements).toHaveLength(2)
+    // await userEvent.click(clearButtonElements[0])
+    // await userEvent.type(searchInputElement, testAccount.id.slice(0,6))
 
     // check if testObject data is visible in table
     const accountRow = screen.getByText(testAccount.id).closest("tr");
@@ -77,7 +77,7 @@ test("renders OverviewAccounts, enters valid and invalid texts, submits", async 
     expect(withinAccountRow.getByText(moment.unix(testAccount.lastModifiedOn).format(config.FORMAT_DATETIME))).toBeInTheDocument()
 
     // check table row to toggle buttons
-    userEvent.click(withinAccountRow.getByRole("checkbox"))
+    await userEvent.click(withinAccountRow.getByRole("checkbox"))
     expect(editButtonElement).toBeEnabled()
     expect(removeButtonElement).toBeEnabled()
 

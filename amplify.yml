@@ -45,6 +45,8 @@ frontend:
       commands:
         # build Amplify frontend
         - npm run build
+        # run frontend unit tests
+        - npm test -- --watchAll=false
 
     postBuild:
       commands:

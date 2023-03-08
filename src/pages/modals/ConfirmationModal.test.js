@@ -24,7 +24,7 @@ test("renders simple ConfirmationModal with button text, action and content", as
     expect(screen.getByText(/are you sure/i)).toBeInTheDocument();
     expect(screen.getByText(contentText)).toBeInTheDocument();
     const actionButton = screen.getByRole("button", { name: buttonText })
-    userEvent.click(actionButton)
+    await userEvent.click(actionButton)
     expect(buttonCallback).toHaveBeenCalled()
 });
 
@@ -53,8 +53,8 @@ test("renders extended ConfirmationModal, enters confirmationText and submits", 
     const confirmationInputElement = screen.getByRole("textbox")
 
     expect(confirmButtonElement).toBeDisabled()
-    userEvent.type(confirmationInputElement, confirmationText)
+    await userEvent.type(confirmationInputElement, confirmationText)
     expect(confirmButtonElement).toBeEnabled()
-    userEvent.click(confirmButtonElement)
+    await userEvent.click(confirmButtonElement)
     expect(buttonCallback).toHaveBeenCalled()
 });

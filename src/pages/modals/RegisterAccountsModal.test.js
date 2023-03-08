@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import RegisterAccountsModal from "./RegisterAccountsModal";
 import { Provider } from "react-redux";
@@ -19,7 +19,7 @@ test("renders RegisterAccountsModal, cannot submit empty dialog", async () => {
     expect(screen.getByText(/register aws accounts/i)).toBeInTheDocument();
 
     expect(registerButtonElement).toBeEnabled()
-    fireEvent.click(registerButtonElement)
+    await userEvent.click(registerButtonElement)
     expect(registerButtonElement).toBeDisabled()
 });
 
@@ -47,21 +47,21 @@ test("renders RegisterAccountsModal, enters valid and invalid texts, submits", a
     expect(registerButtonElement).toBeEnabled()
 
     // try invalid and valid account list
-    userEvent.type(accountsInputElement, "123456789012,1a2b3c4d5e6f")
+    await userEvent.type(accountsInputElement, "123456789012,1a2b3c4d5e6f")
     expect(registerButtonElement).toBeDisabled()
-    fireEvent.change(accountsInputElement, { target: { value: "" }})
-    userEvent.type(accountsInputElement, testObject.accountIds.join(","))
+    await userEvent.clear(accountsInputElement)
+    await userEvent.type(accountsInputElement, testObject.accountIds.join(","))
     expect(registerButtonElement).toBeEnabled()
 
     // try invalid and valid role name
-    userEvent.type(roleInputElement, 'invalid?role#name')
+    await userEvent.type(roleInputElement, 'invalid?role#name')
     expect(registerButtonElement).toBeDisabled()
-    fireEvent.change(roleInputElement, { target: { value: "" }})
-    userEvent.type(roleInputElement, testObject.roleName)
+    await userEvent.clear(roleInputElement)
+    await userEvent.type(roleInputElement, testObject.roleName)
     expect(registerButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const registerUserAction = jest.spyOn(actions, "registerAccounts").mockImplementation((accounts) => () => accounts)
-    userEvent.click(registerButtonElement)
+    await userEvent.click(registerButtonElement)
     expect(registerUserAction.mock.lastCall[0]).toMatchObject(testObject)
 });

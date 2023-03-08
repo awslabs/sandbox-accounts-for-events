@@ -1,7 +1,8 @@
-import Amplify, { Auth } from "aws-amplify";
+import { Amplify } from "aws-amplify";
+import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
 
 import awsconfig from "./aws-exports";
-import PubSub from "@aws-amplify/pubsub";
+import { PubSub }  from "@aws-amplify/pubsub";
 
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { Route, Outlet, Navigate, Routes, HashRouter } from "react-router-dom";
@@ -30,6 +31,7 @@ PubSub.configure(awsconfig);
 const AuthContainer = ({ children }) => {
     const dispatch = useDispatch();
     const config = useSelector((state) => state.config)
+    const { user, authStatus } = useAuthenticator((context) => [context.user, context.authStatus]);
 
     useEffect(() => {
         applyMode(Mode[config.DISPLAY_THEME])
@@ -37,13 +39,11 @@ const AuthContainer = ({ children }) => {
     },[config])
 
     useEffect(() => {
-        Auth.currentAuthenticatedUser()
-            .then((data) => {
-                dispatch(setCurrentUser(data));
-                dispatch(fetchConfig());
-            })
-            .catch((reason) => reason);
-    }, [dispatch]);
+        if (authStatus === "authenticated") {
+            dispatch(setCurrentUser(user));
+            dispatch(fetchConfig());
+        }
+    }, [dispatch, user, authStatus]);
 
     return children;
 };
@@ -56,41 +56,43 @@ const PrivateOutlet = ({ groupName }) => {
 const App = () => {
     return (
         <Provider store={store}>
-            <AuthContainer>
-                <HashRouter>
-                    <TopMenuBar />
-                    <Box className="content-frame">
-                        <Routes>
-                            <Route exact path="/" element={<Home />} />
-                            <Route exact path="/login/:urlParamEventId" element={<Home />} />
-                            <Route path="/events" element={<PrivateOutlet groupName="isOperator" />}>
-                                <Route path="" element={<OverviewEvents />} />
-                                <Route path="statistics" element={<Statistics />} />
-                                <Route path=":urlParamEventId" element={<DetailEvent />} />
-                            </Route>
-                            <Route path="/usage" element={<PrivateOutlet groupName="isOperator" />}>
-                                <Route path="" element={<OverviewUsage />} />
-                            </Route>
-                            <Route path="/users" element={<PrivateOutlet groupName="isAdmin" />}>
-                                <Route path="" element={<OverviewUsers />} />
-                                <Route path=":urlParamUserId" element={<OverviewUsers />} />
-                            </Route>
-                            <Route path="/leases" element={<PrivateOutlet groupName="isAdmin" />}>
-                                <Route path="" element={<OverviewLeases />} />
-                                <Route path=":urlParamLeaseId" element={<OverviewLeases />} />
-                            </Route>
-                            <Route path="/accounts" element={<PrivateOutlet groupName="isAdmin" />}>
-                                <Route path="" element={<OverviewAccounts />} />
-                                <Route path=":urlParamAccountId" element={<OverviewAccounts />} />
-                            </Route>
-                            <Route path="/config" element={<PrivateOutlet groupName="isAdmin" />}>
-                                <Route path="" element={<AdminConfig />} />
-                            </Route>
-                            <Route path="*" element={<Navigate to="/" />} />
-                        </Routes>
-                    </Box>
-                </HashRouter>
-            </AuthContainer>
+            <Authenticator.Provider>
+                <AuthContainer>
+                    <HashRouter>
+                        <TopMenuBar />
+                        <Box className="content-frame">
+                            <Routes>
+                                <Route exact path="/" element={<Home />} />
+                                <Route exact path="/login/:urlParamEventId" element={<Home />} />
+                                <Route path="/events" element={<PrivateOutlet groupName="isOperator" />}>
+                                    <Route path="" element={<OverviewEvents />} />
+                                    <Route path="statistics" element={<Statistics />} />
+                                    <Route path=":urlParamEventId" element={<DetailEvent />} />
+                                </Route>
+                                <Route path="/usage" element={<PrivateOutlet groupName="isOperator" />}>
+                                    <Route path="" element={<OverviewUsage />} />
+                                </Route>
+                                <Route path="/users" element={<PrivateOutlet groupName="isAdmin" />}>
+                                    <Route path="" element={<OverviewUsers />} />
+                                    <Route path=":urlParamUserId" element={<OverviewUsers />} />
+                                </Route>
+                                <Route path="/leases" element={<PrivateOutlet groupName="isAdmin" />}>
+                                    <Route path="" element={<OverviewLeases />} />
+                                    <Route path=":urlParamLeaseId" element={<OverviewLeases />} />
+                                </Route>
+                                <Route path="/accounts" element={<PrivateOutlet groupName="isAdmin" />}>
+                                    <Route path="" element={<OverviewAccounts />} />
+                                    <Route path=":urlParamAccountId" element={<OverviewAccounts />} />
+                                </Route>
+                                <Route path="/config" element={<PrivateOutlet groupName="isAdmin" />}>
+                                    <Route path="" element={<AdminConfig />} />
+                                </Route>
+                                <Route path="*" element={<Navigate to="/" />} />
+                            </Routes>
+                        </Box>
+                    </HashRouter>
+                </AuthContainer>
+            </Authenticator.Provider>
         </Provider>
     );
 };

@@ -27,6 +27,6 @@ test("renders EditUserModal, submits", async () => {
 
     // submit and test redux action call payload
     const saveUserAction = jest.spyOn(actions, "updateUser").mockImplementation((event) => () => event)
-    userEvent.click(saveButtonElement)
+    await userEvent.click(saveButtonElement)
     expect(saveUserAction.mock.lastCall[0]).toMatchObject(testObject)
 });
