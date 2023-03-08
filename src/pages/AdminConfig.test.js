@@ -33,22 +33,21 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
     expect(screen.getByText(/lease and event parameters/i)).toBeInTheDocument();
     expect(screen.getByText(/display preferences/i)).toBeInTheDocument();
 
-    // try numeric and alphanumeric values for number all numer fields
-    // Object.keys(config).forEach(async (item) => {
-    //     if (typeof config[item] === "number") {
-    //         const parameterElement = screen.queryByTestId(item)
-    //         if (parameterElement !== null) {
-    //             const inputElement = parameterElement.childNodes[0]
-    //             await userEvent.clear(inputElement)
-    //             await userEvent.type(inputElement, 'a1b2')
-    //             expect(saveButtonElement).toBeDisabled()
+    for (const item of Object.keys(config)) {
+        if (typeof config[item] === "number") {
+            const parameterElement = screen.queryByTestId(item)
+            if (parameterElement !== null) {
+                const inputElement = parameterElement.childNodes[0]
+                await userEvent.clear(inputElement)
+                await userEvent.type(inputElement, 'a1b2')
+                expect(saveButtonElement).toBeDisabled()
 
-    //             await userEvent.clear(inputElement)
-    //             await userEvent.type(inputElement, "10")
-    //             expect(saveButtonElement).toBeEnabled()
-    //         }
-    //     }
-    // });
+                await userEvent.clear(inputElement)
+                await userEvent.type(inputElement, "10")
+                expect(saveButtonElement).toBeEnabled()
+            }
+        }
+    };
 
     // undo inputs
     await userEvent.click(undoButtonElement)
@@ -69,6 +68,6 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
     // input confirmation text & submit
     await userEvent.type(confirmTextInputElement, "save")
     expect(confirmButtonElement).toBeEnabled()
-    // await userEvent.click(confirmButtonElement)
-    // expect(saveConfigAction.mock.lastCall[0]).toMatchObject(config)
+    await userEvent.click(confirmButtonElement)
+    expect(saveConfigAction.mock.lastCall[0]).toMatchObject(config)
 });

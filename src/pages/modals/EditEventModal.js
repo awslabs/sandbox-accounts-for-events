@@ -172,12 +172,12 @@ const EditEventModal = () => {
                             <Grid gridDefinition={[{ colspan: 6 }, { colspan: 6 }]}>
                                 <DatePicker
                                     onChange={({ detail }) => updateFormValue({ eventDateInput: detail.value })}
-                                    value={value.eventDateInput}
+                                    value={value.eventDateInput || ""}
                                     placeholder="YYYY/MM/DD"
                                 />
                                 <TimeInput
                                     onChange={({ detail }) => updateFormValue({ eventTimeInput: detail.value })}
-                                    value={value.eventTimeInput}
+                                    value={value.eventTimeInput || ""}
                                     format="hh:mm"
                                     placeholder="00:00"
                                 />
@@ -211,7 +211,7 @@ const EditEventModal = () => {
                             </Grid>
                             <Checkbox
                                 onChange={({ detail }) => updateFormValue({ overwriteEventDays: detail.checked })}
-                                checked={value.overwriteEventDays}
+                                checked={false | value.overwriteEventDays}
                             >
                                 Overwrite all existing AWS account leases with new duration
                             </Checkbox>
@@ -235,7 +235,7 @@ const EditEventModal = () => {
                             />
                             <Checkbox
                                 onChange={({ detail }) => updateFormValue({ overwriteEventBudget: detail.checked })}
-                                checked={value.overwriteEventBudget}
+                                checked={false | value.overwriteEventBudget}
                             >
                                 Overwrite all existing AWS account leases with new budget
                             </Checkbox>

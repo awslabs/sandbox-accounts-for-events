@@ -166,7 +166,7 @@ const Statistics = () => {
                                     {
                                         title: "current AWS account pool limit",
                                         type: "threshold",
-                                        y: statsData.accountStats.all,
+                                        y: statsData.accountStats.all || [],
                                         color: "#e44"
                                     }
                                 ]}

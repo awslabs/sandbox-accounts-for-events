@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import OverviewLeases from "./OverviewLeases";
 import * as redux from "react-redux";
@@ -50,11 +50,13 @@ test("renders OverviewLeases, enters valid and invalid texts, submits", async ()
     expect(fetchLeasesAction).toBeCalled()
 
     // check if search box filters correctly
-    // await userEvent.type(searchInputElement, 'unknown{enter}')
-    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    // expect(clearButtonElements).toHaveLength(2)
-    // await userEvent.click(clearButtonElements[0])
-    // await userEvent.type(searchInputElement, 'domain{enter}')
+    await userEvent.type(searchInputElement, 'unknown')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    expect(clearButtonElements).toHaveLength(2)
+    await userEvent.click(clearButtonElements[0])
+    await userEvent.type(searchInputElement, 'domain')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
 
     // check if testObject data is visible in table
     const leaseRow = screen.getByText(testLease.accountId).closest("tr");

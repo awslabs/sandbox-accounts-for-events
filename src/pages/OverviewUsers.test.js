@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import OverviewUsers from "./OverviewUsers";
 import * as redux from "react-redux";
@@ -67,11 +67,13 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     expect(fetchUsersAction).toBeCalled()
 
     // check if search box filters correctly
-    // await userEvent.type(searchInputElement, 'unknown{enter}')
-    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    // expect(clearButtonElements).toHaveLength(2)
-    // await userEvent.click(clearButtonElements[0])
-    // await userEvent.type(searchInputElement, 'domain{enter}')
+    await userEvent.type(searchInputElement, 'unknown')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    expect(clearButtonElements).toHaveLength(2)
+    await userEvent.click(clearButtonElements[0])
+    await userEvent.type(searchInputElement, 'domain')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
 
     // check if testObject data is visible in table
     const userRow = screen.getByText(testUser.Attributes[0].Value).closest("tr");

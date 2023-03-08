@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import OverviewEvents from "./OverviewEvents";
 import { HashRouter } from "react-router-dom";
@@ -71,11 +71,13 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     expect(fetchEventsAction).toBeCalled()
 
     // check if search box filters correctly
-    // await userEvent.type(searchInputElement, 'invalid{enter}')
-    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    // expect(clearButtonElements).toHaveLength(2)
-    // await userEvent.click(clearButtonElements[0])
-    // await userEvent.type(searchInputElement, testEvent.eventName)
+    await userEvent.type(searchInputElement, 'invalid')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    expect(clearButtonElements).toHaveLength(2)
+    await userEvent.click(clearButtonElements[0])
+    await userEvent.type(searchInputElement, testEvent.eventName)
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
 
     // check if testObject data is visible in table
     const eventRow = screen.getByText(testEvent.id).closest("tr");
@@ -92,7 +94,6 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     const splitPanel = screen.getByTestId("splitPanel");
     const withinSplitPanel = within(splitPanel)
     expect(withinSplitPanel.getByText(/event: "/i)).toBeInTheDocument();
-//    expect(withinSplitPanel.getAllByText(testEvent.id)).toHaveLength(2)
     expect(withinSplitPanel.getAllByText(testEvent.id)).toHaveLength(2)
     expect(withinSplitPanel.getByText(moment.unix(testEvent.eventOn).format(config.FORMAT_DATETIME))).toBeInTheDocument()
     expect(withinSplitPanel.getByText(testEvent.maxAccounts)).toBeInTheDocument()

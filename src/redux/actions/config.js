@@ -60,7 +60,7 @@ export const fetchConfig = () => async (dispatch) => {
         const response = await API.graphql(graphqlOperation(queries.listConfigs));
         const configItems = response.data.listConfigs.items;
         if (configItems.length > 0) dispatch({ type: "config/loaded", payload: JSON.parse(configItems[0].config) });
-        else throw new Error("No data found in configuration database.");
+        else console.warn("No data found in SAfE configuration database, using default settings");
     } catch (error) {
         console.error("Error loading configuration settings, using defaults instead.", error);
     }

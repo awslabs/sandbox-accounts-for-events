@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import OverviewUsage from "./OverviewUsage";
 import { HashRouter } from "react-router-dom";
@@ -53,11 +53,13 @@ test("renders OverviewUsage, enters valid and invalid search term", async () => 
     expect(fetchUsageAction).toBeCalled()
 
     // check if search box filters correctly
-    // await userEvent.type(searchInputElement, 'invalid{enter}')
-    // const clearButtonElements = screen.getAllByRole("button", { name: /clear filters/i })
-    // expect(clearButtonElements).toHaveLength(2)
-    // await userEvent.click(clearButtonElements[0])
-    // await userEvent.type(searchInputElement, testUsage.accountId)
+    await userEvent.type(searchInputElement, 'invalid')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    const clearButtonElements = screen.getAllByRole("button", { name: /clear filters/i })
+    expect(clearButtonElements).toHaveLength(2)
+    await userEvent.click(clearButtonElements[0])
+    await userEvent.type(searchInputElement, testUsage.accountId)
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
 
     // check if testObject data is visible in table
     const usageRow = screen.getByText(testUsage.accountId).closest("tr");

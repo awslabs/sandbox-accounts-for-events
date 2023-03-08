@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DetailEvent from "./DetailEvent";
 import { HashRouter } from "react-router-dom";
@@ -76,11 +76,13 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     expect(fetchEventAction).toBeCalled()
 
     // check if search box filters correctly
-    // await userEvent.type(searchInputElement, 'invalid{enter}')
-    // const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
-    // expect(clearButtonElements).toHaveLength(2)
-    // await userEvent.click(clearButtonElements[0])
-    // await userEvent.type(searchInputElement, "testuser")
+    await userEvent.type(searchInputElement, 'invalid')
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
+    expect(clearButtonElements).toHaveLength(2)
+    await userEvent.click(clearButtonElements[0])
+    await userEvent.type(searchInputElement, "test")
+    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
 
     // check if details data is correct
     const detailPanel = screen.getByTestId("detailPanel");
