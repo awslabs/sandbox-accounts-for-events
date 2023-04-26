@@ -139,7 +139,7 @@ Follow the manuals in the "docs" folder to understand how to operate *Sandbox Ac
 * [Operator documentation](docs/operator.md) - Operator guide how to set up & manage events, manage users and provide AWS account leases
 * [Admin documentation](docs/admin.md) - Admin guide how to register and manage AWS account pool
 * [Children Accounts](docs/accounts.md) - How to create and prepare AWS accounts for your account pool
-* [FAQ](docs/faq.md) - Answers to commonly asked questions
+* [FAQ](docs/FAQ.md) - Answers to commonly asked questions
 
 # Contributing to *Sandbox Accounts for Events*
 
