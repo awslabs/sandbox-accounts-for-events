@@ -4,7 +4,7 @@ backend:
     preBuild:
       commands:
         # install required Amplify CLI version and moreutils for "sponge" command
-        - npm i -g @aws-amplify/cli
+        - npm i -g @aws-amplify/cli@10.8.0
         - amazon-linux-extras install epel -y
         - yum install -y moreutils jq
 
