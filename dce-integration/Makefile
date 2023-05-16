@@ -13,8 +13,8 @@ vendor:
 	go mod vendor
 
 mod:
-	-go mod init github.com/Optum/dce
-
+	go mod tidy -v
+	
 vet:
 	go vet
 

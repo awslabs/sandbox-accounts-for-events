@@ -35,9 +35,6 @@ phases:
       # Use improved TerraForm file for DynamoDB deployment to allow on-demand instead of provisioned capacity
       - cp dce-integration/modules/dynamodb.tf dce/modules/dynamodb.tf
 
-      # Use improved deployment script that waits for Lambda deployment to be in ready state before uploading code
-      - cp dce-integration/scripts/deploy.sh dce/scripts/deploy.sh
-
       # Use improved build script that includes pre-, fix- and post-build scripts into AWS Nuke build artifact 
       - cp dce-integration/scripts/build.sh dce/scripts/build.sh
 
