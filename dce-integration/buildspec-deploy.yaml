@@ -6,9 +6,9 @@ phases:
       golang: 1.18
 
     commands:
-      # Download and install TerraForm 6
-      - wget https://releases.hashicorp.com/terraform/1.2.6/terraform_1.2.6_linux_amd64.zip
-      - unzip terraform_1.2.6_linux_amd64.zip -d /usr/bin/
+      # Download and install TerraForm 
+      - wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
+      - unzip terraform_0.12.31_linux_amd64.zip -d /usr/bin/
 
   pre_build:
     commands:
