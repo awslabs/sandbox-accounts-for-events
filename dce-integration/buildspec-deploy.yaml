@@ -28,10 +28,6 @@ phases:
       # Set "Sandbox Accounts for Events"-specific config for TerraForm variables
       - cp dce-integration/modules/dce.tfvars dce/modules/
 
-      # Use updated Makefile and TerraForm main.tf to allow TerraForm version 1.2.6
-      - cp dce-integration/Makefile dce/Makefile
-      - cp dce-integration/modules/main.tf dce/modules/main.tf
-
       # Use improved TerraForm file for DynamoDB deployment to allow on-demand instead of provisioned capacity
       - cp dce-integration/modules/dynamodb.tf dce/modules/dynamodb.tf
 
