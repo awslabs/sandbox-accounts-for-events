@@ -114,7 +114,7 @@ const EventLogin = () => {
                         <Header variant="h1" actions={<Button onClick={clearEvent}>Change event</Button>}>
                             Welcome to "{Event.item.eventName}"
                         </Header>
-                        {!User.isOperator || !User.isAdmin ? (
+                        {User.isOperator || User.isAdmin ? (
                             <Alert type="warning" header="IMPORTANT for operators & admins">
                                 Be careful: Clicking on the button below below will consume an AWS account from the
                                 account pool list.
