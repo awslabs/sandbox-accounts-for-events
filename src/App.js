@@ -1,8 +1,8 @@
 // import { Amplify } from "aws-amplify";
 import { Authenticator, useAuthenticator } from '@aws-amplify/ui-react';
 
-// import awsconfig from "./aws-exports";
-// import { PubSub }  from "@aws-amplify/pubsub";
+import awsconfig from "./aws-exports";
+import { PubSub }  from "@aws-amplify/pubsub";
 
 import { Provider, useDispatch, useSelector } from "react-redux";
 import { Route, Outlet, Navigate, Routes, HashRouter } from "react-router-dom";
@@ -25,8 +25,8 @@ import Statistics from "./pages/Statistics";
 import AdminConfig from "./pages/AdminConfig";
 import { applyMode, applyDensity, Density, Mode } from '@cloudscape-design/global-styles';
 
-// Amplify.configure(awsconfig);
-// PubSub.configure(awsconfig);
+Amplify.configure(awsconfig);
+PubSub.configure(awsconfig);
 
 const AuthContainer = ({ children }) => {
     const dispatch = useDispatch();
