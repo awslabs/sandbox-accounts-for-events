@@ -45,6 +45,7 @@ const events = (state = initialState, action) => {
     };
 
     switch (action.type) {
+        case "event/loading":
         case "events/loading":
             return {
                 ...state,
@@ -55,11 +56,6 @@ const events = (state = initialState, action) => {
                 ...state,
                 status: "idle",
                 items: action.events.map((item) => convertItem(item, action.leases))
-            };
-        case "event/loading":
-            return {
-                ...state,
-                status: "loading"
             };
         case "event/loaded":
             return {

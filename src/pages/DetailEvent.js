@@ -200,7 +200,7 @@ const DetailPanel = () => {
                         </Box>
                         <Box>
                             <Box variant="h5">Maximum budget per AWS account</Box>
-                            {Item.eventBudget + " " + Config.BUDGET_CURRENCY}
+                            {Item.eventBudget + " USD"}
                         </Box>
                         <Box>
                             <Box variant="h5">Created on</Box>
@@ -242,7 +242,7 @@ const DetailPanel = () => {
                         </Box>
                         <Box>
                             <Box variant="h5">Current overall spend</Box>
-                            {Item.eventSpend + " " + Config.BUDGET_CURRENCY}
+                            {Item.eventSpend + " USD"}
                         </Box>
                     </SpaceBetween>
                 )}

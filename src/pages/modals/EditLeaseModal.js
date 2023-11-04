@@ -151,7 +151,7 @@ const EditLeaseModal = ({ isAdminView }) => {
                             </FormField>
                         ) : null}
                         <FormField
-                            label={"Budget in " + Config.BUDGET_CURRENCY}
+                            label={"Budget in USD"}
                             description={"Enter budget cap for this lease (maximum " + Config.ACCOUNT_MAX_BUDGET + ")"}
                             errorText={inputError.BUDGET}
                         >

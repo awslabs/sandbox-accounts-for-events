@@ -13,7 +13,7 @@ const leases = (state = initialState, action) => {
         let spendAmount = item.spendAmount ?? 0;
         if (typeof spendAmount !== "string") spendAmount = spendAmount.toFixed(2);
         let principalIdParts = item.principalId.match(
-            new RegExp("^(" + action.config.EVENT_ID_REGEX + ")" + action.config.EVENT_PRINCIPAL_SEPARATOR + "\\S{5,}$")
+            new RegExp("^(" + action.config.EVENT_ID_REGEX + ")__\\S{5,}$")
         );
 
         return {
@@ -288,7 +288,7 @@ export const createLease =
                         principalId,
                         budgetNotificationEmails,
                         user,
-                        budgetCurrency: config.BUDGET_CURRENCY
+                        budgetCurrency: "USD"
                     })
                 })
             ).then((response) => {

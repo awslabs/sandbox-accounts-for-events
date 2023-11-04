@@ -11,7 +11,7 @@ const usage = (state = initialState, action) => {
     const convertItem = (item) => ({
         ...item,
         startDate: moment.unix(item.startDate).format(action.config.FORMAT_DATE),
-        eventId: item.principalId.includes(action.config.EVENT_PRINCIPAL_SEPARATOR) ? item.principalId.substring(0, action.config.EVENT_ID_LENGTH) : ""
+        eventId: item.principalId.includes("__") ? item.principalId.substring(0, action.config.EVENT_ID_LENGTH) : ""
     });
 
     switch (action.type) {

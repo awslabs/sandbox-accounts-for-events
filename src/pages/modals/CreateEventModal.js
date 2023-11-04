@@ -208,7 +208,7 @@ const CreateEventModal = () => {
                         />
                     </FormField>
                     <FormField
-                        label={"Budget in " + Config.BUDGET_CURRENCY}
+                        label={"Budget in USD"}
                         description={
                             "Enter budget cap for each AWS account (maximum " + Config.ACCOUNT_MAX_BUDGET + ")"
                         }

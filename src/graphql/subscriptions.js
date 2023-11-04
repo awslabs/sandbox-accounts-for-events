@@ -2,8 +2,8 @@
 // this is an auto generated file. This will be overwritten
 
 export const onCreateEvent = /* GraphQL */ `
-  subscription OnCreateEvent {
-    onCreateEvent {
+  subscription OnCreateEvent($filter: ModelSubscriptionEventFilterInput) {
+    onCreateEvent(filter: $filter) {
       id
       eventName
       eventOn
@@ -15,12 +15,13 @@ export const onCreateEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
 export const onUpdateEvent = /* GraphQL */ `
-  subscription OnUpdateEvent {
-    onUpdateEvent {
+  subscription OnUpdateEvent($filter: ModelSubscriptionEventFilterInput) {
+    onUpdateEvent(filter: $filter) {
       id
       eventName
       eventOn
@@ -32,12 +33,13 @@ export const onUpdateEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
 export const onDeleteEvent = /* GraphQL */ `
-  subscription OnDeleteEvent {
-    onDeleteEvent {
+  subscription OnDeleteEvent($filter: ModelSubscriptionEventFilterInput) {
+    onDeleteEvent(filter: $filter) {
       id
       eventName
       eventOn
@@ -49,36 +51,40 @@ export const onDeleteEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
 export const onCreateConfig = /* GraphQL */ `
-  subscription OnCreateConfig {
-    onCreateConfig {
+  subscription OnCreateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onCreateConfig(filter: $filter) {
       id
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
 export const onUpdateConfig = /* GraphQL */ `
-  subscription OnUpdateConfig {
-    onUpdateConfig {
+  subscription OnUpdateConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onUpdateConfig(filter: $filter) {
       id
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
 export const onDeleteConfig = /* GraphQL */ `
-  subscription OnDeleteConfig {
-    onDeleteConfig {
+  subscription OnDeleteConfig($filter: ModelSubscriptionConfigFilterInput) {
+    onDeleteConfig(filter: $filter) {
       id
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;

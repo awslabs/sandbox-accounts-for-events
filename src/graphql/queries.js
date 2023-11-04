@@ -2,17 +2,17 @@
 // this is an auto generated file. This will be overwritten
 
 export const safeLoginApi = /* GraphQL */ `
-  query safeLoginApi($action: String, $paramJson: String) {
+  query SafeLoginApi($action: String, $paramJson: String) {
     safeLoginApi(action: $action, paramJson: $paramJson)
   }
 `;
 export const safeAdminApi = /* GraphQL */ `
-  query safeAdminApi($action: String, $paramJson: String) {
+  query SafeAdminApi($action: String, $paramJson: String) {
     safeAdminApi(action: $action, paramJson: $paramJson)
   }
 `;
 export const safeOperatorApi = /* GraphQL */ `
-  query safeOperatorApi($action: String, $paramJson: String) {
+  query SafeOperatorApi($action: String, $paramJson: String) {
     safeOperatorApi(action: $action, paramJson: $paramJson)
   }
 `;
@@ -30,6 +30,7 @@ export const getEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -52,8 +53,10 @@ export const listEvents = /* GraphQL */ `
         eventStatus
         createdAt
         updatedAt
+        __typename
       }
       nextToken
+      __typename
     }
   }
 `;
@@ -64,6 +67,7 @@ export const getConfig = /* GraphQL */ `
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -79,8 +83,10 @@ export const listConfigs = /* GraphQL */ `
         config
         createdAt
         updatedAt
+        __typename
       }
       nextToken
+      __typename
     }
   }
 `;

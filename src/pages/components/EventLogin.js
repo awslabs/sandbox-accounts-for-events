@@ -3,10 +3,8 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useParams } from "react-router";
 import AwsLoginModal from "../modals/AwsLoginModal";
-import moment from "moment";
 import { isEmpty, regExpAll } from "./utils.js";
-import { fetchAwsLoginUrl } from "../../redux/actions/aws_login";
-import { fetchEndUserEvent } from "../../redux/actions/events";
+import { fetchAwsLoginUrl, getEndUserEvent } from "../../redux/actions/aws_login";
 
 const EventLogin = () => {
     const { urlParamEventId } = useParams();
@@ -16,12 +14,11 @@ const EventLogin = () => {
     const NotificationItem = useSelector((state) => state.notification);
     const User = useSelector((state) => state.current_user);
     const Config = useSelector((state) => state.config);
-    const Event = useSelector((state) => state.events);
     const AwsLogin = useSelector((state) => state.aws_login);
     const dispatch = useDispatch();
 
     const clearEvent = () => {
-        dispatch({ type: "event/dismiss" });
+        dispatch({ type: "aws_login/event_dismiss" });
         dispatch({ type: "notification/dismiss" });
         setInputError({});
         setValueChangedOnce(true);
@@ -44,7 +41,7 @@ const EventLogin = () => {
         if (!validateInputs(value)) {
             return;
         }
-        dispatch(fetchEndUserEvent(value));
+        dispatch(getEndUserEvent(value));
     };
 
     const updateFormValue = (update) => {
@@ -53,14 +50,14 @@ const EventLogin = () => {
     };
 
     useEffect(() => {
-        if (!valueChangedOnce && isEmpty(Event.item) && urlParamEventId && User.isLoggedIn) {
-            dispatch(fetchEndUserEvent(urlParamEventId));
+        if (!valueChangedOnce && isEmpty(AwsLogin.event) && urlParamEventId && User.isLoggedIn) {
+            dispatch(getEndUserEvent(urlParamEventId));
         }
-    }, [Event.item, urlParamEventId, dispatch, valueChangedOnce, User]);
+    }, [AwsLogin.event, urlParamEventId, dispatch, valueChangedOnce, User]);
 
     useEffect(() => {
-        if (!Event.item.eventStatus) return;
-        switch (Event.item.eventStatus) {
+        if (!AwsLogin.event.eventStatus) return;
+        switch (AwsLogin.event.eventStatus) {
             case "Waiting":
                 dispatch({
                     type: "notification/waiting",
@@ -82,10 +79,10 @@ const EventLogin = () => {
                     message: "Internal event status error. Please ask your event support for help."
                 });
         }
-    }, [Event.item, dispatch]);
+    }, [AwsLogin.event, dispatch]);
 
     useEffect(() => {
-        dispatch({ type: "event/dismiss" });
+        dispatch({ type: "aws_login/event_dismiss" });
         dispatch({ type: "notification/dismiss" });
     }, [dispatch]);
 
@@ -96,7 +93,7 @@ const EventLogin = () => {
     return (
         <Container>
             <SpaceBetween size="xl">
-                {!Event.item.id ? (
+                {!AwsLogin.event.id ? (
                     <SpaceBetween size="m">
                         <FormField
                             description="Ask your event support staff for details"
@@ -105,14 +102,14 @@ const EventLogin = () => {
                         >
                             <Input value={value} onChange={({ detail }) => updateFormValue(detail.value)} />
                         </FormField>
-                        <Button variant="primary" onClick={submit} loading={Event.status === "loading"}>
+                        <Button variant="primary" onClick={submit} loading={AwsLogin.event_status === "loading"}>
                             Log in to event
                         </Button>
                     </SpaceBetween>
                 ) : (
                     <>
                         <Header variant="h1" actions={<Button onClick={clearEvent}>Change event</Button>}>
-                            Welcome to "{Event.item.eventName}"
+                            Welcome to "{AwsLogin.event.eventName}"
                         </Header>
                         {User.isOperator || User.isAdmin ? (
                             <Alert type="warning" header="IMPORTANT for operators & admins">
@@ -131,26 +128,7 @@ const EventLogin = () => {
                             icon="external"
                             variant="primary"
                             loading={AwsLogin.status === "loading"}
-                            onClick={() =>
-                                dispatch(
-                                    fetchAwsLoginUrl({
-                                        principalId:
-                                            Event.item.id +
-                                            Config.EVENT_PRINCIPAL_SEPARATOR +
-                                            User.email.replace(/[^a-zA-Z0-9]/g, Config.EVENT_EMAIL_SUBST),
-                                        budgetAmount: Event.item.eventBudget,
-                                        budgetCurrency: Config.BUDGET_CURRENCY,
-                                        user: User.email,
-                                        expiresOn: moment
-                                            .unix(Event.item.eventOn)
-                                            .add(Event.item.eventDays, "days")
-                                            .add(Event.item.eventHours, "hours")
-                                            .unix(),
-                                        maxAccounts: Event.item.maxAccounts,
-                                        eventId: Event.item.id
-                                    })
-                                )
-                            }
+                            onClick={() => dispatch(fetchAwsLoginUrl({ eventId: AwsLogin.event.id })) }
                             disabled={NotificationItem.visible}
                         >
                             Open AWS Console

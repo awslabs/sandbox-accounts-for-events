@@ -17,6 +17,8 @@ const current_user = (state = initialState, action) => {
 };
 
 export const setCurrentUser = (data) => (dispatch, getState) => {
+    if (!data.attributes)
+        return
     const config = getState().config;
     let useremail = data.attributes.email;
     let tokenPayload = data.signInUserSession.accessToken.payload;

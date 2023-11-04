@@ -6,5 +6,22 @@
         "execute-api:ManageConnections"
     ],
     "Resource": ["arn:aws:execute-api:*:*:*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "dynamodb:UpdateItem",
+        "dynamodb:GetItem",
+        "dynamodb:ListTables"
+    ],
+    "Resource": ["arn:aws:dynamodb:*:*:table/*"]
+  },
+  {
+    "Effect": "Allow",
+    "Action": [
+        "cognito-idp:ListUserPools",
+        "cognito-idp:AdminGetUser"
+    ],
+    "Resource": ["*"]
   }
 ]

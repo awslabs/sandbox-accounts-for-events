@@ -39,7 +39,7 @@ const AuthContainer = ({ children }) => {
     },[config])
 
     useEffect(() => {
-        if (authStatus === "authenticated") {
+        if (authStatus === "authenticated" && user) {
             dispatch(setCurrentUser(user));
             dispatch(fetchConfig());
         }

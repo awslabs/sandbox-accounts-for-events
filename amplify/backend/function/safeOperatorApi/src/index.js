@@ -1,10 +1,15 @@
 const https = require("https");
 const aws4 = require("aws4");
-const AWS = require("aws-sdk");
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, UpdateCommand, DeleteCommand } = require('@aws-sdk/lib-dynamodb');
+
 const apiUrl = new URL(process.env.DCE_API_GW);
 const region = process.env.REGION;
 const leasesTable = process.env.DCE_LEASES_TABLE;
 const serviceName = "execute-api";
+
+const ddbClient = new DynamoDBClient({ region });
+const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
 
 const respondWithError = (message = "Internal error.", errorObject = {}) => {
     console.error(message, errorObject);
@@ -164,12 +169,11 @@ const updateLease = ({
             "Internal error while trying to update lease.",
             "Parameter 'budgetNotificationEmails' missing."
         );
-    if (!user) return respondWithError("Internal error while trying to update lease.", "Parameter 'user' missing.");
-    const ddb = new AWS.DynamoDB.DocumentClient({
-        region: region
-    });
-    return ddb
-        .update({
+    if (!user) 
+        return respondWithError("Internal error while trying to update lease.", "Parameter 'user' missing.");
+
+    return ddbDocClient
+        .send(new UpdateCommand({
             TableName: leasesTable,
             Key: {
                 AccountId: accountId,
@@ -185,8 +189,7 @@ const updateLease = ({
                 ":n": budgetNotificationEmails
             },
             ReturnValues: "UPDATED_NEW"
-        })
-        .promise()
+        }))
         .then((response) =>
             respondWithSuccess("DynamoDB table record for lease for " + user + " successfully updated.", response)
         )
@@ -219,18 +222,14 @@ const deleteLease = ({ accountId, principalId, user }) => {
     if (!accountId)
         return respondWithError("Internal error while trying to delete lease.", "Parameter 'accountId' missing.");
     if (!user) return respondWithError("Internal error while trying to delete lease.", "Parameter 'user' missing.");
-    const ddb = new AWS.DynamoDB.DocumentClient({
-        region: region
-    });
-    return ddb
-        .delete({
+    return ddbDocClient
+        .send(new DeleteCommand({
             TableName: leasesTable,
             Key: {
                 AccountId: accountId,
                 PrincipalId: principalId
             }
-        })
-        .promise()
+        }))
         .then((response) => respondWithSuccess("Lease for " + user + " successfully deleted.", response))
         .catch((error) => respondWithError("Error trying to delete lease for " + user + ".", error));
 };
@@ -278,7 +277,10 @@ const listUsage = () => {
         .catch((error) => respondWithError("Error trying to retrieve usage data.", error));
 };
 
-exports.handler = async ({ arguments: args }) => {
+exports.handler = async (event, context) => {
+    console.log("Lambda invoked with the following parameters: ", event, context)
+    let args = event.arguments
+
     if (!args) return respondWithError("Internal error while trying to execute task.", "Event arguments missing.");
     if (!args.action)
         return respondWithError("Internal error while trying to execute task.", "Parameter 'action' missing.");

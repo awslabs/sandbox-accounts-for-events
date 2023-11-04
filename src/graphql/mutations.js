@@ -18,6 +18,7 @@ export const createEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -38,6 +39,7 @@ export const updateEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -58,6 +60,7 @@ export const deleteEvent = /* GraphQL */ `
       eventStatus
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -71,6 +74,7 @@ export const createConfig = /* GraphQL */ `
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -84,6 +88,7 @@ export const updateConfig = /* GraphQL */ `
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;
@@ -97,6 +102,7 @@ export const deleteConfig = /* GraphQL */ `
       config
       createdAt
       updatedAt
+      __typename
     }
   }
 `;

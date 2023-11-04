@@ -1,5 +1,4 @@
 type Event @model @auth(rules: [
-  { allow: private, operations: [read] },
   { allow: groups, groups: ["admin","operator"] }
 ]) {
   id: ID!

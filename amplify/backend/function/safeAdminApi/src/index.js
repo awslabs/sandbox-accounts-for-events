@@ -1,10 +1,18 @@
 const https = require("https");
 const aws4 = require("aws4");
-const AWS = require("aws-sdk");
+const { IAMClient, ListAttachedRolePoliciesCommand, ListAccountAliasesCommand } = require('@aws-sdk/client-iam');
+const { STSClient, AssumeRoleCommand } = require('@aws-sdk/client-sts');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { DynamoDBDocumentClient, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+
 const apiUrl = new URL(process.env.DCE_API_GW);
 const region = process.env.REGION;
 const accountsTable = process.env.DCE_ACCOUNTS_TABLE;
 const serviceName = "execute-api";
+
+const stsClient = new STSClient({ region });
+const ddbClient = new DynamoDBClient({ region });
+const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
 
 const respondWithError = (message = "Internal error.", errorObject = {}) => {
     console.error(message, errorObject);
@@ -84,25 +92,22 @@ const registerAccount = ({ id, roleName }) => {
 
     const roleArn = "arn:aws:iam::" + id + ":role/" + roleName;
 
-    const sts = new AWS.STS({ region: region });
-    return sts
-        .assumeRole({
+    return stsClient
+        .send(new AssumeRoleCommand({
             RoleArn: roleArn,
             RoleSessionName: "testAdminLogin",
             DurationSeconds: 900
-        })
-        .promise()
+        }))
         .then((credentials) => {
-            const iam = new AWS.IAM({
+            const iamClient = new IAMClient({
                 credentials: {
                     accessKeyId: credentials.Credentials.AccessKeyId,
                     secretAccessKey: credentials.Credentials.SecretAccessKey,
                     sessionToken: credentials.Credentials.SessionToken
                 }
             });
-            return iam
-                .listAttachedRolePolicies({ RoleName: roleName })
-                .promise()
+            return iamClient
+                .send(new ListAttachedRolePoliciesCommand({ RoleName: roleName }))
                 .then((policies) => {
                     if (!policies.AttachedPolicies.find((item) => item.PolicyName === "AdministratorAccess"))
                         return respondWithError(
@@ -113,9 +118,8 @@ const registerAccount = ({ id, roleName }) => {
                                 ".",
                             error
                         );
-                    return iam
-                        .listAccountAliases({})
-                        .promise()
+                    return iamClient
+                        .send(new ListAccountAliasesCommand({}))
                         .then((aliases) => {
                             if (aliases.AccountAliases.length === 0)
                                 return respondWithError("No account alias found for account " + id + ".");
@@ -161,11 +165,8 @@ const updateAccount = ({ id, accountStatus, adminRoleArn }) => {
         return respondWithError("Internal error while trying to update account.", "Parameter 'accountStatus' missing.");
     if (!adminRoleArn)
         return respondWithError("Internal error while trying to update account.", "Parameter 'adminRoleArn' missing.");
-    let ddb = new AWS.DynamoDB.DocumentClient({
-        region: region
-    });
-    return ddb
-        .update({
+    return ddbDocClient
+        .send(new UpdateCommand({
             TableName: accountsTable,
             Key: {
                 Id: id
@@ -176,8 +177,7 @@ const updateAccount = ({ id, accountStatus, adminRoleArn }) => {
                 ":r": adminRoleArn
             },
             ReturnValues: "UPDATED_NEW"
-        })
-        .promise()
+        }))
         .then((response) =>
             respondWithSuccess("DynamoDB table record for account " + id + " successfully updated.", response)
         )
@@ -197,7 +197,10 @@ const removeAccount = ({ id }) => {
         .catch((error) => respondWithError("Failed to remove account " + id + ".", error));
 };
 
-exports.handler = async ({ arguments: args }, context) => {
+exports.handler = async (event, context) => {
+    console.log("Lambda invoked with the following parameters: ", event, context)
+    let args = event.arguments
+
     if (!args)
         return respondWithError("Internal error while trying to execute account task.", "Event arguments missing.");
     if (!args.action)

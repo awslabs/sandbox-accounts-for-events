@@ -1,109 +1,71 @@
 {
-  "auth": {
-    "userPoolGroups": {
-      "service": "Cognito-UserPool-Groups",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [
-        {
-          "category": "auth",
-          "resourceName": "safeafe5208f",
-          "attributes": [
-            "UserPoolId",
-            "AppClientIDWeb",
-            "AppClientID",
-            "IdentityPoolId"
-          ]
-        }
-      ]
-    },
-    "safeafe5208f": {
-      "service": "Cognito",
-      "providerPlugin": "awscloudformation",
-      "dependsOn": [],
-      "customAuth": false
-    }
-  },
   "api": {
     "AdminQueries": {
-      "service": "API Gateway",
-      "providerPlugin": "awscloudformation",
       "authorizationType": "AMAZON_COGNITO_USER_POOLS",
       "dependsOn": [
         {
-          "category": "auth",
-          "resourceName": "safeafe5208f",
           "attributes": [
             "UserPoolId"
-          ]
+          ],
+          "category": "auth",
+          "resourceName": "safeafe5208f"
         },
         {
-          "category": "function",
-          "resourceName": "AdminQueries4757b5b2",
           "attributes": [
             "Arn",
             "Name"
-          ]
+          ],
+          "category": "function",
+          "resourceName": "AdminQueries4757b5b2"
         }
-      ]
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway"
     },
     "safegraphql": {
-      "service": "AppSync",
-      "providerPlugin": "awscloudformation",
       "output": {
         "authConfig": {
+          "additionalAuthenticationProviders": [],
           "defaultAuthentication": {
             "authenticationType": "AMAZON_COGNITO_USER_POOLS",
             "userPoolConfig": {
               "userPoolId": "authsafeafe5208f"
             }
-          },
-          "additionalAuthenticationProviders": []
+          }
         }
-      }
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync"
     }
   },
-  "function": {
-    "AdminQueries4757b5b2": {
-      "service": "Lambda",
+  "auth": {
+    "safeafe5208f": {
+      "customAuth": false,
+      "dependsOn": [],
       "providerPlugin": "awscloudformation",
-      "build": true,
+      "service": "Cognito"
+    },
+    "userPoolGroups": {
       "dependsOn": [
         {
-          "category": "auth",
-          "resourceName": "safeafe5208f",
           "attributes": [
-            "UserPoolId"
-          ]
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "safeafe5208f"
         }
-      ]
-    },
-    "safeOperatorApi": {
-      "build": true,
+      ],
       "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
-    },
-    "safeLoginApi": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
-    },
-    "safeAdminApi": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": []
+      "service": "Cognito-UserPool-Groups"
     }
   },
   "custom": {
     "cfnAdminUser": {
-      "service": "customCloudformation",
-      "providerPlugin": "awscloudformation",
       "dependsOn": [
         {
-          "category": "auth",
-          "resourceName": "safeafe5208f",
           "attributes": [
             "IdentityPoolId",
             "IdentityPoolName",
@@ -112,15 +74,159 @@
             "UserPoolName",
             "AppClientIDWeb",
             "AppClientID"
-          ]
+          ],
+          "category": "auth",
+          "resourceName": "safeafe5208f"
         },
         {
-          "category": "auth",
-          "resourceName": "userPoolGroups",
           "attributes": [
             "adminGroupRole",
             "operatorGroupRole"
-          ]
+          ],
+          "category": "auth",
+          "resourceName": "userPoolGroups"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "customCloudformation"
+    }
+  },
+  "function": {
+    "AdminQueries4757b5b2": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "safeafe5208f"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "safeAdminApi": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "safeLoginApi": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "safeOperatorApi": {
+      "build": true,
+      "dependsOn": [],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_AdminQueries4757b5b2_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries4757b5b2"
+        }
+      ]
+    },
+    "AMPLIFY_function_AdminQueries4757b5b2_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "AdminQueries4757b5b2"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeAdminApi_dceAccountsTable": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeAdminApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeAdminApi_dceApiGw": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeAdminApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeAdminApi_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeAdminApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeAdminApi_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeAdminApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeLoginApi_dceApiGw": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeLoginApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeLoginApi_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeLoginApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeLoginApi_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeLoginApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeOperatorApi_dceApiGw": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeOperatorApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeOperatorApi_dceLeasesTable": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeOperatorApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeOperatorApi_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeOperatorApi"
+        }
+      ]
+    },
+    "AMPLIFY_function_safeOperatorApi_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "safeOperatorApi"
         }
       ]
     }

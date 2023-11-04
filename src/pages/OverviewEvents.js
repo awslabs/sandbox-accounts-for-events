@@ -236,7 +236,7 @@ const ItemTable = () => {
                         id: "eventSpend",
                         header: "Current spend",
                         sortingField: "eventSpend",
-                        cell: (item) => item.eventSpend + " " + Config.BUDGET_CURRENCY
+                        cell: (item) => item.eventSpend + " USD"
                     }
                 ]}
                 items={items}
@@ -433,11 +433,11 @@ const DetailSplitPanel = () => {
                 </Box>
                 <Box>
                     <Box variant="h5">Maximum budget per AWS account</Box>
-                    {item.eventBudget + " " + Config.BUDGET_CURRENCY}
+                    {item.eventBudget + " USD"}
                 </Box>
                 <Box>
                     <Box variant="h5">Current overall spend</Box>
-                    {item.eventSpend + " " + Config.BUDGET_CURRENCY}
+                    {item.eventSpend + " USD"}
                 </Box>
                 <Box>
                     <Box variant="h5">Created on</Box>

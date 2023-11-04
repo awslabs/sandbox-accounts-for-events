@@ -216,32 +216,31 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        ZipFile:
-          Fn::Join:
-            - ''
-            - - const response = require('cfn-response');
-              - const aws = require('aws-sdk');
-              - const identity = new aws.CognitoIdentityServiceProvider();
-              - exports.handler = (event, context, callback) => {
-              - ' if (event.RequestType == ''Delete'') { '
-              - '   response.send(event, context, response.SUCCESS, {})'
-              - ' }'
-              - ' if (event.RequestType == ''Update'' || event.RequestType == ''Create'') {'
-              - '   const params = {'
-              - '     ClientId: event.ResourceProperties.clientId,'
-              - '     UserPoolId: event.ResourceProperties.userpoolId'
-              - '   };'
-              - '   identity.describeUserPoolClient(params).promise()'
-              - '     .then((res) => {'
-              - '       response.send(event, context, response.SUCCESS, {''appSecret'': res.UserPoolClient.ClientSecret});'
-              - '     })'
-              - '     .catch((err) => {'
-              - '       response.send(event, context, response.FAILED, {err});'
-              - '     });'
-              - ' }'
-              - '};'
+        ZipFile: | 
+          const response = require('cfn-response');
+          const { CognitoIdentityProviderClient, DescribeUserPoolClientCommand } = require("@aws-sdk/client-cognito-identity-provider");
+          const identity = new CognitoIdentityProviderClient();
+          exports.handler = (event, context, callback) => {
+            console.log("Lambda invoked with the following parameters: ", event, context);
+            if (event.RequestType == "Delete") { 
+              response.send(event, context, response.SUCCESS, {})
+            }
+            if (event.RequestType == "Update" || event.RequestType == "Create") {
+              const params = {
+                ClientId: event.ResourceProperties.clientId,
+                UserPoolId: event.ResourceProperties.userpoolId
+              };
+              identity.send(new DescribeUserPoolClientCommand(params))
+                .then((res) => {
+                  response.send(event, context, response.SUCCESS, {"appSecret": res.UserPoolClient.ClientSecret});
+                })
+                .catch((err) => {
+                  response.send(event, context, response.FAILED, {err});
+              });
+            }
+          };
       Handler: index.handler
-      Runtime: nodejs14.x
+      Runtime: nodejs18.x
       Timeout: 300
       Role:
         Fn::GetAtt:
@@ -385,4 +384,4 @@ Outputs:
         - appSecret
     Condition: ShouldOutputAppClientSecrets
 Description: >-
-  {"createdOn":"Linux","createdBy":"Amplify","createdWith":"7.6.15","stackType":"auth-Cognito","metadata":{}}
+  {"createdOn":"Mac","createdBy":"Amplify","createdWith":"12.7.1","stackType":"auth-Cognito","metadata":{}}

@@ -79,10 +79,10 @@ const CreateLeaseModal = ({ isAdminView }) => {
         setValue((prev) => {
             let newValue = { ...prev, ...update };
             validateInputs(newValue, true);
-            let user = newValue.user.replace(/[^a-zA-Z0-9]/g, Config.EVENT_EMAIL_SUBST);
+            let user = newValue.user.replace(/[^a-zA-Z0-9]/g, "+");
 
             if (newValue.eventId !== "")
-                newValue.principalId = newValue.eventId + Config.EVENT_PRINCIPAL_SEPARATOR + user;
+                newValue.principalId = newValue.eventId + "__" + user;
             else newValue.principalId = user;
 
             return newValue;
@@ -150,7 +150,7 @@ const CreateLeaseModal = ({ isAdminView }) => {
                         />
                     </FormField>
                     <FormField
-                        label={"Budget in " + Config.BUDGET_CURRENCY}
+                        label={"Budget in USD"}
                         description={"Enter budget cap for this lease (maximum " + Config.ACCOUNT_MAX_BUDGET + ")"}
                         errorText={inputError.BUDGET}
                     >

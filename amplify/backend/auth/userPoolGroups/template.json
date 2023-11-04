@@ -257,15 +257,16 @@
               "\n",
               [
                 "const response = require('cfn-response');",
-                "const AWS = require('aws-sdk');",
+                "const { CognitoIdentityClient, SetIdentityPoolRolesCommand } = require('@aws-sdk/client-cognito-identity');",
                 "exports.handler = (event, context) => {",
+                "console.log('Lambda invoked with the following parameters: ', event, context);",
                 "if (event.RequestType == 'Delete') {",
                 "    response.send(event, context, response.SUCCESS, {message: 'Request type delete'})",
                 "};",
                 "if (event.RequestType == 'Create' || event.RequestType == 'Update') {",
                 "    let { identityPoolId, appClientID, appClientIDWeb, userPoolId, region }  = event.ResourceProperties;",
                 "    try {",
-                "       const cognitoidentity = new AWS.CognitoIdentity();",
+                "       const cognitoidentity = new CognitoIdentityClient();",
                 "       let params = {",
                 "           IdentityPoolId: identityPoolId,",
                 "           Roles: {",
@@ -286,7 +287,7 @@
                 "               AmbiguousRoleResolution: 'AuthenticatedRole',",
                 "           }",
                 "       }",
-                "    cognitoidentity.setIdentityPoolRoles(params).promise();",
+                "    cognitoidentity.send(new SetIdentityPoolRolesCommand(params));",
                 "    response.send(event, context, response.SUCCESS, {message: 'Successfully updated identity pool.'})",
                 "    } catch(err) {",
                 "        response.send(event, context, response.FAILED, {message: 'Error updating identity pool'});",
@@ -298,7 +299,7 @@
           }
         },
         "Handler": "index.handler",
-        "Runtime": "nodejs14.x",
+        "Runtime": "nodejs18.x",
         "Timeout": 300,
         "Role": {
           "Fn::GetAtt": [
@@ -365,5 +366,5 @@
       }
     }
   },
-  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.6.15\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}"
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.7.1\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}"
 }

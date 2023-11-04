@@ -42,9 +42,9 @@ build:
 	rm -f build-cfn/*
 
 # create build artifacts (= zip files) for CloudFormation deployment
-	git archive --format zip --output build-cfn/sandbox-accounts-for-events.zip $(branch)
-	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
-	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -r ../../../build-cfn/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
+	zip -FSr build-cfn/sandbox-accounts-for-events.zip . -x amplify/#current-cloud-backend/\* build/\* build-cfn/\* \*dist/\* \*.DS_Store\* \*.vscode/\* \*.git/\* src/aws-exports.json\* \*amplify-meta.json\* amplify/team-provider-info.json\* \*awscloudformation\* \*node_modules\* amplify/.config/local-\*
+	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -FSr ../../../build-cfn/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
+	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -FSr ../../../build-cfn/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
 
 # upload build artifacts and CloudFormation template to specified S3 bucket
 	aws s3 sync build-cfn s3://$(bucket) $(profileString)

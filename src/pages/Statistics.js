@@ -186,7 +186,7 @@ const Statistics = () => {
                                 empty={<NoData />}
                             />
                         </Container>
-                        <Container header={<Header>AWS service spend in {Config.BUDGET_CURRENCY}</Header>}>
+                        <Container header={<Header>AWS service spend in USD</Header>}>
                             <AreaChart
                                 hideFilter
                                 series={[
