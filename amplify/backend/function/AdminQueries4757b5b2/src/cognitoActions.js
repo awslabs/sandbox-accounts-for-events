@@ -12,8 +12,6 @@
  * and limitations under the License.
  */
 
-
-
 const { CognitoIdentityProvider } = require('@aws-sdk/client-cognito-identity-provider');
 const { v4: uuidv4 } = require('uuid');
 
