@@ -165,10 +165,11 @@ app.get('/getUser', async (req, res, next) => {
 app.get('/listUsers', async (req, res, next) => {
   try {
     let response;
+    let limit = Number(req.query?.limit || 25);
     if (req.query.token) {
-      response = await listUsers(req.query.limit || 25, req.query.token);
+      response = await listUsers(limit, req.query.token);
     } else if (req.query.limit) {
-      response = await listUsers((Limit = req.query.limit));
+      response = await listUsers((Limit = limit));
     } else {
       response = await listUsers();
     }
@@ -181,10 +182,11 @@ app.get('/listUsers', async (req, res, next) => {
 app.get('/listGroups', async (req, res, next) => {
   try {
     let response;
+    let limit = Number(req.query?.limit || 25);
     if (req.query.token) {
-      response = await listGroups(req.query.limit || 25, req.query.token);
+      response = await listGroups(limit, req.query.token);
     } else if (req.query.limit) {
-      response = await listGroups((Limit = req.query.limit));
+      response = await listGroups((Limit = limit));
     } else {
       response = await listGroups();
     }
@@ -203,10 +205,11 @@ app.get('/listGroupsForUser', async (req, res, next) => {
 
   try {
     let response;
+    let limit = Number(req.query?.limit || 25);
     if (req.query.token) {
-      response = await listGroupsForUser(req.query.username, req.query.limit || 25, req.query.token);
+      response = await listGroupsForUser(req.query.username, limit, req.query.token);
     } else if (req.query.limit) {
-      response = await listGroupsForUser(req.query.username, (Limit = req.query.limit));
+      response = await listGroupsForUser(req.query.username, (Limit = limit));
     } else {
       response = await listGroupsForUser(req.query.username);
     }
@@ -225,10 +228,11 @@ app.get('/listUsersInGroup', async (req, res, next) => {
 
   try {
     let response;
+    let limit = Number(req.query?.limit || 25);
     if (req.query.token) {
-      response = await listUsersInGroup(req.query.groupname, req.query.limit || 25, req.query.token);
+      response = await listUsersInGroup(req.query.groupname, limit, req.query.token);
     } else if (req.query.limit) {
-      response = await listUsersInGroup(req.query.groupname, (Limit = req.query.limit));
+      response = await listUsersInGroup(req.query.groupname, (Limit = limit));
     } else {
       response = await listUsersInGroup(req.query.groupname);
     }
