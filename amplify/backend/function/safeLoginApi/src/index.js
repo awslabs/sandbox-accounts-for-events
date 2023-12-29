@@ -164,7 +164,7 @@ const getAwsLoginUrlForEvent = async ({eventId}, event) => {
                                     if (leases.filter((lease) => lease.principalId.startsWith(eventId)).length >= response.Item.maxAccounts)
                                         return respondWithError("No more free AWS accounts available for this event.");
                                     return invokeApi("leases", "POST", {
-                                        budgetAmount: response.Item.budgetAmount,
+                                        budgetAmount: response.Item.eventBudget,
                                         expiresOn: moment
                                             .unix(response.Item.eventOn)
                                             .add(response.Item.eventDays, "days")

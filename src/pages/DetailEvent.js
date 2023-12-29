@@ -352,7 +352,7 @@ const LeasesTable = () => {
                         subtitle="No leases found."
                         action={
                             Item && Item.eventStatus !== "Terminated" ? (
-                                <Button onClick={createEventLease}>Create lease</Button>
+                                <Button onClick={() => dispatch({ type: "modal/open", status: "createLease", item: Item })}>Create lease</Button>
                             ) : null
                         }
                     />

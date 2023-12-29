@@ -57,8 +57,13 @@
       "Sid": "DenyCUR",
       "Effect": "Deny",
       "Action": [
-        "aws-portal:ViewBilling",
-        "aws-portal:ViewAccount",
+        "aws-portal:*",
+        "account:*",
+        "billing:*",
+        "payments:*",
+        "invoicing:*",
+        "purchase-orders:*",
+        "tax:*",
         "ce:*",
         "cur:*"
       ],
