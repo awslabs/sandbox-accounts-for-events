@@ -5,6 +5,7 @@ const initialState = {
     status: "hidden",
     event_status: "idle",
     url: "",
+    credentials: "",
     event: {}
 };
 
@@ -19,13 +20,17 @@ const aws_login = (state = initialState, action) => {
             return {
                 ...state,
                 status: "visible",
-                url: action.payload.url
+                url: action.payload.consoleUrl,
+                credentials: "export AWS_ACCESS_KEY_ID=" + action.payload.accessKeyId + "\n" +
+                             "export AWS_SECRET_ACCESS_KEY=" + action.payload.secretAccessKey + "\n" +
+                             "export AWS_SESSION_TOKEN=" + action.payload.sessionToken + "\n"
             };
         case "aws_login/loadError":
         case "aws_login/dismiss":
             return {
                 ...state,
                 url: "",
+                credentials: "",
                 status: "hidden"
             };
                 
@@ -62,7 +67,7 @@ export const fetchAwsLoginUrl = (params) => async (dispatch) => {
         if (!payload || payload.status === "error") {
             throw payload;
         }
-        dispatch({ type: "aws_login/loaded", payload: { url: payload.body } });
+        dispatch({ type: "aws_login/loaded", payload: payload.body });
         dispatch({ type: "notification/dismiss" });
     } catch (error) {
         console.error(error);

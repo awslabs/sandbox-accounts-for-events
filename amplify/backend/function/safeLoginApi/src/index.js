@@ -99,7 +99,7 @@ const getEndUserEvent = ({ id }) => {
 const getLeaseLoginUrl = ({ id }, user) => {
     return invokeApi("leases/" + id + "/auth", "POST", "")
         .then((response) => {
-            if (response.consoleUrl) return response.consoleUrl.replace("\\u0026", "?");
+            if (response.consoleUrl) return response;
             else throw response;
         })
         .then((url) => {
@@ -219,7 +219,7 @@ const getAwsLoginUrlForLease = ({ id }) => {
     if (!id) return respondWithError("Internal error while trying to log in.", "Parameter 'id' missing.");
     return invokeApi("leases/" + id + "/auth", "POST", "")
         .then((response) => {
-            if (response.consoleUrl) return response.consoleUrl.replace("\\u0026", "?");
+            if (response.consoleUrl) return response;
             else throw response;
         })
         .then((url) => {

@@ -20,7 +20,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import { fetchEvent, terminateEvent, startEvent } from "../redux/actions/events";
-import { deleteLease, createLease, terminateLeases } from "../redux/actions/leases";
+import { deleteLease, terminateLeases } from "../redux/actions/leases";
 import EmptyState from "./components/EmptyState";
 import CopyClipboardIconButton from "./components/CopyClipboardIconButton";
 import Navigation from "./components/Navigation";
@@ -265,25 +265,6 @@ const LeasesTable = () => {
         )
     }));
     const dispatch = useDispatch();
-
-    const createEventLease = (item) => {
-        if (Item.maxAccounts <= EventLeases.items.length) {
-            dispatch({
-                type: "notification/error",
-                message:
-                    "Cannot create new lease, already reached maximum of " +
-                    Item.maxAccounts +
-                    " leases for this event."
-            });
-            return;
-        }
-        dispatch(
-            createLease({
-                ...item,
-                expiresOn: moment.unix(Item.eventOn).add(Item.eventDays, "days").add(Item.eventHours, "hours").unix()
-            })
-        );
-    };
 
     const { items, actions, filteredItemsCount, collectionProps, propertyFilterProps, paginationProps } = useCollection(
         EventLeases.items,
