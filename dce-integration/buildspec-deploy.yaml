@@ -37,6 +37,12 @@ phases:
       # Use improved IAM policy template for principal to avoid conflicts between policy and SCPs 
       - cp dce-integration/modules/fixtures/policies/principal_policy.tmpl dce/modules/fixtures/policies/principal_policy.tmpl
 
+      # Replace Go1.x Lambda runtime (deprecated) with AmazonLinux2
+      - sed -i 's/"go1.x"/"provided.al2"/g' dce/modules/lambda/lambda.tf
+      - sed -i 's/= var.handler/= "bootstrap"/g' dce/modules/lambda/lambda.tf
+      - sed -i 's|go build -v -o ../../../bin/lambda/$mod_name$|go build -v -o ../../../bin/lambda/bootstrap|g' dce/scripts/build.sh
+      - sed -i 's|^\s*bin/lambda/$mod_name$|      bin/lambda/bootstrap|g' dce/scripts/build.sh
+
   build:
     commands:
       # Build and deploy backend resources via TerraForm

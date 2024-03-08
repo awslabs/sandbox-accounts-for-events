@@ -3,10 +3,9 @@ backend:
   phases:
     preBuild:
       commands:
-        # install required Amplify CLI version and moreutils for "sponge" command
+        # install required Amplify CLI version and jq 
         - npm i -g @aws-amplify/cli@12.7.1
-        - amazon-linux-extras install epel -y
-        - yum install -y moreutils jq
+        - sudo yum install -y jq
 
     build:
       commands:
@@ -24,12 +23,14 @@ backend:
         - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AWS_APP_ID}/main/AMPLIFY_function_safeAdminApi_dceApiGw\",\"Value\":\"\\\"${DCE_API_GW}\\\"\",\"Overwrite\":true}"
         - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AWS_APP_ID}/main/AMPLIFY_function_safeOperatorApi_dceLeasesTable\",\"Value\":\"\\\"${DCE_LEASES_TABLE}\\\"\",\"Overwrite\":true}"
         - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AWS_APP_ID}/main/AMPLIFY_function_safeAdminApi_dceAccountsTable\",\"Value\":\"\\\"${DCE_ACCOUNTS_TABLE}\\\"\",\"Overwrite\":true}"
-        - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeAdminApi/parameters.json
-        - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceAccountsTable = $var' --arg var $DCE_ACCOUNTS_TABLE | sponge amplify/backend/function/safeAdminApi/parameters.json
-        - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeOperatorApi/parameters.json
-        - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceLeasesTable = $var' --arg var $DCE_LEASES_TABLE | sponge amplify/backend/function/safeOperatorApi/parameters.json
-        - cat amplify/backend/function/safeLoginApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW | sponge amplify/backend/function/safeLoginApi/parameters.json
-        - cat amplify/backend/custom/cfnAdminUser/parameters.json | jq '.adminUserEmailAddress = $var' --arg var $ADMIN_USER_EMAIL | sponge amplify/backend/custom/cfnAdminUser/parameters.json
+        - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+        - cat parameters.json | jq '.dceAccountsTable = $var' --arg var $DCE_ACCOUNTS_TABLE > amplify/backend/function/safeAdminApi/parameters.json
+        - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+        - cat parameters.json | jq '.dceLeasesTable = $var' --arg var $DCE_LEASES_TABLE > amplify/backend/function/safeOperatorApi/parameters.json
+        - cat amplify/backend/function/safeLoginApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+        - mv parameters.json amplify/backend/function/safeLoginApi/parameters.json
+        - cat amplify/backend/custom/cfnAdminUser/parameters.json | jq '.adminUserEmailAddress = $var' --arg var $ADMIN_USER_EMAIL > parameters.json
+        - mv parameters.json amplify/backend/custom/cfnAdminUser/parameters.json
 
         # create empty Amplify backend config file and deploy Amplify project
         - echo "{}" > amplify/team-provider-info.json
@@ -43,7 +44,7 @@ frontend:
     preBuild:
       commands:
         # configure NodeJS build environment
-        - nvm use 12
+        - nvm use 18
         - npm ci
 
     build:

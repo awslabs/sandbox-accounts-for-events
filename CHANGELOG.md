@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.1.2] - 2024-03-08
+### Added
+- no additions
+
+### Changed
+- changed DCE Lambda runtimes from (deprecated) Go1.x to AmazonLinux2
+- removed dependency to moreutils package (no longer available in AmazonLinux2023) from amplify.yml 
+
+### Removed
+- nothing removed
+
+
 ## [1.1.1] - 2024-03-07
 ### Added
 - added AWS CLI credentials copy & paste functionality to AWS Account login popup
