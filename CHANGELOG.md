@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.1.3] - 2024-06-26
+### Added
+- added new ServiceTimeout parameter to custom CloudFront resources to enforce faster fails on deployment issues
+
+### Fixed
+- added paginating retrieval of leases list to avoid login issues for existing leases
+- updated automated unit tests to newest CloudScape changes
+- updated npm packages to address known vulnerabilities 
+
+### Removed
+- nothing removed
+
+
 ## [1.1.2] - 2024-03-08
 ### Added
 - no additions

@@ -1,4 +1,5 @@
 import { render, screen, within, waitFor, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import OverviewUsers from "./OverviewUsers";
 import * as redux from "react-redux";
@@ -47,12 +48,14 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     const fetchUsersAction = jest.spyOn(userActions, "fetchUsers").mockImplementation((users) => () => users)
     store.dispatch({ type: "users/loaded", payload: [testUser], addUsers: false, config })
     store.dispatch({ type: "leases/loaded", payload: [testLease], config })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <OverviewUsers/>
-        </ReduxProvider>
-    );
-    const searchInputElement = screen.getByPlaceholderText(/search/i);
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <OverviewUsers/>
+            </ReduxProvider>
+        );
+    })
+    const searchInputElement = screen.getByPlaceholderText(/find users/i);
     const createButtonElement = screen.getByTestId("createUserRow")
     const editButtonElement = screen.getByTestId("editUserRow")
     const deleteButtonElement = screen.getByTestId("deleteUserRow")
@@ -63,17 +66,21 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     expect(deleteButtonElement).toBeDisabled()
 
     // check if user and lease data has been fetched
-    expect(fetchLeasesAction).toBeCalled()
-    expect(fetchUsersAction).toBeCalled()
+    expect(fetchLeasesAction).toHaveBeenCalled()
+    expect(fetchUsersAction).toHaveBeenCalled()
 
     // check if search box filters correctly
-    await userEvent.type(searchInputElement, 'unknown')
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.type(searchInputElement, 'unknown')
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
     const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
     expect(clearButtonElements).toHaveLength(2)
-    await userEvent.click(clearButtonElements[0])
-    await userEvent.type(searchInputElement, 'domain')
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.click(clearButtonElements[0])
+        await userEvent.type(searchInputElement, 'domain')
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
 
     // check if testObject data is visible in table
     const userRow = screen.getByText(testUser.Attributes[0].Value).closest("tr");
@@ -83,7 +90,9 @@ test("renders OverviewUsers, enters valid and invalid texts, submits", async () 
     expect(withinUserRow.getByText(testUser.lastModifiedDate)).toBeInTheDocument()
 
     // check table row to toggle buttons
-    await userEvent.click(withinUserRow.getByRole("checkbox"))
+    await act(async () => {
+        await userEvent.click(withinUserRow.getByRole("checkbox"))
+    })
     expect(editButtonElement).toBeEnabled()
     expect(deleteButtonElement).toBeEnabled()
 

@@ -178,6 +178,7 @@ Resources:
     DependsOn: DceDeployProject
     Properties:
       ServiceToken: !GetAtt DceTriggerCodeBuildLambda.Arn
+      ServiceTimeout: 900
       Region: !Ref "AWS::Region"
 
   ##################
@@ -343,6 +344,7 @@ Resources:
       - AppUiAmplifyApp
     Properties:
       ServiceToken: !GetAtt AppUiTriggerAmplifyDeploymentLambda.Arn
+      ServiceTimeout: 1200
       Region: !Ref "AWS::Region"
 
 Outputs:

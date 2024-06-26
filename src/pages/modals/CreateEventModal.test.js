@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import CreateEventModal from "./CreateEventModal";
 import { Provider } from "react-redux";
@@ -10,17 +11,21 @@ const ReduxProvider = ({ children, reduxStore }) => <Provider store={reduxStore}
 
 test("renders CreateEventModal, cannot submit empty dialog", async () => {
 
-    render(
-        <ReduxProvider reduxStore={store}>
-            <CreateEventModal />
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <CreateEventModal />
+            </ReduxProvider>
+        );
+    })
     const createButtonElement = screen.getByRole("button", { name: "Create" })
 
     expect(screen.getByText(/create new event/i)).toBeInTheDocument();
 
     expect(createButtonElement).toBeEnabled()
-    await userEvent.click(createButtonElement)
+    await act(async () => {
+        await userEvent.click(createButtonElement)
+    })
     expect(createButtonElement).toBeDisabled()
 });
 
@@ -39,11 +44,13 @@ test("renders CreateEventModal, enters valid and invalid texts, submits", async 
         eventStatus: 'Waiting'
     }
     testObject.eventOn = moment(testObject.eventDateInput + " " + testObject.eventTimeInput).unix()
-    render(
-        <ReduxProvider reduxStore={store}>
-            <CreateEventModal />
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <CreateEventModal />
+            </ReduxProvider>
+        );
+    })
     expect(screen.getByText(/create new event/i)).toBeInTheDocument();
     const nameInputElement = screen.getByLabelText(/event name/i);
     const dateInputElement = screen.getByPlaceholderText("YYYY/MM/DD");
@@ -57,48 +64,75 @@ test("renders CreateEventModal, enters valid and invalid texts, submits", async 
 
     // check if submit button is initially enabled
     expect(createButtonElement).toBeEnabled()
-    await userEvent.type(nameInputElement, testObject.eventName)
+    await act(async () => {
+        await userEvent.type(nameInputElement, testObject.eventName)
+    })
 
     // try invalid and valid email address
-    await userEvent.type(ownerInputElement, "testowner")
+    await act(async () => {
+        await userEvent.type(ownerInputElement, "testowner")
+    })
     expect(createButtonElement).toBeDisabled()
-    await userEvent.clear(ownerInputElement)
-    await userEvent.type(ownerInputElement, testObject.eventOwner)
+    await act(async () => {
+        await userEvent.clear(ownerInputElement)
+        await userEvent.type(ownerInputElement, testObject.eventOwner)
+    })
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid date
-    await userEvent.type(timeInputElement, testObject.eventTimeInput)
-    await userEvent.type(dateInputElement, '2021/01/01')
+    await act(async () => {
+        await userEvent.clear(timeInputElement)
+        fireEvent.change(timeInputElement, { target: { value: testObject.eventTimeInput } } )
+        await userEvent.clear(dateInputElement)
+        fireEvent.change(dateInputElement, { target: { value: "2021-01-01" } } )
+    })
     expect(createButtonElement).toBeDisabled()
-    await userEvent.clear(dateInputElement)
-    await userEvent.type(dateInputElement, testObject.eventDateInput.split('-').join('/'))
+    await act(async () => {
+        await userEvent.clear(dateInputElement)
+        fireEvent.change(dateInputElement, { target: { value: testObject.eventDateInput.replaceAll("-", "/") } } )
+    })
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid duration
-    await userEvent.clear(durationDaysInputElement)
-    await userEvent.type(durationDaysInputElement, testObject.eventDays)
-    await userEvent.type(durationHoursInputElement, '25')
+    await act(async () => {
+        await userEvent.clear(durationDaysInputElement)
+        await userEvent.type(durationDaysInputElement, testObject.eventDays)
+        await userEvent.type(durationHoursInputElement, '25')
+    })
     expect(createButtonElement).toBeDisabled()
-    await userEvent.clear(durationHoursInputElement)
-    await userEvent.type(durationHoursInputElement, testObject.eventHours)
+    await act(async () => {
+        await userEvent.clear(durationHoursInputElement)
+        await userEvent.type(durationHoursInputElement, testObject.eventHours)
+    })
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid number of accounts
-    await userEvent.type(accountsInputElement, '5a')
+    await act(async () => {
+        await userEvent.type(accountsInputElement, '5a')
+    })
     expect(createButtonElement).toBeDisabled()
-    await userEvent.clear(accountsInputElement)
-    await userEvent.type(accountsInputElement, testObject.maxAccounts)
+    await act(async () => {
+        await userEvent.clear(accountsInputElement)
+        await userEvent.type(accountsInputElement, testObject.maxAccounts)
+    })
     expect(createButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    await userEvent.type(budgetInputElement, '5a')
+    await act(async () => {
+        await userEvent.type(budgetInputElement, '5a')
+    })
     expect(createButtonElement).toBeDisabled()
-    await userEvent.clear(budgetInputElement)
-    await userEvent.type(budgetInputElement, testObject.eventBudget)
+    await act(async () => {
+        await userEvent.clear(budgetInputElement)
+        await userEvent.type(budgetInputElement, testObject.eventBudget)
+    })
     expect(createButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const createEventAction = jest.spyOn(actions, "createEvent").mockImplementation((event) => () => event)
-    await userEvent.click(createButtonElement)
+    await act(async () => {
+        await userEvent.click(createButtonElement)
+    })
     expect(createEventAction.mock.lastCall[0]).toMatchObject(testObject)
+
 });

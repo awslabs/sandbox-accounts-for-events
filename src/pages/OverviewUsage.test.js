@@ -1,4 +1,5 @@
 import { render, screen, within, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import OverviewUsage from "./OverviewUsage";
 import { HashRouter } from "react-router-dom";
@@ -38,28 +39,33 @@ test("renders OverviewUsage, enters valid and invalid search term", async () => 
     const fetchUsageAction = jest.spyOn(usageActions, "fetchUsage").mockImplementation((usage) => () => usage)
     store.dispatch({ type: "usage/loaded", payload: [testUsage], config })
     store.dispatch({ type: "leases/loaded", payload: [testLease], config })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <HashRouter>
-            <OverviewUsage/>
-            </HashRouter>
-        </ReduxProvider>
-    );
-
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <HashRouter>
+                <OverviewUsage/>
+                </HashRouter>
+            </ReduxProvider>
+        );
+    })
     expect(screen.getByText(/daily aws account lease spend/i)).toBeInTheDocument()
-    const searchInputElement = screen.getByPlaceholderText(/search/i);
+    const searchInputElement = screen.getByPlaceholderText(/find usage/i);
 
     // check if event data has been fetched
-    expect(fetchUsageAction).toBeCalled()
+    expect(fetchUsageAction).toHaveBeenCalled()
 
     // check if search box filters correctly
-    await userEvent.type(searchInputElement, 'invalid')
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.type(searchInputElement, 'invalid')
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
     const clearButtonElements = screen.getAllByRole("button", { name: /clear filters/i })
     expect(clearButtonElements).toHaveLength(2)
-    await userEvent.click(clearButtonElements[0])
-    await userEvent.type(searchInputElement, testUsage.accountId)
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.click(clearButtonElements[0])
+        await userEvent.type(searchInputElement, testUsage.accountId)
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
 
     // check if testObject data is visible in table
     const usageRow = screen.getByText(testUsage.accountId).closest("tr");

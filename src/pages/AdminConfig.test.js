@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import AdminConfig from "./AdminConfig";
 import { Provider } from "react-redux";
@@ -12,13 +13,15 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
     const config = store.getState().config
     const fetchConfigAction = jest.spyOn(actions, "fetchConfig").mockImplementation((fetchConfig) => () => fetchConfig)
 
-    render(
-        <ReduxProvider reduxStore={store}>
-            <AdminConfig/>
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <AdminConfig/>
+            </ReduxProvider>
+        );
+    })
 
-    expect(fetchConfigAction).toBeCalled()
+    expect(fetchConfigAction).toHaveBeenCalled()
 
     const saveButtonElement = screen.getByTestId("saveConfigButton")
     const undoButtonElement = screen.getByTestId("undoConfigButton")
@@ -38,25 +41,35 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
             const parameterElement = screen.queryByTestId(item)
             if (parameterElement !== null) {
                 const inputElement = parameterElement.childNodes[0]
-                await userEvent.clear(inputElement)
-                await userEvent.type(inputElement, 'a1b2')
+                await act(async () => {
+                    await userEvent.clear(inputElement)
+                    await userEvent.type(inputElement, 'a1b2')
+                })
                 expect(saveButtonElement).toBeDisabled()
 
-                await userEvent.clear(inputElement)
-                await userEvent.type(inputElement, "10")
+                await act(async () => {
+                    await userEvent.clear(inputElement)
+                    await userEvent.type(inputElement, "10")
+                })
                 expect(saveButtonElement).toBeEnabled()
             }
         }
     };
 
     // undo inputs
-    await userEvent.click(undoButtonElement)
+    await act(async () => {
+        await userEvent.click(undoButtonElement)
+    })
     const confirmUndoButton = screen.getByTestId("confirmUndo inputsDialog")
-    await userEvent.click(confirmUndoButton)
+    await act(async () => {
+        await userEvent.click(confirmUndoButton)
+    })
 
     // submit and test redux action call payload
     const saveConfigAction = jest.spyOn(actions, "updateConfig").mockImplementation((updateConfig) => () => updateConfig)
-    await userEvent.click(saveButtonElement)
+    await act(async () => {
+        await userEvent.click(saveButtonElement)
+    })
 
     // identify components of confirmation dialog
     const confirmTextInputElement = screen.getByPlaceholderText("save");
@@ -66,8 +79,12 @@ test("renders AdminConfig, enters valid and invalid texts, submits", async () =>
     expect(confirmButtonElement).toBeDisabled()
 
     // input confirmation text & submit
-    await userEvent.type(confirmTextInputElement, "save")
+    await act(async () => {
+        await userEvent.type(confirmTextInputElement, "save")
+    })
     expect(confirmButtonElement).toBeEnabled()
-    await userEvent.click(confirmButtonElement)
+    await act(async () => {
+        await userEvent.click(confirmButtonElement)
+    })
     expect(saveConfigAction.mock.lastCall[0]).toMatchObject(config)
 });

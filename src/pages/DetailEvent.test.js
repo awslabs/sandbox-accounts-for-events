@@ -1,4 +1,5 @@
 import { render, screen, within, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import DetailEvent from "./DetailEvent";
 import { HashRouter } from "react-router-dom";
@@ -44,18 +45,22 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     const fetchEventAction = jest.spyOn(eventActions, "fetchEvent").mockImplementation((events) => () => events)
     store.dispatch({ type: "event/loaded", event: testEvent, leases: [testLease], config })
     store.dispatch({ type: "leases/loaded", payload: [testLease], config })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <HashRouter>
-            <DetailEvent/>
-            </HashRouter>
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <HashRouter>
+                <DetailEvent/>
+                </HashRouter>
+            </ReduxProvider>
+        );
+    })
 
     // check if actions menu is active
     expect(screen.getByText(/event details/i)).toBeInTheDocument();
     const actionsButtonElement = screen.getByRole("button", { name: /actions/i })
-    await userEvent.click(actionsButtonElement)
+    await act(async () => {
+        await userEvent.click(actionsButtonElement)
+    })
     expect(screen.getByRole("menuitem", { name: /start/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /edit/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /terminate/i })).toBeInTheDocument
@@ -63,7 +68,7 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
 
     // check leases table
     expect(screen.getByText(/leased aws accounts/i)).toBeInTheDocument();
-    const searchInputElement = screen.getByPlaceholderText(/search/i);
+    const searchInputElement = screen.getByPlaceholderText(/Find leases/i);
     const createLeaseButtonElement = screen.getByTestId("createLeaseRow")
     const editLeaseButtonElement = screen.getByTestId("editLeaseRow")
     const terminateLeaseButtonElement = screen.getByTestId("terminateLeaseRow")
@@ -73,16 +78,20 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     expect(createLeaseButtonElement).toBeEnabled()
 
     // check if event data has been fetched
-    expect(fetchEventAction).toBeCalled()
+    expect(fetchEventAction).toHaveBeenCalled()
 
     // check if search box filters correctly
-    await userEvent.type(searchInputElement, 'invalid')
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.type(searchInputElement, 'invalid')
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
     const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
     expect(clearButtonElements).toHaveLength(2)
-    await userEvent.click(clearButtonElements[0])
-    await userEvent.type(searchInputElement, "test")
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.click(clearButtonElements[0])
+        await userEvent.type(searchInputElement, "test")
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
 
     // check if details data is correct
     const detailPanel = screen.getByTestId("detailPanel");
@@ -99,8 +108,10 @@ test("renders DetailEvent, enters valid and invalid texts, submits", async () =>
     // check table row to toggle buttons
     const leaseRow = screen.getByText(testLease.accountId).closest("tr");
     const withinLeaseRow = within(leaseRow)
-    await userEvent.click(withinLeaseRow.getByRole("checkbox"))
-    await userEvent.click(actionsButtonElement)
+    await act(async () => {
+        await userEvent.click(withinLeaseRow.getByRole("checkbox"))
+        await userEvent.click(actionsButtonElement)
+    })
     expect(editLeaseButtonElement).toBeEnabled()
     expect(terminateLeaseButtonElement).toBeEnabled()
     expect(deleteLeaseButtonElement).toBeDisabled()

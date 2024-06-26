@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { act } from "react"
 import Statistics from "./Statistics";
 import * as redux from "react-redux";
 import store from "../redux/store";
@@ -10,14 +11,16 @@ test("renders Statistics,", async () => {
 
     const fetchStatisticsAction = jest.spyOn(actions, "fetchStatistics").mockImplementation((stats) => () => stats)
 
-    render(
-        <ReduxProvider reduxStore={store}>
-            <Statistics/>
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <Statistics/>
+            </ReduxProvider>
+        );
+    })
 
     await waitFor(() => {
-        expect(fetchStatisticsAction).toBeCalled;
+        expect(fetchStatisticsAction).toHaveBeenCalled;
 
         // basic text checks
         expect(screen.getByText(/utilization and usage report/i)).toBeInTheDocument();

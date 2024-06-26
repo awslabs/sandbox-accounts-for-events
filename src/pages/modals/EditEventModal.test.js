@@ -1,4 +1,5 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import EditEventModal from "./EditEventModal";
 import { Provider } from "react-redux";
@@ -24,11 +25,13 @@ test("renders EditEventModal, enters valid and invalid texts, submits", async ()
     }
     testObject.eventOn = moment(testObject.eventDateInput + " " + testObject.eventTimeInput).unix()
     store.dispatch({ type: "modal/open", item: testObject })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <EditEventModal />
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <EditEventModal />
+            </ReduxProvider>
+        );
+    })
 
     expect(screen.getByText(/edit event/i)).toBeInTheDocument();
     const dateInputElement = screen.getByPlaceholderText("YYYY/MM/DD");
@@ -44,51 +47,73 @@ test("renders EditEventModal, enters valid and invalid texts, submits", async ()
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid email address
-    await userEvent.clear(ownerInputElement)
-    await await userEvent.type(ownerInputElement, "testowner##")
+    await act(async () => {
+        await userEvent.clear(ownerInputElement)
+        await userEvent.type(ownerInputElement, "testowner##")
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(ownerInputElement)
-    await await userEvent.type(ownerInputElement, testObject.eventOwner)
+    await act(async () => {
+        await userEvent.clear(ownerInputElement)
+        await userEvent.type(ownerInputElement, testObject.eventOwner)
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid date
-    await userEvent.clear(timeInputElement)
-    await await userEvent.type(timeInputElement, testObject.eventTimeInput)
-    await userEvent.clear(dateInputElement)
-    await await userEvent.type(dateInputElement, '2021/01/01')
+    await act(async () => {
+        await userEvent.clear(timeInputElement)
+        fireEvent.change(timeInputElement, { target: { value: testObject.eventTimeInput } } )
+        await userEvent.clear(dateInputElement)
+        fireEvent.change(dateInputElement, { target: { value: "2021-01-01" } } )
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(dateInputElement)
-    await await userEvent.type(dateInputElement, testObject.eventDateInput.split('-').join('/'))
+    await act(async () => {
+        await userEvent.clear(dateInputElement)
+        fireEvent.change(dateInputElement, { target: { value: testObject.eventDateInput.replaceAll("-", "/") } } )
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid duration
-    await userEvent.clear(durationDaysInputElement)
-    await await userEvent.type(durationDaysInputElement, testObject.eventDays)
-    await userEvent.clear(durationHoursInputElement)
-    await await userEvent.type(durationHoursInputElement, '25')
+    await act(async () => {
+        await userEvent.clear(durationDaysInputElement)
+        await userEvent.type(durationDaysInputElement, testObject.eventDays)
+        await userEvent.clear(durationHoursInputElement)
+        await userEvent.type(durationHoursInputElement, '25')
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(durationHoursInputElement)
-    await await userEvent.type(durationHoursInputElement, testObject.eventHours)
+    await act(async () => {
+        await userEvent.clear(durationHoursInputElement)
+        await userEvent.type(durationHoursInputElement, testObject.eventHours)
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid number of accounts
-    await userEvent.clear(accountsInputElement)
-    await await userEvent.type(accountsInputElement, '5a')
+    await act(async () => {
+        await userEvent.clear(accountsInputElement)
+        await userEvent.type(accountsInputElement, '5a')
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(accountsInputElement)
-    await await userEvent.type(accountsInputElement, testObject.maxAccounts)
+    await act(async () => {
+        await userEvent.clear(accountsInputElement)
+        await userEvent.type(accountsInputElement, testObject.maxAccounts)
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    await userEvent.clear(budgetInputElement)
-    await await userEvent.type(budgetInputElement, '5a')
+    await act(async () => {
+        await userEvent.clear(budgetInputElement)
+        await userEvent.type(budgetInputElement, '5a')
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(budgetInputElement)
-    await await userEvent.type(budgetInputElement, testObject.eventBudget)
+    await act(async () => {
+        await userEvent.clear(budgetInputElement)
+        await userEvent.type(budgetInputElement, testObject.eventBudget)
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const saveEventAction = jest.spyOn(actions, "updateEvent").mockImplementation((event) => () => event)
-    await await userEvent.click(saveButtonElement)
+    await act(async () => {
+        await userEvent.click(saveButtonElement)
+    })
     expect(saveEventAction.mock.lastCall[0]).toMatchObject(testObject)
 });

@@ -105,15 +105,20 @@ export const fetchLeases =
     async (dispatch, getState) => {
         try {
             if (showStatus) dispatch({ type: "leases/loading" });
-            const response = await API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" }));
-            const payload = JSON.parse(response.data.safeOperatorApi);
             let items = [];
-            if (!payload || payload.status === "error") {
-                throw payload;
-            }
-            if (payload.status === "success") {
-                items = payload.body.leases;
-            }
+            let nextToken = null;
+            do {
+                const response = await API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases", nextToken }));
+                const payload = JSON.parse(response.data.safeOperatorApi);
+                if (!payload || payload.status === "error") {
+                    throw payload;
+                }
+                if (payload.status === "success") {
+                    items = [...items, ...payload.body.leases];
+                    nextToken = payload.nextToken;
+                }
+            } while (nextToken);
+          
             dispatch({ type: "leases/loaded", payload: items, config: getState().config });
         } catch (error) {
             console.error(error);

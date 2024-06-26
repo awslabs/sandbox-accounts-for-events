@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import EditAccountModal from "./EditAccountModal";
 import { Provider } from "react-redux";
@@ -14,11 +15,13 @@ test("renders EditAccountModal, enters valid and invalid texts, submits", async 
         accountStatus: "Leased"
     }
     store.dispatch({ type: "modal/open", item: testObject })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <EditAccountModal isAdminView/>
-        </ReduxProvider>
-    );
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <EditAccountModal isAdminView/>
+            </ReduxProvider>
+        );
+    })
     expect(screen.getByText(/edit aws account/i)).toBeInTheDocument();
     const roleInputElement = screen.getByLabelText(/admin role for backend account management tasks/i);
     const saveButtonElement = screen.getByRole("button", { name: "Save" })
@@ -27,16 +30,22 @@ test("renders EditAccountModal, enters valid and invalid texts, submits", async 
     expect(saveButtonElement).toBeEnabled()
 
     // try invalid and valid budget
-    await userEvent.clear(roleInputElement)
-    await userEvent.type(roleInputElement, 'invalid?role#name')
+    await act(async () => {
+        await userEvent.clear(roleInputElement)
+        await userEvent.type(roleInputElement, 'invalid?role#name')
+    })
     expect(saveButtonElement).toBeDisabled()
-    await userEvent.clear(roleInputElement)
-    await userEvent.type(roleInputElement, testObject.adminRole)
+    await act(async () => {
+        await userEvent.clear(roleInputElement)
+        await userEvent.type(roleInputElement, testObject.adminRole)
+    })
     expect(saveButtonElement).toBeEnabled()
 
     // submit and test redux action call payload
     const saveAccountAction = jest.spyOn(actions, "updateAccount").mockImplementation((account) => () => account)
-    await userEvent.click(saveButtonElement)
+    await act(async () => {
+        await userEvent.click(saveButtonElement)
+    })
 
     // identify components of confirmation dialog
     expect(screen.getByText(/please confirm/i)).toBeInTheDocument();
@@ -47,8 +56,12 @@ test("renders EditAccountModal, enters valid and invalid texts, submits", async 
     expect(confirmButtonElement).toBeDisabled()
 
     // input confirmation text & submit
-    await userEvent.type(confirmTextInputElement, "update")
+    await act(async () => {
+        await userEvent.type(confirmTextInputElement, "update")
+    })
     expect(confirmButtonElement).toBeEnabled()
-    await userEvent.click(confirmButtonElement)
+    await act(async () => {
+        await userEvent.click(confirmButtonElement)
+    })
     expect(saveAccountAction.mock.lastCall[0]).toMatchObject(testObject)
 });

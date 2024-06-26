@@ -1,4 +1,5 @@
 import { render, screen, within, fireEvent } from "@testing-library/react";
+import { act } from "react"
 import userEvent from "@testing-library/user-event";
 import OverviewEvents from "./OverviewEvents";
 import { HashRouter } from "react-router-dom";
@@ -44,14 +45,16 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     const fetchEventsAction = jest.spyOn(eventActions, "fetchEvents").mockImplementation((events) => () => events)
     store.dispatch({ type: "events/loaded", events: [testEvent], leases: [testLease], config })
     store.dispatch({ type: "leases/loaded", payload: [testLease], config })
-    render(
-        <ReduxProvider reduxStore={store}>
-            <HashRouter>
-            <OverviewEvents/>
-            </HashRouter>
-        </ReduxProvider>
-    );
-    const searchInputElement = screen.getByPlaceholderText(/search/i);
+    await act(async () => {
+        render(
+            <ReduxProvider reduxStore={store}>
+                <HashRouter>
+                <OverviewEvents/>
+                </HashRouter>
+            </ReduxProvider>
+        );
+     })
+    const searchInputElement = screen.getByPlaceholderText(/find events/i);
     const actionsButtonElement = screen.getByRole("button", { name: /actions/i })
     const operateButtonElement = screen.getByRole("button", { name: /operate/i })
     const createButtonElement = screen.getByTestId("createEventRow")
@@ -61,23 +64,29 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     expect(operateButtonElement).toBeDisabled()
 
     // open Actions menu and check which menu items are enabled
-    await userEvent.click(actionsButtonElement)
+    await act(async () => {
+        await userEvent.click(actionsButtonElement)
+    })
     expect(screen.getByRole("menuitem", { name: /edit/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /delete/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /start/i })).toBeInTheDocument
     expect(screen.getByRole("menuitem", { name: /terminate/i })).toBeInTheDocument
 
     // check if event data has been fetched
-    expect(fetchEventsAction).toBeCalled()
+    expect(fetchEventsAction).toHaveBeenCalled()
 
     // check if search box filters correctly
-    await userEvent.type(searchInputElement, 'invalid')
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.type(searchInputElement, 'invalid')
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
     const clearButtonElements = screen.getAllByRole("button", { name: "Clear filters" })
     expect(clearButtonElements).toHaveLength(2)
-    await userEvent.click(clearButtonElements[0])
-    await userEvent.type(searchInputElement, testEvent.eventName)
-    fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    await act(async () => {
+        await userEvent.click(clearButtonElements[0])
+        await userEvent.type(searchInputElement, testEvent.eventName)
+        fireEvent.keyDown(searchInputElement, {key: 'enter', keyCode: 13})
+    })
 
     // check if testObject data is visible in table
     const eventRow = screen.getByText(testEvent.id).closest("tr");
@@ -86,8 +95,10 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     expect(withinEventRow.getByText(moment.unix(testEvent.eventOn).format(config.FORMAT_DATETIME))).toBeInTheDocument()
 
     // check table row to toggle buttons
-    await userEvent.click(withinEventRow.getByRole("checkbox"))
-    await userEvent.click(actionsButtonElement)
+    await act(async () => {
+        await userEvent.click(withinEventRow.getByRole("checkbox"))
+        await userEvent.click(actionsButtonElement)
+    })
     expect(operateButtonElement).toBeEnabled()
 
     // check if details tab opens
@@ -113,5 +124,4 @@ test("renders OverviewEvents, enters valid and invalid texts, submits", async ()
     expect(withinLeaseRow.getByText(testLease.leaseStatus)).toBeInTheDocument()
     expect(withinLeaseRow.getByText(testLease.principalId.substring(0, config.EVENT_ID_LENGTH))).toBeInTheDocument()
     expect(withinLeaseRow.getByText("expires on " + moment.unix(testLease.expiresOn).format(config.FORMAT_DATETIME))).toBeInTheDocument()
-
 });

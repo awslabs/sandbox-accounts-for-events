@@ -138,7 +138,7 @@ const getAwsLoginUrlForEvent = async ({eventId}, event) => {
             return ddbDocClient.send(new GetCommand({ TableName: eventsTable, Key: { id: eventId } }))
                 .then(response => {
                     if (response.Item) {
-                        return invokeApi("leases", "GET")
+                        return invokeApi("leases?limit=500", "GET")
                             .then((leases) => {
                                 if (leases.message) return respondWithError("Failed to list leases.", leases.message);
                     
