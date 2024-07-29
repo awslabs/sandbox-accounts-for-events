@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-react": "^4.6.4",
+    "@aws-amplify/ui-react": "^4.6.5",
     "@cloudscape-design/components": "^3.0.312",
     "@cloudscape-design/design-tokens": "^3.0.15",
     "@cloudscape-design/global-styles": "^1.0.10",
@@ -11,7 +11,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
-    "aws-amplify": "^5.3.12",
+    "aws-amplify": "^6.4.3",
     "aws4": "^1.12.0",
     "moment": "^2.29.4",
     "nanoid": "^4.0.2",
