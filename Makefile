@@ -4,7 +4,6 @@
 # - email: (only for "deploy") Email address of initial admin user to be auto-created 
 # - github_token: (only for "build") Token that will be used to host sandbox-account code (this token must have admin privileges on your github account)
 # - github_owner: (only for "deploy") Github username/organization where the repo will be created
-# - github_reponame: (only for "deploy") (optional) Name of the repo that will be created
 #
 # command syntax: 
 #   make build bucket=[myDeploymentBucket]
@@ -73,7 +72,6 @@ deploy:
 		--parameters ParameterKey=AdminUserEmailInput,ParameterValue=$(email) \
 		             ParameterKey=RepositoryBucket,ParameterValue=$(bucket) \
 					 ParameterKey=GitHubOwner,ParameterValue=$(github_owner) \
-					 ParameterKey=GitHubRepoName,ParameterValue=$(github_reponame) \
 		--capabilities CAPABILITY_IAM $(profileString) \
 		--region $(region); \
 	fi
