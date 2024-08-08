@@ -1,6 +1,21 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
+  GitHubToken:
+    Type: String
+    Description: "GitHub OAuth Token"
+    Default: "{{resolve:secretsmanager:DCE-Github-Token:SecretString:OauthToken}}"
+
+  GitHubOwner:
+    Type: String
+    Description: "GitHub Username or Organization"
+    Default: "awslabs"
+
+  GitHubRepoName:
+    Type: String
+    Description: "GitHub Repository Name"
+    Default: "sandbox-accounts-for-events"
+
   AdminUserEmailInput:
     Type: String
     Description: Email address of admin user for Sandbox Accounts for Events
@@ -12,8 +27,8 @@ Parameters:
     Default: dcerepo
   AmplifyEnvironment:
     Type: String
-    Description: "Environment name for Sandbox Accounts for Events webapp. Keep 'main' unless advised otherwise."
-    Default: main
+    Description: "Environment name for Sandbox Accounts for Events webapp. Keep 'master' unless advised otherwise."
+    Default: master
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -37,10 +52,6 @@ Metadata:
         default: "S3 bucket that holds required source zip files"
       AmplifyEnvironment:
         default: "Name of Amplify environment"
-
-#################
-# DCE TERRAFORM #
-#################
 
 Resources:
 
@@ -185,6 +196,19 @@ Resources:
   # AMPLIFY APP UI #
   ##################
 
+  GitHubRepo:
+    Type: AWS::CodeStar::GitHubRepository
+    Properties: 
+      RepositoryName: !Ref GitHubRepoName
+      RepositoryOwner: !Ref GitHubOwner
+      IsPrivate: false
+      RepositoryAccessToken: !Ref GitHubToken
+      RepositoryDescription: "Amplify-based UI frontend for Sandbox-Accounts-for-Events"
+      Code: 
+        S3: 
+          Bucket: !Ref RepositoryBucket
+          Key: sandbox-accounts-for-events.zip
+
   AppUiAmplifyRole:
     Type: AWS::IAM::Role
     DependsOn: DceCodeBuildTerraformDeployment
@@ -204,10 +228,11 @@ Resources:
 
   AppUiAmplifyApp:
     Type: AWS::Amplify::App
-    DependsOn: DceCodeBuildTerraformDeployment
+    DependsOn: GitHubRepo
     Properties:
       Name: Sandbox-Accounts-for-Events-UI
-      Repository: !GetAtt AppUiAmplifyRepository.CloneUrlHttp
+      Repository: !Sub "https://github.com/${GitHubOwner}/${GitHubRepoName}.git"
+      AccessToken: !Ref GitHubToken
       EnvironmentVariables:
         - Name: ADMIN_USER_EMAIL
           Value: !Ref AdminUserEmailInput
@@ -217,27 +242,16 @@ Resources:
 
   AppUiAmplifyBranch:
     Type: AWS::Amplify::Branch
-    DependsOn: DceCodeBuildTerraformDeployment
+    DependsOn: AppUiAmplifyApp
     Properties:
       BranchName: !Ref AmplifyEnvironment
       AppId: !GetAtt AppUiAmplifyApp.AppId
       EnableAutoBuild: yes
-
-  AppUiAmplifyRepository:
-    Type: AWS::CodeCommit::Repository
-    DependsOn: DceCodeBuildTerraformDeployment
-    Properties:
-      RepositoryName: Sandbox-Accounts-for-Events
-      RepositoryDescription: Amplify-based UI frontend for Sandbox-Accounts-for-Events
-      Code:
-        BranchName: !Ref AmplifyEnvironment
-        S3:
-          Bucket: !Ref RepositoryBucket
-          Key: sandbox-accounts-for-events.zip
+      Stage: PRODUCTION
 
   AppUiTriggerAmplifyDeploymentLambda:
     Type: AWS::Lambda::Function
-    DependsOn: DceCodeBuildTerraformDeployment
+    DependsOn: AppUiAmplifyApp
     Properties:
       Code:
         S3Bucket: !Ref RepositoryBucket
@@ -250,15 +264,16 @@ Resources:
       Timeout: 900
       Environment:
         Variables:
-          AMPLIFY_REPO: !GetAtt AppUiAmplifyRepository.Name
-          AMPLIFY_BRANCH: !GetAtt AppUiAmplifyBranch.BranchName
+          GITHUB_REPO: !Sub "${GitHubOwner}/${GitHubRepoName}"
+          GITHUB_BRANCH: !Ref AmplifyEnvironment
+          GITHUB_TOKEN: !Ref GitHubToken
           AMPLIFY_APP_ID: !GetAtt AppUiAmplifyApp.AppId
           AMPLIFY_ENV: !Ref AmplifyEnvironment
           DELETE_ROLE_ARN: !GetAtt AppUiAmplifyRole.Arn
 
   AppUiTriggerAmplifyDeploymentRole:
     Type: AWS::IAM::Role
-    DependsOn: DceCodeBuildTerraformDeployment
+    DependsOn: AppUiAmplifyApp
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
@@ -273,7 +288,7 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: CodeCommitPolicy
+        - PolicyName: GitHubPolicy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
@@ -281,7 +296,7 @@ Resources:
                 Action:
                   - codecommit:GetBranch
                   - codecommit:CreateCommit
-                Resource: !GetAtt AppUiAmplifyRepository.Arn
+                Resource: '*'
         - PolicyName: AmplifyDeletePolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -306,6 +321,16 @@ Resources:
                 Action:
                   - amplify:ListJobs
                 Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/branches/${AppUiAmplifyBranch.BranchName}/jobs/*
+        - PolicyName: AmplifyWebhookPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - amplify:CreateWebhook
+                  - amplify:GetWebhook
+                  - amplify:ListWebHooks
+                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/webhooks/*
         - PolicyName: CloudFormationPolicy
           PolicyDocument:
             Version: 2012-10-17

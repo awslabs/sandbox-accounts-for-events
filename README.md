@@ -35,6 +35,7 @@ Prerequisites:
 * An AWS account, preferably part of AWS Organizations (see recommendations in chapter [Children Accounts](docs/accounts.md))
 * AWS CLI v2 installed
 * GNU make installed
+* [Github personal token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) (with admin_repo and admin_webhook), that will be used to create sandbox repo on github rather than [codecommit (deprecated)](https://horovits.medium.com/disruption-ahead-aws-quietly-axing-services-033e7518eefb)
 
 1. Clone this GitHub repository to your local environment:
     ```bash
@@ -58,19 +59,19 @@ Prerequisites:
 
 1. Build project and upload to newly created S3 bucket:
     ```bash
-    make build bucket=[your_deployment_bucket_name]
+    make build bucket=[your_deployment_bucket_name] github_token=[your_github_token]
     ```
 
 1. Deploy the project into your AWS account. You have to specify the email address of an initial admin user for *Sandbox Accounts for Events*:
     ```bash
-    make deploy bucket=[your_deployment_bucket_name] email=[email_address_of_admin_user]
+    make deploy bucket=[your_deployment_bucket_name] email=[email_address_of_admin_user] github_owner=[your_github_username]
     ```
     The CloudFormation script will now start to create the *Sandbox Accounts for Events* resources in your account, this deployment typically takes about 
     25-30 minutes. It will also generate an initial admin user and send a registration email to the email address you specified in step 5.
 
 1. Go to the CloudFormation page your AWS Console and wait until the stack "Sandbox-Accounts-for-Events" is deployed successfully. Choose this stack, switch to the "Outputs" tab and follow the link right to "AmplifyDomainOutput" to open the *Sandbox Accounts for Events* frontend in your browser. Log in with the email address you provided in step 5 and the one-time password you received via email.
 
-1. By default, *Sandbox Accounts for Events* will create the AWS Amplify application at URL https://main.xxxxxxxxxxxxxx.amplifyapp.com/. If you want to give it a more friendly domain name, follow the steps in [Set up custom domains for AWS Amplify projects](https://docs.aws.amazon.com/amplify/latest/userguide/custom-domains.html)
+1. By default, *Sandbox Accounts for Events* will create the AWS Amplify application at URL https://master.xxxxxxxxxxxxxx.amplifyapp.com/. If you want to give it a more friendly domain name, follow the steps in [Set up custom domains for AWS Amplify projects](https://docs.aws.amazon.com/amplify/latest/userguide/custom-domains.html)
 
 
 ## Deinstalling Sandbox Accounts for Events
@@ -121,7 +122,7 @@ If you experience CloudFormation error messages stating failed deployment/rollba
 
 1. Go to the CloudFormation page your AWS Console. Choose the stack "Sandbox-Accounts-for-Events" (in state DELETE_FAILED) and choose "Delete". Note down the resources that failed deletion, mark them to retain the resources and choose "Delete Stack". The stack should now be deleted successfully.
 
-1. Go to the S3 page in your AWS console and check if all deployment-releated S3 buckets have been deleted properly. If you still find any leftover S3 buckets labelled "amplify-xxxxxx-main-xxxxxx-deployment" or "dce-terraform-state-xxxxxxxx", delete them ("xxxxxx" being a random alphanumeric string).
+1. Go to the S3 page in your AWS console and check if all deployment-releated S3 buckets have been deleted properly. If you still find any leftover S3 buckets labelled "amplify-xxxxxx-master-xxxxxx-deployment" or "dce-terraform-state-xxxxxxxx", delete them ("xxxxxx" being a random alphanumeric string).
 
 1. Clean up your local environment:
     ```bash
@@ -154,4 +155,3 @@ The sample code; software libraries; command line tools; proofs of concept; temp
 
 ---
 Copyright 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
