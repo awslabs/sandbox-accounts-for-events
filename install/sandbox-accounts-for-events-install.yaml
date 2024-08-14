@@ -201,7 +201,7 @@ Resources:
     Properties: 
       RepositoryName: !Ref GitHubRepoName
       RepositoryOwner: !Ref GitHubOwner
-      IsPrivate: false
+      IsPrivate: true
       RepositoryAccessToken: !Ref GitHubToken
       RepositoryDescription: "Amplify-based UI frontend for Sandbox-Accounts-for-Events"
       Code: 
