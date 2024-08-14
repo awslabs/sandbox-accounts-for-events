@@ -62,7 +62,7 @@ Prerequisites:
     make build bucket=[your_deployment_bucket_name] github_token=[your_github_token]
     ```
 
-1. Deploy the project into your AWS account. You have to specify the email address of an initial admin user for *Sandbox Accounts for Events*:
+1. Deploy the project into your AWS account. You have to specify the email address of an initial admin user for *Sandbox Accounts for Events* and your github username (shortname) or organisation name :
     ```bash
     make deploy bucket=[your_deployment_bucket_name] email=[email_address_of_admin_user] github_owner=[your_github_username]
     ```
