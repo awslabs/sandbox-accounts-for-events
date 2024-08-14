@@ -80,6 +80,8 @@ delete:
 	aws cloudformation delete-stack \
 	--stack-name Sandbox-Accounts-for-Events $(profileString) \
 	--region $(region)
+	aws secretsmanager delete-secret --secret-id DCE-Github-Token --force-delete-without-recovery --no-cli-pager
+
 
 create-bucket:
 	aws s3 mb s3://$(bucket) --region $(region) $(profileString)
