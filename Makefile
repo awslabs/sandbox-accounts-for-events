@@ -51,7 +51,7 @@ build:
 	if [ -z "$(github_token)" ]; then \
 		echo "*** Missing command line parameter 'github_token=[your_github_token]'.  Stop."; \
 	else \
-		aws secretsmanager describe-secret --secret-id DCE-Github-Token >/dev/null 2>&1 || (aws secretsmanager create-secret --name DCE-Github-Token --description "GitHub OAuth Token" --secret-string "{\"OauthToken\":\"${github_token}\"}" >/dev/null 2>&1 && echo "Secret created successfully.") \
+		aws secretsmanager describe-secret --secret-id DCE-Github-Token $(region) $(profileString) >/dev/null 2>&1 || (aws secretsmanager create-secret --name DCE-Github-Token --description "GitHub OAuth Token" --secret-string "{\"OauthToken\":\"${github_token}\"}" $(region) $(profileString) >/dev/null 2>&1 && echo "Secret created successfully.") \
 	fi
 
 # upload build artifacts and CloudFormation template to specified S3 bucket
@@ -80,7 +80,7 @@ delete:
 	aws cloudformation delete-stack \
 	--stack-name Sandbox-Accounts-for-Events $(profileString) \
 	--region $(region)
-	aws secretsmanager delete-secret --secret-id DCE-Github-Token --force-delete-without-recovery --no-cli-pager
+	aws secretsmanager delete-secret --secret-id DCE-Github-Token --force-delete-without-recovery --no-cli-pager --region $(region) $(profileString)
 
 
 create-bucket:
