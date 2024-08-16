@@ -15,7 +15,7 @@ phases:
   build:
     commands:
       # Get bucket name from Amplify parameter file and delete bucket if Amplify hasn't done it
-      - aws s3 cp s3://$TERRAFORM_BUCKET/team-provider-info.json . || true
+      - aws s3 cp s3://$DEPLOYMENT_BUCKET/team-provider-info.json . || true
       - export AMPLIFY_BUCKET=$(cat team-provider-info.json | jq -r '.main.categories.function.safeAdminApi.deploymentBucketName') || true
       - aws s3 rb s3://$AMPLIFY_BUCKET --force || true
 
@@ -24,6 +24,3 @@ phases:
       - cd dce/modules
       - ../../dce-integration/scripts/terraform-destroy.sh || true
       - cd ../..
-
-      # Empty Log bucket so CFN can delete it 
-      - aws s3 rm s3://$LOG_BUCKET --recursive || true

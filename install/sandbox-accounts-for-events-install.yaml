@@ -38,82 +38,22 @@ Metadata:
       AmplifyEnvironment:
         default: "Name of Amplify environment"
 
-#################
-# DCE TERRAFORM #
-#################
 
 Resources:
 
-  LoggingBucket:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      OwnershipControls:
-        Rules:
-          - ObjectOwnership: BucketOwnerPreferred
-      AccessControl: LogDeliveryWrite
-      BucketEncryption: 
-        ServerSideEncryptionConfiguration: 
-        - ServerSideEncryptionByDefault:
-            SSEAlgorithm: AES256
-
-  DceTerraformStateBucket:
+  DeploymentBucket:
     Type: AWS::S3::Bucket
     Properties: 
       BucketName: 
         !Sub
-          - 'dce-terraform-state-${RandomGUID}'
+          - 'dce-deployment-${RandomGUID}'
           - { RandomGUID: !Select [0, !Split ["-", !Select [2, !Split ["/", !Ref AWS::StackId ]]]] }
       BucketEncryption: 
         ServerSideEncryptionConfiguration: 
         - ServerSideEncryptionByDefault:
             SSEAlgorithm: AES256
-      LoggingConfiguration:
-        DestinationBucketName: !Ref LoggingBucket
-        LogFilePrefix: dce-terraform-logs
 
-  DceDeployProject:
-    Type: AWS::CodeBuild::Project
-    Properties:
-      ServiceRole: !Ref DceCodeBuildRole
-      Name: DeployDce
-      Artifacts:
-        Type: NO_ARTIFACTS
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_MEDIUM
-        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
-        EnvironmentVariables:
-          - Name: TERRAFORM_BUCKET
-            Value: !Ref DceTerraformStateBucket
-      Source:
-        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
-        Type: S3
-        BuildSpec: dce-integration/buildspec-deploy.yaml
-      TimeoutInMinutes: 20
-
-  DceDestroyProject:
-    Type: AWS::CodeBuild::Project
-    Properties:
-      ServiceRole: !Ref DceCodeBuildRole
-      Name: DestroyDce
-      Artifacts:
-        Type: NO_ARTIFACTS
-      Environment:
-        Type: LINUX_CONTAINER
-        ComputeType: BUILD_GENERAL1_MEDIUM
-        Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
-        EnvironmentVariables:
-          - Name: TERRAFORM_BUCKET
-            Value: !Ref DceTerraformStateBucket
-          - Name: LOG_BUCKET
-            Value: !Ref LoggingBucket
-      Source:
-        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
-        Type: S3
-        BuildSpec: dce-integration/buildspec-destroy.yaml
-      TimeoutInMinutes: 20
-
-  DceCodeBuildRole:
+  CodeBuildRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
@@ -126,6 +66,50 @@ Resources:
                 - codebuild.amazonaws.com
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
+
+#################
+# DCE TERRAFORM #
+#################
+
+  DceDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodeBuildRole
+      Name: DeployDce
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
+          - Name: DEPLOYMENT_BUCKET
+            Value: !Ref DeploymentBucket
+      Source:
+        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
+        Type: S3
+        BuildSpec: dce-integration/buildspec-deploy.yaml
+      TimeoutInMinutes: 20
+
+  DceDestroyProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodeBuildRole
+      Name: DestroyDce
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
+          - Name: DEPLOYMENT_BUCKET
+            Value: !Ref DeploymentBucket
+      Source:
+        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
+        Type: S3
+        BuildSpec: dce-integration/buildspec-destroy.yaml
+      TimeoutInMinutes: 20
 
   DceTriggerCodeBuildLambda:
     Type: AWS::Lambda::Function
@@ -185,6 +169,36 @@ Resources:
   # AMPLIFY APP UI #
   ##################
 
+  AmplifyDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      ServiceRole: !Ref CodeBuildRole
+      Name: DeployAmplify
+      Environment:
+        Type: LINUX_CONTAINER
+        ComputeType: BUILD_GENERAL1_LARGE
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:5.0
+        EnvironmentVariables:
+          - Name: ADMIN_USER_EMAIL
+            Value: !Ref AdminUserEmailInput
+          - Name: AMPLIFY_APP_ID
+            Value: !GetAtt AppUiAmplifyApp.AppId
+          - Name: AMPLIFY_BRANCH
+            Value: !GetAtt AppUiAmplifyBranch.BranchName
+          - Name: DEPLOYMENT_BUCKET
+            Value: !Ref DeploymentBucket
+      Source:
+        Location: !Sub ${RepositoryBucket}/sandbox-accounts-for-events.zip
+        Type: S3
+        BuildSpec: install/buildspec-amplify.yaml
+      Artifacts:
+        Location: !Ref DeploymentBucket
+        Type: S3
+        Name: amplify.zip
+        Packaging: ZIP
+      TimeoutInMinutes: 20
+
+
   AppUiAmplifyRole:
     Type: AWS::IAM::Role
     DependsOn: DceCodeBuildTerraformDeployment
@@ -207,13 +221,6 @@ Resources:
     DependsOn: DceCodeBuildTerraformDeployment
     Properties:
       Name: Sandbox-Accounts-for-Events-UI
-      Repository: !GetAtt AppUiAmplifyRepository.CloneUrlHttp
-      EnvironmentVariables:
-        - Name: ADMIN_USER_EMAIL
-          Value: !Ref AdminUserEmailInput
-        - Name: TERRAFORM_BUCKET
-          Value: !Ref DceTerraformStateBucket
-      IAMServiceRole: !GetAtt AppUiAmplifyRole.Arn
 
   AppUiAmplifyBranch:
     Type: AWS::Amplify::Branch
@@ -222,18 +229,6 @@ Resources:
       BranchName: !Ref AmplifyEnvironment
       AppId: !GetAtt AppUiAmplifyApp.AppId
       EnableAutoBuild: yes
-
-  AppUiAmplifyRepository:
-    Type: AWS::CodeCommit::Repository
-    DependsOn: DceCodeBuildTerraformDeployment
-    Properties:
-      RepositoryName: Sandbox-Accounts-for-Events
-      RepositoryDescription: Amplify-based UI frontend for Sandbox-Accounts-for-Events
-      Code:
-        BranchName: !Ref AmplifyEnvironment
-        S3:
-          Bucket: !Ref RepositoryBucket
-          Key: sandbox-accounts-for-events.zip
 
   AppUiTriggerAmplifyDeploymentLambda:
     Type: AWS::Lambda::Function
@@ -250,7 +245,8 @@ Resources:
       Timeout: 900
       Environment:
         Variables:
-          AMPLIFY_REPO: !GetAtt AppUiAmplifyRepository.Name
+          AMPLIFY_DEPLOY_PROJECT: !Ref AmplifyDeployProject
+
           AMPLIFY_BRANCH: !GetAtt AppUiAmplifyBranch.BranchName
           AMPLIFY_APP_ID: !GetAtt AppUiAmplifyApp.AppId
           AMPLIFY_ENV: !Ref AmplifyEnvironment
@@ -273,15 +269,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: CodeCommitPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - codecommit:GetBranch
-                  - codecommit:CreateCommit
-                Resource: !GetAtt AppUiAmplifyRepository.Arn
         - PolicyName: AmplifyDeletePolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -289,23 +276,7 @@ Resources:
               - Effect: Allow
                 Action:
                   - amplify:GetBackendEnvironment
-                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/backendenvironments/${AmplifyEnvironment}
-        - PolicyName: AmplifyBackendDeletePolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - amplifybackend:RemoveAllBackends
-                Resource: !Sub arn:aws:amplifybackend:${AWS::Region}:${AWS::AccountId}:/backend/${AppUiAmplifyApp.AppId}/remove/*
-        - PolicyName: AmplifyJobsPolicy
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - amplify:ListJobs
-                Resource: !Sub arn:aws:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/branches/${AppUiAmplifyBranch.BranchName}/jobs/*
+                Resource: !Sub arn:${AWS::Partition}:amplify:${AWS::Region}:${AWS::AccountId}:apps/${AppUiAmplifyApp.AppId}/backendenvironments/${AmplifyEnvironment}
         - PolicyName: CloudFormationPolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -314,7 +285,7 @@ Resources:
                 Action:
                   - cloudformation:DescribeStacks
                   - cloudformation:DeleteStack
-                Resource: !Sub arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*/*
+                Resource: !Sub arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/*/*
         - PolicyName: PassRolePolicy
           PolicyDocument:
             Version: 2012-10-17
@@ -324,18 +295,17 @@ Resources:
                   - iam:GetRole
                   - iam:PassRole
                 Resource: !GetAtt AppUiAmplifyRole.Arn
-        - PolicyName: S3Policy
+        - PolicyName: CodeBuildPolicy
           PolicyDocument:
             Version: 2012-10-17
             Statement:
               - Effect: Allow
                 Action:
-                  - s3:Get*
-                  - s3:Delete*
-                  - s3:List*
+                  - codebuild:StartBuild
+                  - codebuild:ListBuildsForProject
+                  - codebuild:BatchGetBuilds
                 Resource:
-                  - arn:aws:s3:::amplify-*
-                  - arn:aws:s3:::amplify-*/*
+                  - !GetAtt AmplifyDeployProject.Arn
 
   AppUiAmplifyDeployment:
     Type: Custom::AppUiAmplifyDeployment

@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Downloading TerraForm state file from S3 bucket."
-aws s3 cp s3://$TERRAFORM_BUCKET/terraform.state.zip .
+aws s3 cp s3://$DEPLOYMENT_BUCKET/terraform.state.zip .
 
 if [ "$?" -eq 0 ]
 then 
@@ -11,7 +11,7 @@ then
     echo "Destroying TerraForm resources." &&
     terraform destroy -auto-approve -var-file dce.tfvars &&
     echo "Emptying TerraForm state S3 bucket." &&
-    aws s3 rm s3://$TERRAFORM_BUCKET --recursive
+    aws s3 rm s3://$DEPLOYMENT_BUCKET --recursive
 else
     echo "Download of TerraForm state file failed. Assuming automated rollback, so setting this execution to SUCCEEDED."
 fi

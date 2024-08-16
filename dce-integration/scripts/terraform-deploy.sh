@@ -9,16 +9,16 @@ then
     echo "TerraForm deployment succeeded. Zipping state folder."
     zip -r terraform.state.zip *
     echo "Uploading state zip file to TerraFrom state S3 bucket."
-    aws s3 cp terraform.state.zip s3://$TERRAFORM_BUCKET/
+    aws s3 cp terraform.state.zip s3://$DEPLOYMENT_BUCKET/
     echo "Saving TerraForm output parameters to file."
     terraform output -json > terraform.output
     echo "Uploading ZerraForm output file to TerraFrom state S3 bucket."
-    aws s3 cp terraform.output s3://$TERRAFORM_BUCKET/
+    aws s3 cp terraform.output s3://$DEPLOYMENT_BUCKET/
 else
     echo "TerraForm deployment failed. Zipping state folder."
     zip -r terraform.state.zip *
     echo "Uploading state zip file to TerraFrom state S3 bucket."
-    aws s3 cp terraform.state.zip s3://$TERRAFORM_BUCKET/
+    aws s3 cp terraform.state.zip s3://$DEPLOYMENT_BUCKET/
     echo "Deleting all potential leftovers of TerraForm resources."
     terraform destroy -auto-approve -var-file dce.tfvars
 fi

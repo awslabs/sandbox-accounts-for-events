@@ -1,0 +1,89 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 18
+  pre_build:
+    commands:
+      # install required Amplify CLI version and jq 
+      - npm i -g @aws-amplify/cli@12.7.1
+
+      # install npm packages
+      - npm ci
+
+  build:
+    commands:
+      # download variables of DCE TerraForm deployment
+      - aws s3 cp s3://$DEPLOYMENT_BUCKET/terraform.output .
+
+      # extract API URL and table names from TerraForm output file
+      - export DCE_API_GW=$(cat terraform.output | jq -r .api_url.value)
+      - export DCE_LEASES_TABLE=$(cat terraform.output | jq -r .leases_table_name.value)
+      - export DCE_ACCOUNTS_TABLE=$(cat terraform.output | jq -r .accounts_table_name.value)
+
+      # update Amplify parameter files to connect Amplify frontend with backend
+      - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AMPLIFY_APP_ID}/${AMPLIFY_BRANCH}/AMPLIFY_function_safeLoginApi_dceApiGw\",\"Value\":\"\\\"${DCE_API_GW}\\\"\",\"Overwrite\":true}"
+      - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AMPLIFY_APP_ID}/${AMPLIFY_BRANCH}/AMPLIFY_function_safeOperatorApi_dceApiGw\",\"Value\":\"\\\"${DCE_API_GW}\\\"\",\"Overwrite\":true}"
+      - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AMPLIFY_APP_ID}/${AMPLIFY_BRANCH}/AMPLIFY_function_safeAdminApi_dceApiGw\",\"Value\":\"\\\"${DCE_API_GW}\\\"\",\"Overwrite\":true}"
+      - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AMPLIFY_APP_ID}/${AMPLIFY_BRANCH}/AMPLIFY_function_safeOperatorApi_dceLeasesTable\",\"Value\":\"\\\"${DCE_LEASES_TABLE}\\\"\",\"Overwrite\":true}"
+      - aws ssm put-parameter --cli-input-json "{\"Type\":\"String\",\"Name\":\"/amplify/${AMPLIFY_APP_ID}/${AMPLIFY_BRANCH}/AMPLIFY_function_safeAdminApi_dceAccountsTable\",\"Value\":\"\\\"${DCE_ACCOUNTS_TABLE}\\\"\",\"Overwrite\":true}"
+      - cat amplify/backend/function/safeAdminApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+      - cat parameters.json | jq '.dceAccountsTable = $var' --arg var $DCE_ACCOUNTS_TABLE > amplify/backend/function/safeAdminApi/parameters.json
+      - cat amplify/backend/function/safeOperatorApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+      - cat parameters.json | jq '.dceLeasesTable = $var' --arg var $DCE_LEASES_TABLE > amplify/backend/function/safeOperatorApi/parameters.json
+      - cat amplify/backend/function/safeLoginApi/parameters.json | jq '.dceApiGw = $var' --arg var $DCE_API_GW > parameters.json
+      - mv parameters.json amplify/backend/function/safeLoginApi/parameters.json
+      - cat amplify/backend/custom/cfnAdminUser/parameters.json | jq '.adminUserEmailAddress = $var' --arg var $ADMIN_USER_EMAIL > parameters.json
+      - mv parameters.json amplify/backend/custom/cfnAdminUser/parameters.json
+
+      # create empty Amplify backend config file and deploy Amplify project
+      - echo "{}" > amplify/team-provider-info.json
+
+      # Amplify headless requires AWS credentials available in the AWS profile, so we store them there
+      - echo "Storing AWS credentials for Amplify CLI"
+      - export CREDS=$(curl 169.254.170.2$AWS_CONTAINER_CREDENTIALS_RELATIVE_URI)
+      - export ACCESS_KEY=$(echo $CREDS | jq -r .AccessKeyId)
+      - export SECRET_KEY=$(echo $CREDS | jq -r .SecretAccessKey)
+      - export TOKEN=$(echo $CREDS | jq -r .Token)
+      - mkdir -p ~/.aws
+      - echo -e "[default]\nregion=${AWS_REGION}\n" > ~/.aws/config
+      - echo -e "[default]\naws_access_key_id=${ACCESS_KEY}\naws_secret_access_key=${SECRET_KEY}\naws_session_token=${TOKEN}\n" > ~/.aws/credentials
+
+      # initialize the project with the import auth parameters and deploy backend
+      - echo "Initializing Amplify project:"
+      - amplify init --yes --amplify "{\"appId\":\"${AMPLIFY_APP_ID}\",\"envName\":\"${AMPLIFY_BRANCH}\"}"  --yes
+      - amplify push --yes --force
+
+      # upload Amplify backend config file to S3 in case we want to connect local development
+      - aws s3 cp amplify/team-provider-info.json s3://$DEPLOYMENT_BUCKET/team-provider-info.json
+
+      # build Amplify frontend
+      - npm run build
+
+      # upload Amplify frontend config file to S3 in case we want to connect local development
+      - aws s3 cp src/aws-exports.js s3://$DEPLOYMENT_BUCKET/aws-exports.js
+      
+      # run frontend unit tests
+      - npm test -- --watchAll=false
+
+      # zipping up the build artifacts
+      - cd build
+      - zip -r ../amplify.zip *
+      - cd ..
+
+      # create an Amplify deployment and upload the artifact zip
+      - export DEPLOY_DETAILS=$(aws amplify create-deployment --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH)
+      - export JOB_ID=$(echo $DEPLOY_DETAILS | jq -r .jobId)
+      - export UPLOAD_URL_ID=$(echo $DEPLOY_DETAILS | jq -r .zipUploadUrl)
+      - curl --request PUT --upload-file amplify.zip "${UPLOAD_URL_ID}"
+      - aws amplify start-deployment --app-id $AMPLIFY_APP_ID --branch-name $AMPLIFY_BRANCH --job-id $JOB_ID
+
+artifacts:
+  base-directory: build
+  files:
+    - '**/*'
+
+cache:
+  paths:
+    - node_modules/**/*
+    - $(npm root --global)/**/*        

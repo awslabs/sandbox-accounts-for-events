@@ -7,6 +7,8 @@ codebuild_client = boto3.client('codebuild')
 deploy_project = os.environ['DEPLOY_PROJECT']
 destroy_project = os.environ['DESTROY_PROJECT']
 
+# helper functon to regularly poll CodeBuild project execution status until finished
+
 def wait_for_codebuild_completion(build_id):
     buildStatus = "IN_PROGRESS"
     while buildStatus == "IN_PROGRESS":
@@ -17,7 +19,13 @@ def wait_for_codebuild_completion(build_id):
         buildStatus = builds['builds'][0]['buildStatus']
     return buildStatus
 
+
+# Lambda handler
+
 def handler(event, context):
+    print("Function invoked with following parameters: ", event, context )
+
+
     if event['RequestType'] == 'Create':
         try:
             build = codebuild_client.start_build(projectName=deploy_project)
@@ -32,6 +40,8 @@ def handler(event, context):
         except Exception as e:
             print("Error when trying to start deploying: ", e)
             cfnresponse.send(event, context, cfnresponse.FAILED, {}, None, str(e))
+
+
     elif event['RequestType'] == 'Delete':
         try:
             print("Checking if CodeBuild 'deploy' project has already finished before we start to destroy it.")
@@ -51,6 +61,8 @@ def handler(event, context):
         except Exception as e:
             print("Error when trying to start destroying: ", e)
             cfnresponse.send(event, context, cfnresponse.FAILED, {}, event['PhysicalResourceId'], str(e))
+
+            
     else:
         print(f"RequestType {event['RequestType']} will be ignored.")
         cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
