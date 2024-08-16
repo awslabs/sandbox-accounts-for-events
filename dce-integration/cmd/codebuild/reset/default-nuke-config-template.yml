@@ -6,18 +6,21 @@ regions:
 {{range .Regions}}  - "{{.}}"
 {{end}}
 
-account-blacklist:
+account-blocklist:
   - "{{ .ParentAccountID}}" # Arbitrary production account id
 
 resource-types:
   excludes:
     - S3Object # Let the S3Bucket delete all Objects instead of individual objects (optimization)
+    - GuardDutyDetector # as it is part of the GuardDuty integration
+    - SecurityHub # same as GuardDuty
 
 accounts:
   "{{ .ID}}": # Child Account
     presets:
     - "sso"
     - "controltower"
+    - "lza"
     filters:
       IAMPolicy:
         # DCE resources
@@ -61,6 +64,10 @@ presets:
       IAMRolePolicyAttachment:
         - type: "glob"
           value: "AWSReservedSSO_*"
+      IAMRolePolicy:
+        - type: "glob"
+          value: "AWSReservedSSO_*"
+
   controltower:
     filters:
       CloudTrailTrail:
@@ -72,8 +79,14 @@ presets:
       EC2VPCEndpoint:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name
+          type: "contains"
+          value: "aws-controltower"
       EC2VPC:
         - type: "contains"
+          value: "aws-controltower"
+        - property: tag:Name
+          type: contains
           value: "aws-controltower"
       OpsWorksUserProfile:
         - type: "contains"
@@ -95,6 +108,9 @@ presets:
       EC2Subnet:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name
+          type: "contains"
+          value: "aws-controltower"
       ConfigServiceDeliveryChannel:
         - type: "contains"
           value: "aws-controltower"
@@ -107,11 +123,17 @@ presets:
       EC2RouteTable:
         - type: "contains"
           value: "aws-controltower"
+        - property: tag:Name 
+          type: "contains"
+          value: "aws-controltower"
       LambdaFunction:
         - type: "contains"
           value: "aws-controltower"
       EC2DHCPOption:
         - type: "contains"
+          value: "aws-controltower"
+        - property: tag:Name  
+          type: "contains"
           value: "aws-controltower"
       IAMRole:
         - type: "contains"
@@ -126,3 +148,177 @@ presets:
       IAMRolePolicy:
         - type: "contains"
           value: "aws-controltower"
+        - type: "contains"
+          value: "AWSControlTower"
+      ConfigServiceConfigRule:
+        - type: "contains"
+          value: "securityhub"
+
+  lza:
+    filters:
+      IAMRole:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      IAMPolicy:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      IAMRolePolicy:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - property: tag:role:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      IAMRolePolicyAttachment:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - property: tag:role:Accelerator
+          type: "contains"
+          value: "AWSAccelerator"
+      CloudWatchEventsRule:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      CloudWatchEventsTarget:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      SNSSubscription:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      KMSAlias:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      S3Bucket:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      KMSKey:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      AWSBackupVault:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      SNSTopic:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      ConfigServiceConfigRule:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      CloudWatchLogsLogGroup:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      LambdaFunction:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      CloudFormationStack:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
+      SSMParameter:
+        - type: "contains"
+          value: "AWSAccelerator"
+        - type: "contains"
+          value: "cdk-accel"
+        - type: "contains"
+          value: "aws-accelerator"
+        - property: tag:Accelerator  
+          type: "contains"
+          value: "AWSAccelerator"
