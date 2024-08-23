@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.2.0] - 2024-08-16
+### Added
+- added AWS LZA resources to template to be excluded from AWS Nuke cleanup (credits to @mavogel)
+
+### Fixed
+- changed web app build from Amplify CI/CD to CodeBuild to be able to remove CodeCommit dependency
+- updated npm packages to fix known vulnerabilities 
+
+### Removed
+- removed depcrecated service from SCP template (credits to @diranetafen)
+- removed LoggingBucket
+
+
 ## [1.1.3] - 2024-06-26
 ### Added
 - added new ServiceTimeout parameter to custom CloudFront resources to enforce faster fails on deployment issues
