@@ -5,9 +5,9 @@ import * as mutations from "../../graphql/mutations";
 let initialState = {
     id: "default",
     EVENT_MAX_DAYS: 90,
-    EVENT_MAX_ACCOUNTS: 50,
-    ACCOUNT_MAX_BUDGET: 1000,
-    EVENT_DEFAULT_LENGTH_DAYS: 0,
+    EVENT_MAX_ACCOUNTS: 100,
+    ACCOUNT_MAX_BUDGET: 100,
+    EVENT_DEFAULT_LENGTH_DAYS: 14,
     EVENT_DEFAULT_LENGTH_HOURS: 8,
     EVENT_DEFAULT_ACCOUNT_BUDGET: 10,
     EVENT_DEFAULT_ACCOUNTS: 5,
