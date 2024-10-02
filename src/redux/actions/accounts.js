@@ -1,7 +1,9 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
 import moment from "moment";
 import { autoDismiss } from "./notification";
+
+const client = generateClient();
 
 const initialState = {
     status: "idle",
@@ -82,8 +84,9 @@ const accounts = (state = initialState, action) => {
                 status: "idle",
                 items: state.items.concat(
                     action.payload
-                        .filter((promise) => promise.status === "fulfilled")
-                        .map((item) => convertItem(item.value))
+                        .filter((promise) => promise.status === "fulfilled" && !state.items.find((item) => item.id === promise.value.id))
+                        .map((item) => convertItem(item.value)
+                    )
                 )
             };
         case "accounts/loadFailed":
@@ -102,7 +105,7 @@ export const fetchAccounts =
     async (dispatch, getState) => {
         try {
             if (showStatus) dispatch({ type: "accounts/loading" });
-            const response = await API.graphql(graphqlOperation(queries.safeAdminApi, { action: "listAccounts" }));
+            const response = await client.graphql({ query: queries.safeAdminApi, variables: { action: "listAccounts" }});
             const payload = JSON.parse(response.data.safeAdminApi);
             let items = [];
             if (!payload || payload.status === "error") {
@@ -128,12 +131,12 @@ export const updateAccount =
     ({ id, accountStatus, adminRoleArn }) =>
     async (dispatch, getState) => {
         try {
-            const response = await API.graphql(
-                graphqlOperation(queries.safeAdminApi, {
+            const response = await client.graphql({ query: queries.safeAdminApi, 
+                variables: {
                     action: "updateAccount",
                     paramJson: JSON.stringify({ id, accountStatus, adminRoleArn })
-                })
-            );
+                }
+            });
             const payload = JSON.parse(response.data.safeAdminApi);
             if (!payload || payload.status === "error") {
                 throw payload;
@@ -164,13 +167,14 @@ export const removeAccounts = (items) => async (dispatch) => {
         }
         const response = await Promise.allSettled(
             items.map(({ id }) =>
-                API.graphql(
-                    graphqlOperation(queries.safeAdminApi, {
+                client.graphql({
+                     query: queries.safeAdminApi, 
+                     variables: {
                         action: "removeAccount",
                         paramJson: JSON.stringify({
                             id
                         })
-                    })
+                     }}
                 ).then((response) => {
                     const payload = JSON.parse(response.data.safeAdminApi);
                     if (!payload || payload.status === "error") {
@@ -238,15 +242,16 @@ export const registerAccounts =
                                     text: "Registering account " + id
                                 }
                             });
-                            API.graphql(
-                                graphqlOperation(queries.safeAdminApi, {
+                            client.graphql({
+                                query: queries.safeAdminApi, 
+                                variables: {
                                     action: "registerAccount",
                                     paramJson: JSON.stringify({
                                         id,
                                         roleName
                                     })
-                                })
-                            )
+                                }
+                            })
                                 .then((response) => {
                                     const payload = JSON.parse(response.data.safeAdminApi);
                                     if (!payload || payload.status === "error") {

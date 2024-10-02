@@ -4,5 +4,6 @@
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
 
-jest.setTimeout(60000)
 window.URL.createObjectURL = function() {};
+global.IS_REACT_ACT_ENVIRONMENT = true
+

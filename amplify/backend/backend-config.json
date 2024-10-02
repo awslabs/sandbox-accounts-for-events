@@ -16,7 +16,7 @@
             "Name"
           ],
           "category": "function",
-          "resourceName": "AdminQueries4757b5b2"
+          "resourceName": "AdminQueries67383b4c"
         }
       ],
       "providerPlugin": "awscloudformation",
@@ -42,6 +42,26 @@
     "safeafe5208f": {
       "customAuth": false,
       "dependsOn": [],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OFF",
+        "mfaTypes": [
+          "SMS"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyCharacters": [],
+          "passwordPolicyMinLength": 8
+        },
+        "signupAttributes": [
+          "EMAIL"
+        ],
+        "socialProviders": [],
+        "usernameAttributes": [
+          "EMAIL"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
       "providerPlugin": "awscloudformation",
       "service": "Cognito"
     },
@@ -92,7 +112,7 @@
     }
   },
   "function": {
-    "AdminQueries4757b5b2": {
+    "AdminQueries67383b4c": {
       "build": true,
       "dependsOn": [
         {
@@ -126,19 +146,19 @@
     }
   },
   "parameters": {
-    "AMPLIFY_function_AdminQueries4757b5b2_deploymentBucketName": {
+    "AMPLIFY_function_AdminQueries67383b4c_deploymentBucketName": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "AdminQueries4757b5b2"
+          "resourceName": "AdminQueries67383b4c"
         }
       ]
     },
-    "AMPLIFY_function_AdminQueries4757b5b2_s3Key": {
+    "AMPLIFY_function_AdminQueries67383b4c_s3Key": {
       "usedBy": [
         {
           "category": "function",
-          "resourceName": "AdminQueries4757b5b2"
+          "resourceName": "AdminQueries67383b4c"
         }
       ]
     },

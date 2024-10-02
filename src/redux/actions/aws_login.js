@@ -1,5 +1,7 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
+
+const client = generateClient();
 
 const initialState = {
     status: "hidden",
@@ -57,12 +59,13 @@ export const fetchAwsLoginUrl = (params) => async (dispatch) => {
     try {
         const loginType = params.id ? "getAwsLoginUrlForLease" : "getAwsLoginUrlForEvent";
         dispatch({ type: "aws_login/loading" });
-        const response = await API.graphql(
-            graphqlOperation(queries.safeLoginApi, {
+        const response = await client.graphql({
+            query: queries.safeLoginApi, 
+            variables: {
                 action: loginType,
                 paramJson: JSON.stringify(params)
-            })
-        );
+            }
+        });
         const payload = JSON.parse(response.data.safeLoginApi);
         if (!payload || payload.status === "error") {
             throw payload;
@@ -79,12 +82,13 @@ export const fetchAwsLoginUrl = (params) => async (dispatch) => {
 export const getEndUserEvent = (id) => async (dispatch) => {
     dispatch({ type: "aws_login/event_loading" });
     try {
-        const response = await API.graphql(
-            graphqlOperation(queries.safeLoginApi, {
+        const response = await client.graphql({
+            query: queries.safeLoginApi,
+            variables: {
                 action: "getEndUserEvent",
                 paramJson: JSON.stringify({id})
-            })
-        );
+            }
+        });
         const payload = JSON.parse(response.data.safeLoginApi);
         if (!payload || payload.status === "error") {
             throw payload;

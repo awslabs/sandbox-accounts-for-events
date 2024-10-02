@@ -1,5 +1,5 @@
-import { API } from "@aws-amplify/api";
-import { Auth } from "aws-amplify";
+import { get, post } from 'aws-amplify/api';
+import { fetchAuthSession } from 'aws-amplify/auth';
 import moment from "moment";
 import { autoDismiss } from "./notification";
 
@@ -84,56 +84,74 @@ export const fetchUsers =
             const existingUsers = getState().users;
             if (showStatus) dispatch({ type: "users/loading" });
             if (requiredUsers >= Number.MAX_SAFE_INTEGER) dispatch({ type: "users/loadingAll" });
-            const jwtToken = (await Auth.currentSession()).getAccessToken().getJwtToken();
+            const jwtToken = (await fetchAuthSession()).tokens.accessToken;
             let items = [];
             let nextToken = existingUsers.nextToken;
 
-            const response = await Promise.all([
-                API.get("AdminQueries", "/listUsers", {
-                    queryStringParameters: {
-                        limit: config.USER_LIST_BATCH_SIZE,
-                        token: requiredUsers > 0 ? nextToken : undefined
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
-                    }
-                }),
-                API.get("AdminQueries", "/listUsersInGroup", {
-                    queryStringParameters: {
-                        groupname: config.OPERATOR_GROUP,
-                        limit: config.USER_LIST_BATCH_SIZE
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
-                    }
-                }),
-                API.get("AdminQueries", "/listUsersInGroup", {
-                    queryStringParameters: {
-                        groupname: config.ADMIN_GROUP,
-                        limit: config.USER_LIST_BATCH_SIZE
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
-                    }
-                })
-            ]);
-            if (response && Array.isArray(response) && response.length === 3) {
-                nextToken = response[0].NextToken;
-                items = items.concat(response[0].Users);
-                while (nextToken && items.length < requiredUsers) {
-                    const nextResponse = await API.get("AdminQueries", "/listUsers", {
-                        queryStringParameters: {
+            const responseObjects = await Promise.all([
+                get({
+                    apiName: "AdminQueries", 
+                    path: "/listUsers", 
+                    options: {
+                        queryParams: {
                             limit: config.USER_LIST_BATCH_SIZE,
-                            token: nextToken
+                            ...( nextToken && requiredUsers > 0 && { token: nextToken }),
                         },
                         headers: {
                             "Content-Type": "application/json",
                             Authorization: jwtToken
                         }
-                    });
+                    }
+                }).response,
+                get({
+                    apiName: "AdminQueries", 
+                    path: "/listUsersInGroup",
+                    options: {
+                        queryParams: {
+                            groupname: config.OPERATOR_GROUP,
+                            limit: config.USER_LIST_BATCH_SIZE
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
+                    }
+                }).response,
+                get({
+                    apiName: "AdminQueries", 
+                    path: "/listUsersInGroup", 
+                    options: {
+                        queryParams: {
+                            groupname: config.ADMIN_GROUP,
+                            limit: config.USER_LIST_BATCH_SIZE
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
+                    }
+                }).response
+            ]);
+            const response = await Promise.all(responseObjects.map(element => element.body.json()))
+            if (response && Array.isArray(response) && response.length === 3) {
+                nextToken = response[0].NextToken;
+                items = items.concat(response[0].Users);
+                while (nextToken && items.length < requiredUsers) {
+                    const nextResponseObject = await get({
+                        apiName: "AdminQueries", 
+                        path: "/listUsers", 
+                        options: {
+                            queryParams: {
+                                limit: config.USER_LIST_BATCH_SIZE,
+                                token: nextToken
+                            },
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: jwtToken
+                            }
+                        }
+                    }).response;
+                    const nextResponse = await nextResponseObject.body.json();
                     items = items.concat(nextResponse.Users);
                     nextToken = nextResponse.NextToken;
                 }
@@ -172,27 +190,35 @@ export const updateUser =
         }
         try {
             const config = getState().config;
-            const jwtToken = (await Auth.currentSession()).getAccessToken().getJwtToken();
+            const jwtToken = (await fetchAuthSession()).tokens.accessToken;
 
             await Promise.all([
-                API.post("AdminQueries", isOperator ? "/addUserToGroup" : "/removeUserFromGroup", {
-                    body: {
-                        username: id,
-                        groupname: config.OPERATOR_GROUP
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
+                post({
+                    apiName: "AdminQueries", 
+                    path: isOperator ? "/addUserToGroup" : "/removeUserFromGroup", 
+                    options: {
+                        body: {
+                            username: id,
+                            groupname: config.OPERATOR_GROUP
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
                     }
                 }),
-                API.post("AdminQueries", isAdmin ? "/addUserToGroup" : "/removeUserFromGroup", {
-                    body: {
-                        username: id,
-                        groupname: config.ADMIN_GROUP
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
+                post({
+                    apiName: "AdminQueries", 
+                    path: isAdmin ? "/addUserToGroup" : "/removeUserFromGroup", 
+                    options: {
+                        body: {
+                            username: id,
+                            groupname: config.ADMIN_GROUP
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
                     }
                 })
             ]);
@@ -213,18 +239,22 @@ export const deleteUsers = (items) => async (dispatch, getState) => {
         return;
     }
     try {
-        const jwtToken = (await Auth.currentSession()).getAccessToken().getJwtToken();
+        const jwtToken = (await fetchAuthSession()).tokens.accessToken;
         const response = await Promise.allSettled(
             items.map(({ id }) =>
-                API.post("AdminQueries", "/deleteUser", {
-                    body: {
-                        username: id
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
+                post({
+                    apiName: "AdminQueries", 
+                    path: "/deleteUser", 
+                    options: {
+                        body: {
+                            username: id
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
                     }
-                }).then(() => ({ id }))
+                }).response.then(() => ({ id }))
             )
         );
         dispatch({ type: "users/delete", payload: response });
@@ -265,43 +295,56 @@ export const createUser =
     async (dispatch, getState) => {
         try {
             const config = getState().config;
-            const jwtToken = (await Auth.currentSession()).getAccessToken().getJwtToken();
-            const response = await API.post("AdminQueries", "/createUser", {
-                body: {
-                    username: email
-                },
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: jwtToken
+            const jwtToken = (await fetchAuthSession()).tokens.accessToken;
+            const responseObject = await post({
+                apiName: "AdminQueries", 
+                path: "/createUser", 
+                options:{
+                    body: {
+                        username: email
+                    },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: jwtToken
+                    }
                 }
-            });
+            }).response;
+            const response = await responseObject.body.json();
 
             const promises = [];
             if (isOperator)
                 promises.push(
-                    API.post("AdminQueries", "/addUserToGroup", {
-                        body: {
-                            username: email,
-                            groupname: config.OPERATOR_GROUP
-                        },
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: jwtToken
+                    post({
+                        apiName: "AdminQueries", 
+                        path: "/addUserToGroup", 
+                        options: {
+                            body: {
+                                username: email,
+                                groupname: config.OPERATOR_GROUP
+                            },
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: jwtToken
+                            }
                         }
-                    })
+                    }).response
                 );
             if (isAdmin)
                 promises.push(
-                    API.post("AdminQueries", "/addUserToGroup", {
-                        body: {
-                            username: email,
-                            groupname: config.ADMIN_GROUP
-                        },
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: jwtToken
+                    post({
+                        apiName: "AdminQueries", 
+                        path: "/addUserToGroup", 
+                        options: {
+                            body: {
+                                username: email,
+                                groupname: config.ADMIN_GROUP
+                            },
+                            headers: {
+                                "Content-Type": "application/json",
+                                Authorization: jwtToken
+                            }
                         }
-                    })
+                    }).response
                 );
             await Promise.all(promises);
             dispatch({

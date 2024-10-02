@@ -61,10 +61,10 @@ phases:
       - npm run build
 
       # upload Amplify frontend config file to S3 in case we want to connect local development
-      - aws s3 cp src/aws-exports.js s3://$DEPLOYMENT_BUCKET/aws-exports.js
+      - aws s3 cp src/amplifyconfiguration.json s3://$DEPLOYMENT_BUCKET/amplifyconfiguration.json || true
       
       # run frontend unit tests
-      - npm test -- --watchAll=false
+      - npm test -- run
 
       # zipping up the build artifacts
       - cd build

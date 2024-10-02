@@ -1,11 +1,14 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
+import { get, post } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
 import * as mutations from "../../graphql/mutations";
 import moment from "moment";
-import { Auth } from "aws-amplify";
+import { fetchAuthSession } from 'aws-amplify/auth';
 import { nanoid } from "nanoid";
 import { autoDismiss } from "./notification";
 import { fetchLeases } from "./leases";
+
+const client = generateClient();
 
 const initialState = {
     status: "idle",
@@ -81,7 +84,7 @@ const events = (state = initialState, action) => {
                               ...state.item,
                               ...action.payload
                           })
-                        : undefined
+                        : state.item
             };
         case "event/delete":
             return {
@@ -112,7 +115,10 @@ const events = (state = initialState, action) => {
 export const fetchEndUserEvent = (id) => async (dispatch, getState) => {
     try {
         dispatch({ type: "event/loading" });
-        const response = await API.graphql(graphqlOperation(queries.getEvent, { id }));
+        const response = await client.graphql({
+            query: queries.getEvent, 
+            variables: { id }
+        });
         const payload = response.data.getEvent;
         if (payload === null) {
             dispatch({
@@ -145,8 +151,8 @@ export const fetchEvent =
                 dispatch({ type: "leases/loading" });
             }
             const response = await Promise.all([
-                API.graphql(graphqlOperation(queries.getEvent, { id })),
-                API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" }))
+                client.graphql({ query: queries.getEvent, variables: { id }}),
+                client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases" }})
             ]);
             const payload = JSON.parse(response[1].data.safeOperatorApi);
             let leaseItems = [];
@@ -195,8 +201,8 @@ export const fetchEvents =
                 dispatch({ type: "leases/loading" });
             }
             const response = await Promise.all([
-                API.graphql(graphqlOperation(queries.listEvents, { limit: 1000 })),
-                API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" }))
+                client.graphql({ query: queries.listEvents, variables: { limit: 1000 }}),
+                client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases" }})
             ]);
             const payload = JSON.parse(response[1].data.safeOperatorApi);
             let leaseItems = [];
@@ -239,8 +245,9 @@ export const updateEvent = (item) => async (dispatch, getState) => {
             return;
         }
         const config = getState().config;
-        await API.graphql(
-            graphqlOperation(mutations.updateEvent, {
+        await client.graphql({
+            query: mutations.updateEvent, 
+            variables: {
                 input: {
                     id: item.id,
                     eventName: item.eventName,
@@ -252,8 +259,8 @@ export const updateEvent = (item) => async (dispatch, getState) => {
                     eventDays: parseInt(item.eventDays),
                     eventHours: parseInt(item.eventHours)
                 }
-            })
-        );
+            }
+        });
         dispatch({ type: "event/updated", payload: item, config });
         if (!item.overwriteEventBudget && !item.overwriteEventDays) {
             dispatch(
@@ -265,7 +272,7 @@ export const updateEvent = (item) => async (dispatch, getState) => {
             return;
         }
 
-        let response = await API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" }));
+        let response = await client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases" }});
         const payload = JSON.parse(response.data.safeOperatorApi);
         if (!payload || payload.status !== "success") {
             throw payload;
@@ -276,7 +283,10 @@ export const updateEvent = (item) => async (dispatch, getState) => {
 
         response = await Promise.allSettled(
             leases.map((lease) => {
-                let newLease = lease;
+                let newLease = {
+                    ...lease,
+                    user: lease.budgetNotificationEmails[0]
+                };
                 if (lease.leaseStatus === "Inactive") return null;
                 if (item.overwriteEventDays)
                     newLease.expiresOn = moment
@@ -285,12 +295,13 @@ export const updateEvent = (item) => async (dispatch, getState) => {
                         .add(item.eventHours, "hours")
                         .unix();
                 if (item.overwriteEventBudget) newLease.budgetAmount = parseInt(item.eventBudget);
-                return API.graphql(
-                    graphqlOperation(queries.safeOperatorApi, {
+                return client.graphql({
+                    query: queries.safeOperatorApi,
+                    variables: {
                         action: "updateLease",
                         paramJson: JSON.stringify(newLease)
-                    })
-                );
+                    }
+                });
             })
         );
         let rejectedPromises = response.filter((promise) => promise.status === "rejected");
@@ -330,48 +341,58 @@ export const deleteEvent =
                 dispatch({ type: "notification/error", message: "Can only delete events in 'Terminated' state." });
                 return;
             }
-            const jwtToken = (await Auth.currentSession()).getAccessToken().getJwtToken();
+            const jwtToken = (await fetchAuthSession()).tokens.accessToken;
 
             const config = getState().config;
             dispatch({ type: "notification/inProgress", message: 'Deleting event "' + eventName + '"...' });
 
-            const mainResponse = await Promise.all([
-                API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" })),
-                API.get("AdminQueries", "/listUsersInGroup", {
-                    queryStringParameters: {
-                        groupname: config.OPERATOR_GROUP,
-                        limit: config.USER_LIST_BATCH_SIZE
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
+            const mainResponsesObject = await Promise.all([
+                client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases" }}),
+                get({
+                    apiName: "AdminQueries", 
+                    path: "/listUsersInGroup", 
+                    options: {
+                        queryParams: {
+                            groupname: config.OPERATOR_GROUP,
+                            limit: config.USER_LIST_BATCH_SIZE
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
                     }
-                }),
-                API.get("AdminQueries", "/listUsersInGroup", {
-                    queryStringParameters: {
-                        groupname: config.ADMIN_GROUP,
-                        limit: config.USER_LIST_BATCH_SIZE
-                    },
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: jwtToken
+                }).response,
+                get({
+                    apiName: "AdminQueries", 
+                    path: "/listUsersInGroup", 
+                    options: {
+                        queryParams: {
+                            groupname: config.ADMIN_GROUP,
+                            limit: config.USER_LIST_BATCH_SIZE
+                        },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: jwtToken
+                        }
                     }
-                })
+                }).response
             ]);
-            const payload = JSON.parse(mainResponse[0].data.safeOperatorApi);
+            const payloadLeases = JSON.parse(mainResponsesObject[0].data.safeOperatorApi);
+            const payloadOperators =await mainResponsesObject[1].body.json()
+            const payloadAdmins = await mainResponsesObject[2].body.json()
 
-            if (!payload || payload.status !== "success") {
-                throw payload;
+            if (!payloadLeases || payloadLeases.status !== "success") {
+                throw payloadLeases;
             }
-            const leases = payload.body.leases;
+            const leases = payloadLeases.body.leases;
             const otherEventUsers = leases
                 .filter((lease) => lease.principalId.substring(0, config.EVENT_ID_LENGTH) !== id)
                 .map((lease) => lease.budgetNotificationEmails[0]);
 
-            const keepUsers = mainResponse[1].Users.map(
+            const keepUsers = payloadOperators.Users.map(
                 (operator) => operator.Attributes.find((attribute) => attribute.Name === "email").Value
             ).concat(
-                mainResponse[2].Users.map(
+                payloadAdmins.Users.map(
                     (admin) => admin.Attributes.find((attribute) => attribute.Name === "email").Value
                 )
             );
@@ -387,16 +408,17 @@ export const deleteEvent =
                         new Promise((resolve) => {
                             if (lease.leaseStatus === "Active") {
                                 resolve(
-                                    API.graphql(
-                                        graphqlOperation(queries.safeOperatorApi, {
+                                    client.graphql({
+                                        query: queries.safeOperatorApi, 
+                                        variables: {
                                             action: "terminateLease",
                                             paramJson: JSON.stringify({
                                                 principalId: lease.principalId,
                                                 accountId: lease.accountId,
                                                 user: lease.budgetNotificationEmails[0]
                                             })
-                                        })
-                                    ).then((terminateResponse) => {
+                                        }
+                                    }).then((terminateResponse) => {
                                         const payload = JSON.parse(terminateResponse.data.safeOperatorApi);
                                         if (!payload || payload.status === "error") {
                                             throw payload;
@@ -408,16 +430,17 @@ export const deleteEvent =
                             }
                         })
                             .then(() => {
-                                API.graphql(
-                                    graphqlOperation(queries.safeOperatorApi, {
+                                client.graphql({
+                                    query: queries.safeOperatorApi, 
+                                    variables: {
                                         action: "deleteLease",
                                         paramJson: JSON.stringify({
                                             principalId: lease.principalId,
                                             accountId: lease.accountId,
                                             user: lease.budgetNotificationEmails[0]
                                         })
-                                    })
-                                )
+                                    }
+                                })
                                     .then((deleteResponse) => {
                                         const payload = JSON.parse(deleteResponse.data.safeOperatorApi);
                                         if (!payload || payload.status === "error") throw payload;
@@ -425,15 +448,19 @@ export const deleteEvent =
                                             !keepUsers.some((user) => user === lease.budgetNotificationEmails[0]) &&
                                             !otherEventUsers.some((user) => user === lease.budgetNotificationEmails[0])
                                         ) {
-                                            API.post("AdminQueries", "/deleteUser", {
-                                                body: {
-                                                    username: lease.budgetNotificationEmails[0]
-                                                },
-                                                headers: {
-                                                    "Content-Type": "application/json",
-                                                    Authorization: jwtToken
+                                            post({
+                                                apiName: "AdminQueries", 
+                                                path: "/deleteUser", 
+                                                options: {
+                                                    body: {
+                                                        username: lease.budgetNotificationEmails[0]
+                                                    },
+                                                    headers: {
+                                                        "Content-Type": "application/json",
+                                                        Authorization: jwtToken
+                                                    }
                                                 }
-                                            }).catch(() => deleteUserErrors++);
+                                            }).response.catch(() => deleteUserErrors++);
                                         }
                                     })
                                     .catch(() => deleteLeaseErrors++);
@@ -448,7 +475,7 @@ export const deleteEvent =
                 if (deleteUserErrors > 0) errorText = "Failed to delete " + deleteUserErrors + " users.";
                 throw new Error(errorText);
             }
-            await API.graphql(graphqlOperation(mutations.deleteEvent, { input: { id } }))
+            await client.graphql({ query: mutations.deleteEvent, variables: { input: { id } }})
                 .then(() => {
                     dispatch({ type: "event/delete", payload: { id } });
                     dispatch(
@@ -478,7 +505,7 @@ export const terminateEvent = (item) => async (dispatch, getState) => {
         const config = getState().config;
         dispatch({ type: "notification/inProgress", message: 'Terminating event "' + item.eventName + '"...' });
 
-        const response = await API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases" }));
+        const response = await client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases" }});
         const payload = JSON.parse(response.data.safeOperatorApi);
 
         if (!payload || payload.status !== "success") {
@@ -494,16 +521,17 @@ export const terminateEvent = (item) => async (dispatch, getState) => {
                     new Promise((resolve) => {
                         if (lease.leaseStatus === "Active") {
                             resolve(
-                                API.graphql(
-                                    graphqlOperation(queries.safeOperatorApi, {
+                                client.graphql({
+                                    query: queries.safeOperatorApi,
+                                    variables: {
                                         action: "terminateLease",
                                         paramJson: JSON.stringify({
                                             principalId: lease.principalId,
                                             accountId: lease.accountId,
                                             user: lease.budgetNotificationEmails[0]
                                         })
-                                    })
-                                ).then((terminateResponse) => {
+                                    }
+                                }).then((terminateResponse) => {
                                     const payload = JSON.parse(terminateResponse.data.safeOperatorApi);
                                     if (!payload || payload.status === "error") {
                                         throw payload;
@@ -529,16 +557,17 @@ export const terminateEvent = (item) => async (dispatch, getState) => {
             return;
         }
         let duration = moment.duration(moment().add(1, "h").diff(moment.unix(item.eventOn)));
-        await API.graphql(
-            graphqlOperation(mutations.updateEvent, {
+        await client.graphql({
+            query: mutations.updateEvent, 
+            variables: {
                 input: {
                     id: item.id,
                     eventDays: duration.days(),
                     eventHours: duration.hours(),
                     eventStatus: "Terminated"
                 }
-            })
-        )
+            }
+        })
             .then(() => {
                 dispatch({ type: "event/updated", payload: { ...item, eventStatus: "Terminated" }, config });
                 dispatch(
@@ -560,8 +589,9 @@ export const createEvent =
     async (dispatch, getState) => {
         try {
             const config = getState().config;
-            const response = await API.graphql(
-                graphqlOperation(mutations.createEvent, {
+            const response = await client.graphql({
+                query: mutations.createEvent,
+                variables: {
                     input: {
                         id: nanoid(config.EVENT_ID_LENGTH).replace(/[_-]/g, "x"),
                         eventName,
@@ -573,8 +603,8 @@ export const createEvent =
                         eventOn,
                         eventStatus
                     }
-                })
-            );
+                }
+            });
             dispatch({ type: "event/create", payload: response.data.createEvent, config });
             dispatch(
                 autoDismiss({
@@ -595,15 +625,16 @@ export const startEvent = (item) => async (dispatch, getState) => {
             return;
         }
         const config = getState().config;
-        await API.graphql(
-            graphqlOperation(mutations.updateEvent, {
+        await client.graphql({
+            query: mutations.updateEvent, 
+            variables: {
                 input: {
                     id: item.id,
                     eventStatus: "Running",
                     eventOn: moment().unix()
                 }
-            })
-        );
+            }
+        });
         dispatch({ type: "event/updated", payload: { ...item, eventStatus: "Running" }, config });
         dispatch(
             autoDismiss({

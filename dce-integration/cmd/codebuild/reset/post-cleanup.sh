@@ -18,6 +18,6 @@ export AWS_SECRET_ACCESS_KEY=$y
 export AWS_SESSION_TOKEN=$z
 
 # re-create the default VPCs that have been removed by AWS Nuke before
-echo "Creating defaut VPCs in us-east-1 and us-west-2 in account $RESET_ACCOUNT"
+echo "Creating default VPCs in us-east-1 and us-west-2 in account $RESET_ACCOUNT"
 aws ec2 create-default-vpc --region us-east-1
 aws ec2 create-default-vpc --region us-west-2

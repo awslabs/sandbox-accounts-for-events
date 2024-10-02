@@ -366,5 +366,5 @@
       }
     }
   },
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.7.1\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}"
+  "Description": "{\"createdOn\":\"Linux\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.7.1\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}"
 }

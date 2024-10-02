@@ -1,6 +1,4 @@
-import { createStore, applyMiddleware } from "redux";
-import thunkMiddleware from "redux-thunk";
-import { combineReducers } from "redux";
+import { configureStore } from '@reduxjs/toolkit'
 
 import current_user from "./actions/current_user";
 import aws_login from "./actions/aws_login";
@@ -16,8 +14,8 @@ import statistics from "./actions/statistics";
 import selection from "./actions/selection";
 import modal from "./actions/modal";
 
-const store = createStore(
-    combineReducers({
+const store = configureStore({
+    reducer: {
         current_user,
         accounts,
         events,
@@ -31,8 +29,7 @@ const store = createStore(
         logs,
         selection,
         modal
-    }),
-    applyMiddleware(thunkMiddleware)
-);
+    }
+});
 
 export default store;

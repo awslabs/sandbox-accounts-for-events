@@ -3,17 +3,17 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      golang: 1.18
+      golang: 1.20
 
     commands:
       # Download and install TerraForm 
-      - wget https://releases.hashicorp.com/terraform/0.12.31/terraform_0.12.31_linux_amd64.zip
-      - unzip terraform_0.12.31_linux_amd64.zip -d /usr/bin/
+      - wget https://releases.hashicorp.com/terraform/0.13.7/terraform_0.13.7_linux_amd64.zip
+      - unzip terraform_0.13.7_linux_amd64.zip -d /usr/bin/
 
   pre_build:
     commands:
       # Download original DCE(TM) project from GitHub
-      - git clone --depth 1 --branch v0.34.1 https://github.com/Optum/dce.git
+      - git clone --depth 1 --branch v0.38.0 https://github.com/Optum/dce.git
 
       # Update/overwrite some files with "Sandbox Accounts for Events"-specific versions:
       # Let AWS Nuke ignore/skip deletion of OrganizationAccountAccess role
@@ -36,12 +36,6 @@ phases:
 
       # Use improved IAM policy template for principal to avoid conflicts between policy and SCPs 
       - cp dce-integration/modules/fixtures/policies/principal_policy.tmpl dce/modules/fixtures/policies/principal_policy.tmpl
-
-      # Replace Go1.x Lambda runtime (deprecated) with AmazonLinux2
-      - sed -i 's/"go1.x"/"provided.al2"/g' dce/modules/lambda/lambda.tf
-      - sed -i 's/= var.handler/= "bootstrap"/g' dce/modules/lambda/lambda.tf
-      - sed -i 's|go build -v -o ../../../bin/lambda/$mod_name$|go build -v -o ../../../bin/lambda/bootstrap|g' dce/scripts/build.sh
-      - sed -i 's|^\s*bin/lambda/$mod_name$|      bin/lambda/bootstrap|g' dce/scripts/build.sh
 
   build:
     commands:

@@ -1,16 +1,11 @@
-import { ProgressBar } from "@cloudscape-design/components";
-
 const createItem = ({ header, type, content, hasProgressBar, progressPercent, loading, hasAction }) => {
     return {
         visible: true,
         type,
         loading,
         header: header ?? (type ? type.toUpperCase() : undefined),
-        content: hasProgressBar ? (
-            <ProgressBar value={progressPercent ?? 0} additionalInfo={content} variant="flash" />
-        ) : (
-            content
-        ),
+        hasProgressBar,
+        content,
         dismissible: true,
         dismissLabel: "Dismiss message",
         hasAction

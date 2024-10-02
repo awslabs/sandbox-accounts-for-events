@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.0] - 2024-10-02
+### Added
+- added vitest package for unit tests
+
+### Fixed
+- fixed: registering new AWS accounts occasionally createding duplicate entries
+- fixed: edit event dialog could cause occasional page crash
+- fixed: existing leases did not update on event update with activated overwrite checkbox
+- updated Amplify CLI to v6
+- updated DCE version to v0.38.0 to include latest AWS Nuke version
+- updated various npm packages to latest stable version to fix known vulnerabilities
+
+
 ## [1.2.0] - 2024-08-16
 ### Added
 - added AWS LZA resources to template to be excluded from AWS Nuke cleanup (credits to @mavogel)
@@ -11,7 +24,7 @@ All notable changes to this project will be documented in this file.
 - updated npm packages to fix known vulnerabilities 
 
 ### Removed
-- removed depcrecated service from SCP template (credits to @diranetafen)
+- removed deprecated service from SCP template (credits to @diranetafen)
 - removed LoggingBucket
 
 

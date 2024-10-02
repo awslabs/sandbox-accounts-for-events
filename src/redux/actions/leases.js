@@ -1,7 +1,9 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
 import moment from "moment";
 import { autoDismiss } from "./notification";
+
+const client = generateClient();
 
 const initialState = {
     status: "idle",
@@ -108,7 +110,7 @@ export const fetchLeases =
             let items = [];
             let nextToken = null;
             do {
-                const response = await API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "listLeases", nextToken }));
+                const response = await client.graphql({ query: queries.safeOperatorApi, variables: { action: "listLeases", nextToken }});
                 const payload = JSON.parse(response.data.safeOperatorApi);
                 if (!payload || payload.status === "error") {
                     throw payload;
@@ -140,8 +142,9 @@ export const updateLease =
     }) =>
     async (dispatch, getState) => {
         try {
-            const response = await API.graphql(
-                graphqlOperation(queries.safeOperatorApi, {
+            const response = await client.graphql({
+                query: queries.safeOperatorApi, 
+                variables: {
                     action: "updateLease",
                     paramJson: JSON.stringify({
                         leaseStatus,
@@ -153,8 +156,8 @@ export const updateLease =
                         accountId,
                         user
                     })
-                })
-            );
+                }
+            });
             const payload = JSON.parse(response.data.safeOperatorApi);
             if (!payload || payload.status === "error") {
                 throw payload;
@@ -195,16 +198,17 @@ export const deleteLease =
                 return;
             }
 
-            await API.graphql(
-                graphqlOperation(queries.safeOperatorApi, {
+            await client.graphql({
+                query: queries.safeOperatorApi, 
+                variables: {
                     action: "deleteLease",
                     paramJson: JSON.stringify({
                         principalId,
                         accountId,
                         user
                     })
-                })
-            ).then((response) => {
+                }
+            }).then((response) => {
                 const payload = JSON.parse(response.data.safeOperatorApi);
                 if (!payload || payload.status === "error") {
                     throw payload;
@@ -231,16 +235,17 @@ export const terminateLeases = (items) => async (dispatch) => {
         }
         const response = await Promise.allSettled(
             items.map(({ principalId, accountId, user }) =>
-                API.graphql(
-                    graphqlOperation(queries.safeOperatorApi, {
+                client.graphql({
+                    query: queries.safeOperatorApi,
+                    variables: {
                         action: "terminateLease",
                         paramJson: JSON.stringify({
                             principalId,
                             accountId,
                             user
                         })
-                    })
-                ).then((response) => {
+                    }
+                }).then((response) => {
                     const payload = JSON.parse(response.data.safeOperatorApi);
                     if (!payload || payload.status === "error") {
                         throw payload;
@@ -284,8 +289,9 @@ export const createLease =
     async (dispatch, getState) => {
         try {
             const config = getState().config;
-            const response = await API.graphql(
-                graphqlOperation(queries.safeOperatorApi, {
+            const response = await client.graphql({
+                query: queries.safeOperatorApi, 
+                variables: {
                     action: "createLease",
                     paramJson: JSON.stringify({
                         budgetAmount: parseInt(budgetAmount),
@@ -295,8 +301,8 @@ export const createLease =
                         user,
                         budgetCurrency: "USD"
                     })
-                })
-            ).then((response) => {
+                }
+            }).then((response) => {
                 const payload = JSON.parse(response.data.safeOperatorApi);
                 if (!payload || payload.status === "error") {
                     throw payload;

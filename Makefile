@@ -42,7 +42,7 @@ build:
 	rm -f build-cfn/*
 
 # create build artifacts (= zip files) for CloudFormation deployment
-	zip -FSr build-cfn/sandbox-accounts-for-events.zip . -x amplify/#current-cloud-backend/\* build/\* build-cfn/\* \*dist/\* \*.DS_Store\* \*.vscode/\* \*.git/\* src/aws-exports.json\* \*amplify-meta.json\* amplify/team-provider-info.json\* \*awscloudformation\* \*node_modules\* amplify/.config/local-\*
+	zip -FSr build-cfn/sandbox-accounts-for-events.zip . -x amplify/#current-cloud-backend/\* build/\* build-cfn/\* \*dist/\* \*.DS_Store\* \*.vscode/\* \*.git/\* src/aws-exports.json\* src/amplifyconfiguration.json\* \*amplify-meta.json\* amplify/team-provider-info.json\* \*awscloudformation\* \*node_modules\* amplify/.config/local-\*
 	cd install/cfn-lambda/dceHandleTerraFormDeployment && zip -FSr ../../../build-cfn/sandbox-accounts-for-events-lambda-terraform.zip . && cd -
 	cd install/cfn-lambda/dceHandleAmplifyDeployment && zip -FSr ../../../build-cfn/sandbox-accounts-for-events-lambda-amplify.zip . && cd -
 

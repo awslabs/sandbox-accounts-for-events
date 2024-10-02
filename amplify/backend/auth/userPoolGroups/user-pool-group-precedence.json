@@ -1,10 +1,10 @@
 [
-    {
-        "groupName": "admin",
-        "precedence": 1
-    },
-    {
-        "groupName": "operator",
-        "precedence": 2
-    }
+  {
+    "groupName": "admin",
+    "precedence": 1
+  },
+  {
+    "groupName": "operator",
+    "precedence": 2
+  }
 ]

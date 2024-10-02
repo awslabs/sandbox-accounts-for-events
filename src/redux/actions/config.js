@@ -1,6 +1,8 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
 import * as mutations from "../../graphql/mutations";
+
+const client = generateClient();
 
 let initialState = {
     id: "default",
@@ -54,7 +56,7 @@ const config = (state = initialState, action) => {
 
 export const fetchConfig = () => async (dispatch) => {
     try {
-        const response = await API.graphql(graphqlOperation(queries.listConfigs));
+        const response = await client.graphql({ query: queries.listConfigs });
         const configItems = response.data.listConfigs.items;
         if (configItems.length > 0) dispatch({ type: "config/loaded", payload: JSON.parse(configItems[0].config) });
         else console.warn("No data found in SAfE configuration database, using default settings");
@@ -73,9 +75,9 @@ export const updateConfig = (config) => async (dispatch, getState) => {
             })
         };
         try {
-            await API.graphql(graphqlOperation(mutations.updateConfig, { input }));
+            await client.graphql({ query: mutations.updateConfig, variables: { input }});
         } catch {
-            await API.graphql(graphqlOperation(mutations.createConfig, { input }));
+            await client.graphql({ query: mutations.createConfig, variables: { input }});
         }
         dispatch({ type: "config/updated", payload: config });
         dispatch({ type: "notification/success", message: "Successfully updated configuration settings." });

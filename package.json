@@ -1,33 +1,30 @@
 {
   "name": "sandbox-accounts-for-events",
-  "version": "0.1.0",
+  "version": "1.3.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-react": "^4.6.4",
-    "@cloudscape-design/components": "^3.0.312",
-    "@cloudscape-design/design-tokens": "^3.0.15",
-    "@cloudscape-design/global-styles": "^1.0.10",
-    "@reduxjs/toolkit": "^1.9.5",
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.4.3",
-    "aws-amplify": "^5.3.12",
-    "aws4": "^1.12.0",
-    "moment": "^2.29.4",
-    "nanoid": "^4.0.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-markdown": "^8.0.7",
-    "react-redux": "^8.1.0",
-    "react-router-dom": "^6.13.0",
-    "redux": "^4.2.1",
-    "redux-thunk": "^2.4.2",
-    "sass": "^1.63.4"
+    "@aws-amplify/ui-react": "^6.5.1",
+    "@cloudscape-design/components": "^3.0.772",
+    "@cloudscape-design/design-tokens": "^3.0.44",
+    "@cloudscape-design/global-styles": "^1.0.32",
+    "@reduxjs/toolkit": "^2.2.7",
+    "@testing-library/jest-dom": "^6.5.0",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "aws-amplify": "^6.6.2",
+    "moment": "^2.30.1",
+    "nanoid": "^5.0.7",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "react-redux": "^9.1.2",
+    "react-router-dom": "^6.26.2",
+    "redux": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --transformIgnorePatterns \"node_modules/(?!your-module-name)/\"",
+    "test": "vitest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -49,13 +46,12 @@
     ]
   },
   "devDependencies": {
-    "react-error-overlay": "6.0.11",
+    "@vitejs/plugin-react": "^4.3.1",
+    "jsdom": "^25.0.1",
+    "react-error-overlay": "^6.0.11",
     "react-scripts": "^5.0.1",
-    "react-test-renderer": "^18.2.0"
-  },
-  "jest": {
-    "moduleNameMapper": {
-      "^.*/ui-react/styles.css$": "<rootDir>/src/test-css.js"
-    }
+    "react-test-renderer": "^18.3.1",
+    "vite": "^5.4.8",
+    "vitest": "^2.1.1"
   }
 }

@@ -1,6 +1,8 @@
-import { API, graphqlOperation } from "@aws-amplify/api";
+import { generateClient } from 'aws-amplify/api';
 import * as queries from "../../graphql/queries";
 import moment from "moment";
+
+const client = generateClient();
 
 const initialState = {
     status: "idle",
@@ -57,8 +59,8 @@ export const fetchStatistics = (dateRange) => async (dispatch) => {
         dispatch({ type: "statistics/loading" });
 
         const response = await Promise.all([
-            API.graphql(graphqlOperation(queries.listEvents)),
-            API.graphql(graphqlOperation(queries.safeOperatorApi, { action: "getStatistics" }))
+            client.graphql({ query: queries.listEvents }),
+            client.graphql({ query: queries.safeOperatorApi, variables: { action: "getStatistics" }})
         ]);
         const payload = JSON.parse(response[1].data.safeOperatorApi);
         if (!payload || payload.status === "error") {
