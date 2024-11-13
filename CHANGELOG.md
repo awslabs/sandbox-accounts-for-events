@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 
+## [1.3.1] - 2024-11-13
+### Fixed
+- fixed: RegisterAccount dialog now also allows IAM roles with "/" paths
+- fixed: Added "OSPackage" to AWS Nuke-excluded resources to avoid failures on trying to delete AWS-managed packages
+
 ## [1.3.0] - 2024-10-02
 ### Added
 - added vitest package for unit tests

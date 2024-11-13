@@ -49,7 +49,7 @@ const RegisterAccountsModal = () => {
             errors.ACCOUNTS = "Invalid account ID list.";
         }
 
-        if ((newValue.roleName.length !== 0) && !/^[\w+=,.@-]{1,64}$/.test(newValue.roleName)) {
+        if ((newValue.roleName.length !== 0) && !/^[\/\w+=,.@-]{1,64}$/.test(newValue.roleName)) {
             errors.ROLE = "Invalid role name.";
         }
 

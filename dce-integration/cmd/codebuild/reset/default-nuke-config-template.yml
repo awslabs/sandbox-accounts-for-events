@@ -14,6 +14,7 @@ resource-types:
     - S3Object # Let the S3Bucket delete all Objects instead of individual objects (optimization)
     - GuardDutyDetector # as it is part of the GuardDuty integration
     - SecurityHub # same as GuardDuty
+    - OSPackage # to avoid running into non-nukeable AWS-managed packages
 
 accounts:
   "{{ .ID}}": # Child Account
