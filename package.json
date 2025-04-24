@@ -52,6 +52,6 @@
     "react-scripts": "^5.0.1",
     "react-test-renderer": "^18.3.1",
     "vite": "^5.4.14",
-    "vitest": "^2.1.1"
+    "vitest": "^2.1.9"
   }
 }
