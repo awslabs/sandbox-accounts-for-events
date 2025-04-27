@@ -1,6 +1,6 @@
 # Children Accounts
 
-*Sandbox Accounts for Events* is a solution to **manage** AWS accounts, but not to create or delete/close them. To be able to add AWS accounts to your account pool (see chapter [Admin documentation](admin.md) on how to register accounts), you need to prepare these upfront.
+_Sandbox Accounts for Events_ is a solution to **manage** AWS accounts, but not to create or delete/close them. To be able to add AWS accounts to your account pool (see chapter [Admin documentation](admin.md) on how to register accounts), you need to prepare these upfront.
 
 But before we start, let's spend a few minutes to understand the possible architectures.
 
@@ -30,17 +30,17 @@ We recommend to build the following structure:
             └──...
 ```
 
-Note that even that you have organized the Children accounts in a substructure, they still need to bo registered with *Sandbox Accounts for Events*. See chapter "Preparing AWS accounts" below to learn how to prepare and add them to the pool.
+Note that even that you have organized the Children accounts in a substructure, they still need to bo registered with _Sandbox Accounts for Events_. See chapter "Preparing AWS accounts" below to learn how to prepare and add them to the pool.
 
 ### Using Service Control Policies (SCPs) in AWS Organizations to limit user permissions
 
-SCPs are a great centralized way to apply permission boundaries to a set of accounts. We recommend creating an SCP specifically for the children accounts and limit the permissions to specific AWS regions (Sandbox Accounts for Events defaults to "use-east1-" and "us-west-2", more details below) and a subset of AWS services that AWS Nuke can successfully clean up automatically.  
+SCPs are a great centralized way to apply permission boundaries to a set of accounts. We recommend creating an SCP specifically for the children accounts and limit the permissions to specific AWS regions (Sandbox Accounts for Events defaults to "use-east1-" and "us-west-2", more details below) and a subset of AWS services that AWS Nuke can successfully clean up automatically.
 
-You can find a recommended SCP policy in the "template" folder of this project: [children-scp.json](../templates/children-scp.json)
+You can find a recommended SCP policy in the "template" folder of this project: [children-scp.json](../templates/children-scp.json). In case you do not want to deploy to the default AWS region "us-east-1", you will need to adjust this SCP to allow your desired region(s).
 
 ## Alternative: Flat architecture without hierarchy
 
-As mentioned, *Sandbox Accounts for Events* does not rely on any account hierarchy to be in place. Any AWS account can be added to the account pool, as long as the backend can successfully assume a role there with "AdministratorAccess" policy attached.  
+As mentioned, _Sandbox Accounts for Events_ does not rely on any account hierarchy to be in place. Any AWS account can be added to the account pool, as long as the backend can successfully assume a role there with "AdministratorAccess" policy attached.  
 Choose this solution if you are not able to set up a new or use an existing AWS Organization for your purposes.
 
 Keep in mind that in this case you will not be able to apply centrally managed AWS Service Control Policies (SCPs) to your account pool, so you need to limit permissions via the principal role policy template.
@@ -49,7 +49,7 @@ Keep in mind that in this case you will not be able to apply centrally managed A
 
 In this case the user permissions are limited by the Principal Policy Template, which is applied to each user when claiming a lease and logging into an AWS account.
 
-**By default, *Sandbox Accounts for Events* is pre-configured for a deployment within AWS Organizations as described in the chapters above. To avoid conflicts between SCPs and the Principal Policy Template, the default Principal Policy Template does not sufficiently limit resources without an SCP being in place. Make sure to overwrite the default policy of this project in _/dce-integration/modules/fixtures/policies/principal_policy.tmpl_**
+**By default, _Sandbox Accounts for Events_ is pre-configured for a deployment within AWS Organizations as described in the chapters above. To avoid conflicts between SCPs and the Principal Policy Template, the default Principal Policy Template does not sufficiently limit resources without an SCP being in place. Make sure to overwrite the default policy of this project in _/dce-integration/modules/fixtures/policies/principal_policy.tmpl_**
 
 You can find a recommended Principal Policy config for a "flat" account architecture in the "template" folder of this project: [principal_policy.tmpl](../templates/principal_policy.tmpl)
 
@@ -57,10 +57,10 @@ You can find a recommended Principal Policy config for a "flat" account architec
 
 Any AWS account needs to fulfill two requirements to be added to the account pool:
 
-* [Create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-custom.html) in each of your children accounts and attach the managed IAM policy "AdministratorAccess" to it. Make sure to give it an identical role name if you want to add all AWS accounts in one batch (default role name is "DCEAdmin").
+-   [Create an IAM role](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-custom.html) in each of your children accounts and attach the managed IAM policy "AdministratorAccess" to it. Make sure to give it an identical role name if you want to add all AWS accounts in one batch (default role name is "DCEAdmin").
 
-* [Add a trust policy](https://aws.amazon.com/blogs/security/how-to-use-trust-policies-with-iam-roles/) to the role, allowing the master account to assume this role.  
-    The IAM trust policy should look like:
+-   [Add a trust policy](https://aws.amazon.com/blogs/security/how-to-use-trust-policies-with-iam-roles/) to the role, allowing the master account to assume this role.  
+     The IAM trust policy should look like:
     ```json
     {
         "Version": "2012-10-17",
@@ -75,7 +75,7 @@ Any AWS account needs to fulfill two requirements to be added to the account poo
             }
         ]
     }
-    ```  
+    ```
     Substitute the "XXXXXXXXXXXX" part with the AWS account ID of your **master account** (where you have deployed Sandbox Accounts for Events), **not** the AWS account ID of your children accounts. If you open the "Register account(s)" dialog in the Sandbox Accounts for Events "Manage acounts" webpage, you can directly copy & paste the correct IAM trust policy from there.
 
 Advanced AWS users working with AWS Organizations may also want to look into [CloudFormation StackSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-concepts.html) to deploy an IAM role into multiple accounts simultaneously.
@@ -89,7 +89,7 @@ DCE creates an AWS CodeBuild project that is executed regularly (default: every 
 
 Note that AWS Nuke is a third party Open Source tool, not an AWS project. AWS Nuke cannot reliably delete all resources, therefore we highly recommend using SCPs or Principal Policy Templates to limit user permissions as described in the account architecture service above. These permission limits should only allow services that can reliably be "nuked" to avoid continuing costs after terminating a lease.
 
-To support AWS Nuke in the cleanup process, *Sandbox Accounts for Events* has implemented three additional shell scripts, which are executed before, during and after cleanup. You can find the scripts in the _/dce-integration/cmd/codebuild/reset/_ folder of this project.
+To support AWS Nuke in the cleanup process, _Sandbox Accounts for Events_ has implemented three additional shell scripts, which are executed before, during and after cleanup. You can find the scripts in the _/dce-integration/cmd/codebuild/reset/_ folder of this project.
 
 ### pre-cleanup.sh
 
@@ -105,7 +105,7 @@ This script is executed **after** an AWS Nuke execution has successfully termina
 
 # Changing the default AWS regions for Sandbox Accounts for Events
 
-By default, Sandbox Accounts for Events is deployed in the "us-east-1" region. Additionally, the SCPs, Principal Policies and AWS Nuke are configured to permit and clean user actions in "us-east-1" and "us-west-2" only, following best practices of the majority of publicly available AWS workshops. 
+By default, Sandbox Accounts for Events is deployed in the "us-east-1" region. Additionally, the SCPs, Principal Policies and AWS Nuke are configured to permit and clean user actions in "us-east-1" and "us-west-2" only, following best practices of the majority of publicly available AWS workshops.
 
 _Note 1: We recommend to limit the allowed AWS regions for your users to a minimum of 1-2 regions only. The more AWS regions you allow, the more regions need to be checked and cleaned by AWS Nuke on each execution, increasing AWS Nuke execution time and costs._
 _Note 2: In the interest of a smooth experience for your users, only choose regions where your required AWS services are available._
@@ -114,14 +114,12 @@ _Note 2: In the interest of a smooth experience for your users, only choose regi
 
 If you need to change your AWS region, you need to adjust the following resources:
 
-* /Makefile: Either use the command line argument "region=[your_desired_region]" for the make commands, or change the value of "region" to the desired AWS region (default = "us-east-1") directly in the Makefile 
-* /dce-integration/modules/dce.tfvars: Change parameter "aws_region" to the desired AWS region (default = "us-east-1")
+-   /Makefile: Either use the command line argument "region=[your_desired_region]" for the make commands, or change the value of "region" to the desired AWS region (default = "us-east-1") directly in the Makefile
+-   /dce-integration/modules/dce.tfvars: Change parameter "aws_region" to the desired AWS region (default = "us-east-1")
 
 ### Sandbox Accounts for Events region permissions for end users
 
 If you need to change the allowed AWS region(s) for your users, you need to adjust the following resources:
 
-* /dce-integration/modules/dce.tfvars: Change parameter "allowed_regions" to an array of the allowed AWS region(s) (default = "["us-east-1","us-west-2"])
-* /dce-integration/cmd/codebuild/reset/post-cleanup.sh: Adjust the "aws ec2 create-default-vpc --profile ..." lines to your desired AWS region(s) (one line per region). Defaults are "aws ec2 create-default-vpc --region us-east-1" and "aws ec2 create-default-vpc --region us-west-2"
-
-
+-   /dce-integration/modules/dce.tfvars: Change parameter "allowed_regions" to an array of the allowed AWS region(s) (default = "["us-east-1","us-west-2"])
+-   /dce-integration/cmd/codebuild/reset/post-cleanup.sh: Adjust the "aws ec2 create-default-vpc --profile ..." lines to your desired AWS region(s) (one line per region). Defaults are "aws ec2 create-default-vpc --region us-east-1" and "aws ec2 create-default-vpc --region us-west-2"

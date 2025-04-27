@@ -53,7 +53,7 @@ echo "### EventBridge Rules ###"
 dce_resources=$(aws events list-rules --query 'Rules[?contains(Name, `dce`) == `true`].Name' --output text $profile_string)
 for dce_resource in $dce_resources; do
     dce_subresources=$(aws events list-targets-by-rule --rule $dce_resource --query 'Targets[?contains(Id, `dce`) == `true`].Id' --output text $profile_string)
-    echo "aa$dce_subresources"
+    echo "deleting rule: $dce_subresources"
     for dce_subresource in $dce_subresources; do
         echo "deleting Eventbridge rule target: $dce_subresource"
         aws events remove-targets --rule $dce_resource --ids $dce_subresource $profile_string

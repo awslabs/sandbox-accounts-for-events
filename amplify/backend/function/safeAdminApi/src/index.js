@@ -90,7 +90,16 @@ const registerAccount = ({ id, roleName }) => {
         return respondWithError("Internal error while trying to register account.", "Parameter 'roleName' missing.");
     if (!id) return respondWithError("Internal error while trying to register account.", "Parameter 'id' missing.");
 
-    const roleArn = "arn:aws:iam::" + id + ":role/" + roleName;
+    let rolePathIndex = roleName.lastIndexOf("/")
+    let roleParams
+    let roleArn
+    if (rolePathIndex === -1) {
+        roleParams = { RoleName: roleName }
+        roleArn = "arn:aws:iam::" + id + ":role/" + roleName
+    } else {
+        roleParams = { RoleName: roleName.substring(rolePathIndex + 1) }
+        roleArn = "arn:aws:iam::" + id + ":role" + roleName
+    }
 
     return stsClient
         .send(new AssumeRoleCommand({
@@ -107,7 +116,7 @@ const registerAccount = ({ id, roleName }) => {
                 }
             });
             return iamClient
-                .send(new ListAttachedRolePoliciesCommand({ RoleName: roleName }))
+                .send(new ListAttachedRolePoliciesCommand(roleParams))
                 .then((policies) => {
                     if (!policies.AttachedPolicies.find((item) => item.PolicyName === "AdministratorAccess"))
                         return respondWithError(
@@ -115,8 +124,7 @@ const registerAccount = ({ id, roleName }) => {
                                 roleName +
                                 " in account " +
                                 id +
-                                ".",
-                            error
+                                "."
                         );
                     return iamClient
                         .send(new ListAccountAliasesCommand({}))

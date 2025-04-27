@@ -50,7 +50,7 @@ const accounts = (state = initialState, action) => {
                     "            },\n" +
                     '            "Action": "sts:AssumeRole",\n' +
                     '            "Condition": {}\n' +
-                    "        },\n" +
+                    "        }\n" +
                     "    ]\n" +
                     "}"
             };
