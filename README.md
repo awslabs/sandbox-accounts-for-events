@@ -1,3 +1,9 @@
+> **IMPORTANT NOTE**
+>
+> In May 2025, AWS has published a new solution called [Innovation Sandbox on AWS](https://docs.aws.amazon.com/solutions/latest/innovation-sandbox-on-aws), covering most of the functionality of this project in a more robust and enterprise-grade way. It also includes additional features, such as lease approvals and lease templates.
+> If you are looking for a way how to provide multiple AWS Sandbox Accounts to your internal teams or long-term classes, [Innovation Sandbox on AWS](https://docs.aws.amazon.com/solutions/latest/innovation-sandbox-on-aws) is likely the better and more future-proof way going forward.
+> If you are looking for a way to provide multiple AWS Sandbox Accounts quickly to a number of previously unknown users (like one-day workshops with external attendees) who can quickly sign up and sign in, the "Innovation Sandbox on AWS" might not be the best choice (yet), as authenticaion is possible via IAM Identity Center only. For these case, this "Sandbox Accounts for Events" project should be a better fit at this point in time.
+
 # Sandbox Accounts for Events
 
 _Sandbox Accounts for Events_ allows to provide multiple, temporary AWS accounts to a number of authenticated users simultaneously via a browser-based GUI. It uses the concept of "leases" to create temporary access tickets and allows to define expiration periods as well as maximum budget spend per leased AWS account.
